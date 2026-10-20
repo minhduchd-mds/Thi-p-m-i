@@ -1,5 +1,19 @@
 # Hỷ Studio · Thiệp cưới web tương tác
 
+## Cổng chào 3D và sảnh chức năng — v1.3 (20/10/2026)
+
+Phiên bản này bổ sung giao diện chào Hỷ Studio theo ý tưởng hai cánh cửa gỗ chạm khắc, mỗi cánh có ô trên/ô dưới, mở **quanh bản lề bằng CSS 3D `rotateY`** trong 1,55 giây. Đây là hiệu ứng phối cảnh 3D chạy trong trình duyệt, **chưa phải mô hình mesh/WebGL vật lý**. Khi chọn giảm chuyển động trong hệ điều hành, hiệu ứng được bỏ qua.
+
+Sau cửa là sảnh với bốn hướng đi:
+- **Thư viện mẫu thiệp:** duyệt ba mẫu đã có (Hồng Hỷ, Ngọc Uyển, Hoa Vân), chọn mẫu rồi chuyển thẳng tới trình chỉnh sửa.
+- **Thiết kế thiệp mới:** vào màn hình biên tập hiện hữu; giữ tính năng xem trước, lưu, chia sẻ.
+- **Thư viện nhạc:** chuyển tới tab Nhạc nền thật trong trình chỉnh sửa; nghe thử nhạc, chọn bài/tải MP3 vẫn giữ nguyên.
+- **Quản lý thiệp:** liệt kê tối đa 15 liên kết chỉnh sửa có quyền trên **chính trình duyệt đang dùng**, tải thông tin hiện thời từ API; không phải danh sách tài khoản, không đồng bộ thiết bị, không có đăng nhập.
+
+Khách mở đường dẫn `/?card=<id>` hoặc người tạo mở `/?edit=<id>` **không nhìn thấy cổng chào**, được chuyển thẳng tới nội dung thiệp tương ứng. Truy cập lại trong cùng phiên sẽ mở thẳng sảnh, tránh xem lại chuyển động không cần thiết. Có nút bỏ qua hiệu ứng, nút trở về sảnh và điều hướng bằng bàn phím. Cổng chào không tự phát nhạc.
+
+Các file mới: `public/hy-gateway.css`, `public/hy-gateway.js`, `test-gateway.js`. Lệnh `npm run check` kiểm tra cú pháp JS và hợp đồng tích hợp, còn `npm run test:api` kiểm tra API. **Vẫn cần kiểm chứng trực quan, thao tác chạm và chuyển động trên trình duyệt/thiết bị thật** trước khi phát hành. Toàn bộ thay đổi chỉ là frontend; logic API, TTL 30 ngày và RSVP không thay đổi.
+
 ## Bản cập nhật 1.2 — Music Library (16/10/2026)
 
 Tập trung cải thiện nhạc nền của Hỷ Studio v1.1:
