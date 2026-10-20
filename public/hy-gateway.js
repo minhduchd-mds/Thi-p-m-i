@@ -246,7 +246,7 @@
   });
   gateway.querySelectorAll('[data-hy-theme]').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelector('[data-theme="' + btn.dataset.hyTheme + '"]')?.click();
+      document.querySelector('button.template[data-theme="' + btn.dataset.hyTheme + '"]')?.click();
       gotoEditor('templates');
     });
   });
