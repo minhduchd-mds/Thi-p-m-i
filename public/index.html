@@ -26,8 +26,51 @@
 @media(max-width:410px){.player-settings{grid-template-columns:1fr}.music-header{align-items:start}}
 .music-credit{display:block;margin:25px auto 0;text-align:center;font-size:10px;line-height:1.8;color:var(--card-accent);max-width:255px;text-decoration:underline;text-underline-offset:3px}
 </style>
+<link rel="stylesheet" href="/hy-gateway.css">
 </head>
 <body>
+<section id="hy-gateway" class="hy-gateway" data-state="closed" role="dialog" aria-modal="true" aria-label="Sảnh chào Hỷ Studio" hidden>
+  <button id="hy-skip" class="hy-skip" type="button">Bỏ qua hiệu ứng →</button>
+  <div class="hy-stage">
+    <div class="hy-portico">
+      <span class="hy-lantern left" aria-hidden="true"></span><span class="hy-lantern right" aria-hidden="true"></span>
+      <div class="hy-plate" aria-label="Hỷ Studio - Thiệp cưới tương tác"><strong>Hỷ Studio</strong><span>THIỆP CƯỚI TƯƠNG TÁC</span></div>
+      <div class="hy-courtyard" aria-hidden="true"><div class="hy-arch"></div></div>
+      <div class="hy-front" aria-hidden="true">
+        <div class="hy-door hy-door--left"><div class="hy-door__upper"></div><div class="hy-door__lower"></div><span class="hy-ring"></span></div>
+        <div class="hy-door hy-door--right"><div class="hy-door__upper"></div><div class="hy-door__lower"></div><span class="hy-ring"></span></div>
+      </div>
+      <div class="hy-opening"><p>Hai cánh cửa mở, một hành trình yêu thương bắt đầu.</p><button type="button" id="hy-enter" class="hy-enter">✧ Mở cửa bước vào</button></div>
+      <section id="hy-page-hall" class="hy-page hy-page--hall" aria-labelledby="hy-hall-heading">
+        <span class="hy-overline">Chào mừng đến với Hỷ Studio</span>
+        <h1 id="hy-hall-heading">Nơi câu chuyện tình yêu bắt đầu</h1>
+        <p>Chọn một không gian để sáng tạo thiệp cưới mang dấu ấn riêng của hai bạn.</p>
+        <div class="hy-actions">
+          <button class="hy-action" type="button" data-hy-action="templates"><span class="hy-action__icon" aria-hidden="true">▣</span><strong>Thư viện mẫu thiệp</strong><small>3 phong cách</small></button>
+          <button class="hy-action" type="button" data-hy-action="design"><span class="hy-action__icon" aria-hidden="true">✎</span><strong>Thiết kế thiệp mới</strong><small>Nội dung & ảnh</small></button>
+          <button class="hy-action" type="button" data-hy-action="music"><span class="hy-action__icon" aria-hidden="true">♫</span><strong>Thư viện nhạc</strong><small>Nghe & chọn bài</small></button>
+          <button class="hy-action" type="button" data-hy-action="manage"><span class="hy-action__icon" aria-hidden="true">♡</span><strong>Quản lý thiệp</strong><small>Thiệp trên thiết bị</small></button>
+        </div>
+      </section>
+      <section id="hy-page-library" class="hy-page" aria-labelledby="hy-library-heading" hidden>
+        <button class="hy-back" type="button" data-hy-back>← Trở về sảnh chính</button>
+        <span class="hy-overline">Bộ sưu tập thiệp cưới</span><h2 id="hy-library-heading">Thư viện mẫu thiệp</h2>
+        <p>Ba mẫu đang có trong trình thiết kế. Chọn để bắt đầu tùy chỉnh thiệp ngay.</p>
+        <div class="hy-collection">
+          <article class="hy-template-card" data-theme="red"><div class="hy-template-visual" aria-hidden="true"><span>囍</span></div><h3>Hồng Hỷ</h3><p>Đỏ son · Ánh kim · Cổ điển trang trọng.</p><button type="button" data-hy-theme="red">Dùng mẫu này →</button></article>
+          <article class="hy-template-card" data-theme="jade"><div class="hy-template-visual" aria-hidden="true"><span>囍</span></div><h3>Ngọc Uyển</h3><p>Xanh ngọc · Kem · Nhẹ nhàng thanh lịch.</p><button type="button" data-hy-theme="jade">Dùng mẫu này →</button></article>
+          <article class="hy-template-card" data-theme="pink"><div class="hy-template-visual" aria-hidden="true"><span>囍</span></div><h3>Hoa Vân</h3><p>Hồng phấn · Đất · Lãng mạn tinh tế.</p><button type="button" data-hy-theme="pink">Dùng mẫu này →</button></article>
+        </div>
+      </section>
+      <section id="hy-page-manager" class="hy-page" aria-labelledby="hy-manager-heading" hidden>
+        <button class="hy-back" type="button" data-hy-back>← Trở về sảnh chính</button>
+        <span class="hy-overline">Bản nháp & liên kết</span><h2 id="hy-manager-heading">Thiệp đã tạo</h2>
+        <p id="hy-owned-note">Xem lại các thiệp đã lưu và mở đường dẫn chỉnh sửa trên trình duyệt này.</p>
+        <div class="hy-manage-list" id="hy-owned-list" aria-live="polite"></div>
+      </section>
+    </div>
+  </div>
+</section>
 <div class="page-shell" id="app">
 <header class="topbar"><a class="brand" href="/" aria-label="Hỷ Studio"><div class="brand-mark">囍</div><div><div class="brand-title">Hỷ Studio</div><small class="brand-en">WEDDING STORY</small></div></a><nav class="top-links" aria-label="Điều hướng"><a href="#mau-thiep">Mẫu thiệp</a><a href="#chinh-sua">Tùy chỉnh</a><a href="#trai-nghiem">Tính năng</a></nav><div class="top-spacer"></div><div class="top-tag">Tình yêu của bạn, dấu ấn của riêng bạn ♡</div><button class="primary editor-only" id="save-top">Lưu & lấy liên kết ↗</button></header>
 <section class="intro"><div><div class="eyebrow">WEDDING INVITATION EXPERIENCE</div><h1>Viết nên câu chuyện <span style="color:var(--red)">chung đôi.</span></h1><p>Tạo thiệp cưới tương tác lấy cảm hứng Tân Trung Hoa · Hoa văn tinh tế · Nhạc nền tự chọn.</p></div><div class="pill">✦ Lưu tối đa 30 ngày kể từ ngày tạo</div></section>
@@ -203,4 +246,5 @@ $('save-top').addEventListener('click',saveCard);$('save-card').addEventListener
 (async()=>{loadDraft();await loadCardFromUrl();setMusic();refreshFilter();refresh();})();
 })();
 </script>
+<script src="/hy-gateway.js" defer></script>
 </body></html>
