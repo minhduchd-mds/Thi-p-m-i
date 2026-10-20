@@ -93,3 +93,183 @@ body.hy-intro-active{overflow:hidden}
 .hy-sound:hover{background:#6c3928}
 .hy-sound[aria-pressed="true"]{background:#f5d9a9;color:#4b291a;border-color:#f5d9a9}
 @media(max-width:560px){.hy-sound{top:9px;left:10px;padding:8px 10px;min-height:33px;font-size:10px}}
+
+
+/* v1.4: Faithful visual reconstruction of the approved Hy Studio gate concept.
+   Cinematic full-width courtyard, timber doors, green/pink/gold invitation lobby. */
+.hy-gateway{
+  background:#29150f url('/hy-courtyard.svg') center center/cover no-repeat;
+  color:#fff1db;
+}
+.hy-gateway:before{background:linear-gradient(180deg,#1a0b064d 0%,#1d0f0830 28%,transparent 45%,#230e0933 100%);z-index:0}
+.hy-stage{inset:0;display:block;padding:0;perspective:1700px;overflow:hidden}
+.hy-stage:after{display:none}
+.hy-portico{
+  position:absolute;inset:0;width:100%;height:100%;min-height:0;
+  border:0;box-shadow:none;background:transparent;transform-style:preserve-3d;
+}
+.hy-portico:before{
+  z-index:7;top:0;left:-2%;right:-2%;width:104%;height:clamp(65px,12vh,119px);
+  background:
+    linear-gradient(180deg,#291814 0%,transparent 70%),
+    repeating-radial-gradient(ellipse at 50% -100%,transparent 0 24px,#9a796066 25px 28px,transparent 29px 56px),
+    repeating-linear-gradient(90deg,#231712 0 34px,#9c775b 35px 39px,#38241c 40px 69px);
+  border-bottom:8px solid #502c1e;border-radius:0;
+  box-shadow:0 16px 25px #210d0bbd,0 6px 0 #bf885899;
+}
+.hy-portico:after{
+  z-index:5;top:clamp(65px,12vh,119px);bottom:0;left:2.3%;right:2.3%;
+  border:0;border-left:clamp(15px,3.1vw,43px) ridge #6b3b25;
+  border-right:clamp(15px,3.1vw,43px) ridge #6b3b25;
+  box-shadow:inset 14px 0 21px #17090570,inset -14px 0 21px #17090570;pointer-events:none
+}
+.hy-courtyard{
+  inset:0;display:block;overflow:hidden;
+  background:#674632 url('/hy-courtyard.svg') center center/cover no-repeat;
+}
+.hy-courtyard:before,.hy-courtyard:after{content:none}
+.hy-arch{display:none}
+.hy-plate{
+  z-index:8;top:21%;width:min(510px,50%);padding:16px 18px 14px;
+  transform:translate(-50%,-50%);
+  border:2px solid #d6a263;border-radius:4px;
+  background:linear-gradient(120deg,#241009e8,#6b341ce9 50%,#32150eea);
+  box-shadow:0 16px 24px #1b0907a8,inset 0 0 0 5px #3b2116,inset 0 0 0 7px #c18b51;
+  transition:top 1.15s ease,transform 1.15s ease;
+}
+.hy-plate strong{font-family:'Dancing Script','Playfair Display',Georgia,serif;font-style:normal;font-weight:700;font-size:clamp(31px,4.8vw,72px);line-height:1.25;text-shadow:0 2px 6px #220e0b,0 0 18px #ecc08347}
+.hy-plate span{font-size:clamp(8px,.78vw,12px);font-weight:600;letter-spacing:3px}
+.hy-gateway[data-state="hall"] .hy-plate{
+  top:9.4%;transform:translate(-50%,-25%);
+  padding:8px 14px 6px;width:min(385px,42%);
+}
+.hy-gateway[data-state="hall"] .hy-plate strong{font-size:clamp(25px,3vw,43px)}
+.hy-gateway[data-state="hall"] .hy-plate span{font-size:9px;letter-spacing:2px}
+.hy-lantern{
+  z-index:7;top:12%;width:clamp(32px,4vw,54px);height:clamp(65px,10vh,106px);
+  background:radial-gradient(ellipse,#fff1c3 4%,#f9c084 62%,#aa4e2a 100%);
+  border:4px solid #64301f;box-shadow:0 0 44px #ffbf5c99,0 0 70px #ffb2635e;
+}
+.hy-lantern.left{left:7%}.hy-lantern.right{right:7%}
+.hy-front{z-index:6;inset:0;pointer-events:none;transform-style:preserve-3d}
+.hy-door{
+  top:clamp(74px,13.6vh,134px);bottom:clamp(35px,6vh,70px);
+  width:43%;min-height:0;padding:4% 3%;
+  border:clamp(7px,.9vw,12px) ridge #8d512e;border-radius:3px;
+  background-color:#3b1d13;
+  box-shadow:0 20px 45px #140907bb, inset 0 0 0 4px #d3a168,inset 0 0 0 10px #3b1d14;
+  gap:2.8%;justify-content:center;
+  transition:transform 1.75s cubic-bezier(.14,.65,.12,1),opacity 1.6s;
+}
+.hy-door--left{left:7%;transform-origin:0 50%;background-image:repeating-linear-gradient(90deg,#24100c18 0 8px,#e5a56f0a 9px 12px),linear-gradient(100deg,#28120c,#79452b 28%,#4b2518 70%,#a05d36)}
+.hy-door--right{right:7%;transform-origin:100% 50%;background-image:repeating-linear-gradient(90deg,#24100c18 0 8px,#e5a56f0a 9px 12px),linear-gradient(100deg,#a05d36,#4b2518 30%,#79452b 72%,#28120c)}
+.hy-door__upper,.hy-door__lower{
+  border:clamp(3px,.5vw,7px) ridge #bc8451;
+  box-shadow:inset 0 0 0 4px #2a130d,inset 0 0 0 7px #bd8550,0 2px 8px #1c0c097f;
+  background:
+    radial-gradient(ellipse at center,#8d503052 0 17%,transparent 18% 45%,#9b582b4b 46% 48%,transparent 49%),
+    repeating-linear-gradient(45deg,transparent 0 25px,#b8783970 25px 27px,transparent 28px 50px),
+    repeating-linear-gradient(-45deg,transparent 0 25px,#b8783959 25px 27px,transparent 28px 50px),
+    linear-gradient(125deg,#25130e,#764026 49%,#361710);
+}
+.hy-door__upper{flex:1.55}
+.hy-door__lower{flex:.73}
+.hy-door__upper:before{font-size:clamp(65px,7.5vw,140px);color:#dbaa70;text-shadow:0 3px 4px #170b09,0 0 16px #d4ae6150}
+.hy-door__lower:before{font-size:clamp(48px,6vw,99px);color:#c9985f}
+.hy-door__upper:after,.hy-door__lower:after{inset:9px;border:2px solid #dab47b84;box-shadow:inset 0 0 0 7px #34190e90}
+.hy-door:after{inset:4px;border:1px solid #e0b27aa6}
+.hy-ring{z-index:6;top:56%;width:clamp(23px,3vw,44px);height:clamp(23px,3vw,44px);border:7px ridge #e1bc79;background:#56311f;box-shadow:0 5px 6px #150c09a8}
+.hy-door--left .hy-ring{right:12px}.hy-door--right .hy-ring{left:12px}
+.hy-gateway[data-state="opening"] .hy-door--left,.hy-gateway[data-state="hall"] .hy-door--left{transform:rotateY(-116deg)}
+.hy-gateway[data-state="opening"] .hy-door--right,.hy-gateway[data-state="hall"] .hy-door--right{transform:rotateY(116deg)}
+.hy-gateway[data-state="hall"] .hy-door{opacity:.98}
+.hy-door:before{width:25px}
+.hy-opening{bottom:13%;width:min(720px,90%);z-index:9;padding:14px 16px 18px}
+.hy-opening:before{content:'';z-index:-1;position:absolute;inset:-6px -15px;border-radius:25px;background:linear-gradient(90deg,transparent,#240f0bb2 18% 82%,transparent);filter:blur(8px)}
+.hy-opening p{font-size:clamp(13px,1.15vw,17px);line-height:1.8;color:#ffebd0;font-weight:600;letter-spacing:.3px}
+.hy-enter{font-size:13px;min-height:53px;padding:0 28px;border:2px solid #f3cca0;background:linear-gradient(120deg,#fce7b8,#e6ae70);color:#53271e;box-shadow:0 9px 24px #1a0706a0,0 0 21px #fbd28a78}
+.hy-skip,.hy-sound{top:24px;z-index:11;background:#29160fbf;border-color:#f2d2a1;color:#fff0d8;min-height:42px}
+.hy-skip{right:3%}.hy-sound{left:3%}
+.hy-page{z-index:5;inset:0;overflow-y:auto;max-height:100dvh;padding:clamp(100px,24vh,235px) 6% 50px;background:transparent}
+.hy-page--hall{background:linear-gradient(180deg,#24120b0b 0%,#1a0c0644 32%,#220f0778 76%,#180a08b0)}
+.hy-page--hall .hy-overline{color:#fff0cf;text-shadow:0 2px 8px #120707}
+.hy-page--hall h1{font-family:'Noto Serif',Georgia,serif;font-size:clamp(26px,2.65vw,40px);color:#fff1d4;max-width:760px;margin:8px auto 10px;text-shadow:0 5px 12px #1d0909e0}
+.hy-page--hall p{font-size:13px;max-width:650px;text-shadow:0 2px 8px #160a09}
+.hy-actions{max-width:840px;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:32px auto 0}
+.hy-action{min-height:196px;gap:12px;padding:18px 10px;border-radius:17px;background:#f9eee5ef;border:2px solid #f5d6bb;color:#432b25;box-shadow:0 12px 28px #14070683,0 0 0 2px #ffffff18;backdrop-filter:blur(12px);transition:transform .24s ease,box-shadow .24s ease}
+.hy-action:nth-child(1){background:linear-gradient(150deg,#ffe3dfef,#fff4eff2);border-color:#ffb9b2}
+.hy-action:nth-child(2){background:linear-gradient(150deg,#fff0d6ef,#fffaf0f2);border-color:#efd0a0}
+.hy-action:nth-child(3){background:linear-gradient(150deg,#e2f0f8ef,#f3f9fff0);border-color:#adc6d8}
+.hy-action:nth-child(4){background:linear-gradient(150deg,#e7f3e8ef,#f7fff9f0);border-color:#b4d6b4}
+.hy-action__icon{height:67px;width:67px;border-radius:17px;font-size:37px;background:#a63f3930;color:#a04541}
+.hy-action:nth-child(2) .hy-action__icon{background:#dba96b36;color:#a66b32}
+.hy-action:nth-child(3) .hy-action__icon{background:#a0c0d858;color:#416f8c}
+.hy-action:nth-child(4) .hy-action__icon{background:#a6d0a151;color:#4d7551}
+.hy-action strong{font-size:15px;line-height:1.42;color:#382620}
+.hy-action small{font-size:11px;color:#846f65}
+.hy-action:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 22px 38px #1e0c098f}
+.hy-page:not(.hy-page--hall){z-index:9;inset:clamp(90px,15vh,150px) max(14px,8vw) clamp(16px,6vh,70px);max-height:none;overflow-y:auto;padding:26px 28px 35px;border-radius:26px;background:linear-gradient(140deg,#fff9f4f7,#f8eae1f4);box-shadow:0 20px 60px #16070491;color:#412b22}
+.hy-page:not(.hy-page--hall) h2{color:#6b2e28;font-size:clamp(26px,2.8vw,38px);margin:8px 0}
+.hy-page:not(.hy-page--hall) p{color:#815f54;font-size:13px}
+.hy-page:not(.hy-page--hall) .hy-overline{color:#a04b40}
+.hy-page:not(.hy-page--hall) .hy-back{background:#fffdf8;color:#7e4232;border-color:#dbbca7;font-weight:700}
+.hy-collection{max-width:950px;gap:16px}
+.hy-template-card{box-shadow:0 8px 22px #99584316;border-color:#e9c9b4;background:#fff;border-radius:18px}
+.hy-template-visual{height:clamp(165px,19vw,245px);border:6px double #dfb68d;border-radius:11px;box-shadow:inset 0 0 0 8px #ffffff3b}
+.hy-template-visual:after{content:'THIỆP MỜI\A Wedding Invitation';white-space:pre;text-align:center;position:absolute;bottom:17px;left:10%;right:10%;font:italic clamp(11px,1.3vw,17px)/1.6 'Noto Serif',serif;opacity:.9}
+.hy-template-visual span{font-size:clamp(45px,5vw,75px);transform:translateY(-15px)}
+.hy-template-card h3{font-size:20px}
+.hy-template-card p{font-size:12px!important}
+.hy-template-card button{font-size:12px;padding:12px;background:#9b3f42}
+@media(max-width:850px){
+ .hy-plate{width:min(420px,55%);top:21%}
+ .hy-page--hall{padding-top:27vh}
+ .hy-actions{max-width:490px;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+ .hy-action{min-height:139px;gap:6px;padding:10px}
+ .hy-action__icon{height:41px;width:41px;font-size:24px;border-radius:10px}
+ .hy-action strong{font-size:12px}
+ .hy-action small{font-size:10px}
+}
+@media(max-width:560px){
+ .hy-portico{width:100vw;height:100dvh;border:0}
+ .hy-portico:before{height:71px}
+ .hy-portico:after{top:65px;left:1%;right:1%;border-left-width:12px;border-right-width:12px}
+ .hy-plate{width:72%;top:23%;padding:10px}
+ .hy-plate strong{font-size:clamp(27px,8vw,38px)}
+ .hy-plate span{font-size:7px;letter-spacing:1.2px}
+ .hy-gateway[data-state="hall"] .hy-plate{top:11%;width:58%;padding:7px}
+ .hy-gateway[data-state="hall"] .hy-plate strong{font-size:27px}
+ .hy-gateway[data-state="hall"] .hy-plate span{font-size:7px;letter-spacing:1px}
+ .hy-door{top:78px;bottom:45px;width:45%;padding:13% 2% 10%;border-width:5px}
+ .hy-door--left{left:5%}.hy-door--right{right:5%}
+ .hy-door__upper{flex:1.15}
+ .hy-door__upper:before{font-size:48px}
+ .hy-door__lower:before{font-size:39px}
+ .hy-ring{border-width:4px;width:19px;height:19px}
+ .hy-door--left .hy-ring{right:1px}.hy-door--right .hy-ring{left:1px}
+ .hy-lantern{display:none}
+ .hy-skip,.hy-sound{top:11px;min-height:33px;font-size:10px;padding:6px 10px}
+ .hy-opening{bottom:11%;padding:0}
+ .hy-opening p{font-size:12px}
+ .hy-enter{min-height:48px;font-size:12px;padding:0 16px}
+ .hy-page--hall{padding:25vh 7% 28px}
+ .hy-page--hall .hy-overline{font-size:9px;letter-spacing:1.5px}
+ .hy-page--hall h1{font-size:clamp(21px,6.1vw,27px);margin:7px 0}
+ .hy-page--hall p{font-size:11px;margin-bottom:9px}
+ .hy-actions{gap:9px;margin-top:15px}
+ .hy-action{min-height:113px;gap:4px;padding:8px 5px;border-radius:12px}
+ .hy-action strong{font-size:11px}.hy-action small{font-size:9px}
+ .hy-page:not(.hy-page--hall){inset:78px 10px 18px;padding:17px 12px;border-radius:16px}
+ .hy-page:not(.hy-page--hall) h2{font-size:23px}
+ .hy-page:not(.hy-page--hall) p{font-size:11px}
+ .hy-collection{grid-template-columns:1fr;max-width:310px;gap:12px}
+ .hy-template-visual{height:145px}
+ .hy-template-visual:after{font-size:11px}
+}
+@media(max-height:680px) and (min-width:561px){
+ .hy-page--hall{padding-top:20vh}
+ .hy-actions{margin-top:12px}
+ .hy-action{min-height:135px}
+ .hy-page--hall h1{font-size:28px}
+ .hy-plate{top:22%}
+}
