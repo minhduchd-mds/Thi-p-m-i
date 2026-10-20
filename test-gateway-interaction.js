@@ -51,11 +51,15 @@ audio.currentTime = 0;
 audio.volume = 0;
 audio.play = function () { this.playCalls++; this.paused = false; this.events.play?.(); return Promise.resolve(); };
 audio.pause = function () { this.paused = true; this.events.pause?.(); };
+let selectedEditorTheme = null;
+const editorThemeButton = makeElement('editor-template-jade');
+editorThemeButton.click = () => { selectedEditorTheme = 'jade'; };
 const document = {
   body: makeElement('body'),
   getElementById(id) {return elements.get(id) || null;},
   querySelector(s) {
     if (s==='.topbar .top-spacer') return makeElement('spacer');
+    if (s==='button.template[data-theme="jade"]') return editorThemeButton;
     return null;
   },
   createElement(tag) {return tag==='audio' ? audio : makeElement(tag);},
@@ -100,6 +104,11 @@ assert.equal(sound.attributes['aria-pressed'],'false');
 actions.find(x=>x.dataset.hyAction==='design').click();
 assert.equal(gateway.hidden,true,'Editing hides the lobby');
 assert.equal(elements.get('app').inert,false,'Editor restored to interactive state');
+actions.find(x=>x.dataset.hyAction==='templates').click();
+assert.equal(elements.get('hy-page-library').hidden,false,'Gallery screen becomes visible');
+themes.find(x=>x.dataset.hyTheme==='jade').click();
+assert.equal(selectedEditorTheme,'jade','Gallery must select the existing editable Jade template');
+assert.equal(gateway.hidden,true,'Choosing a gallery template opens the real editor');
 
 const home = document.querySelector('.topbar .top-spacer'); // home button inserted after the spacer
 assert.ok(home);
