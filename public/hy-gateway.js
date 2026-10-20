@@ -51,10 +51,10 @@
     setShown(false);
     if (section === 'music') {
       document.querySelector('[data-tab="music"]')?.click();
-      document.getElementById('panel-music')?.scrollIntoView({behavior:'instant',block:'start'});
+      document.getElementById('panel-music')?.scrollIntoView({behavior:'auto',block:'start'});
     } else {
       const anchor = section === 'templates' ? 'mau-thiep' : 'chinh-sua';
-      document.getElementById(anchor)?.scrollIntoView({behavior:'instant',block:'start'});
+      document.getElementById(anchor)?.scrollIntoView({behavior:'auto',block:'start'});
     }
     document.getElementById('chinh-sua')?.setAttribute('tabindex', '-1');
     document.getElementById('chinh-sua')?.focus({preventScroll:true});
@@ -63,8 +63,8 @@
     entrance.disabled = false;
     gateway.dataset.state = 'hall';
     skip.textContent = 'Vào trình thiết kế ↗';
-    setPage(hall);
     setShown(true);
+    setPage(hall);
   };
 
   const ownedList = $('#hy-owned-list');
@@ -165,8 +165,8 @@
   document.querySelector('.topbar .top-spacer')?.after(homeButton);
 
   gateway.dataset.state = 'closed';
-  setPage(hall);
   setShown(true);
+  setPage(hall);
   try {
     if (sessionStorage.getItem('hy-studio-gateway-seen') === '1') finishOpening();
     else entrance.focus({preventScroll:true});
