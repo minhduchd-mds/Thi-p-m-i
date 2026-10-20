@@ -7,8 +7,8 @@ const css = fs.readFileSync('public/hy-gateway.css', 'utf8');
 const js = fs.readFileSync('public/hy-gateway.js', 'utf8');
 
 new vm.Script(js, { filename: 'public/hy-gateway.js' });
-assert.match(html, /href="\/hy-gateway\.css"/);
-assert.match(html, /src="\/hy-gateway\.js" defer/);
+assert.match(html, /href="\/hy-gateway\.css\?v=1\.3\.1"/);
+assert.match(html, /src="\/hy-gateway\.js\?v=1\.3\.1" defer/);
 assert.match(html, /id="hy-gateway"[^>]*hidden/);
 for (const id of ['hy-page-hall','hy-page-library','hy-page-manager','hy-skip','hy-enter','hy-owned-list','chinh-sua','mau-thiep','panel-music','phone-screen','open-envelope','rsvp-form','save-card']) {
   assert.ok(html.includes('id="' + id + '"'), 'Missing UI anchor: ' + id);
@@ -33,4 +33,10 @@ assert.match(js, /record\.expiresAt/, 'Show card expiration');
 assert.match(js, /document\.querySelector\('\[data-theme=/, 'Theme selection must reuse the original editor');
 assert.match(js, /document\.querySelector\('\[data-tab="music"\]'\)/, 'Music path must open real music panel');
 assert.match(html, /id="bg-music" preload="metadata"/, 'Do not autoplay audio in guest experience');
+assert.match(html, /Mở cửa &amp; nghe nhạc/, 'Entrance button must signal music playback');
+assert.match(js, /duyen-ngoc-phuong-dong\.mp3/, 'Welcome music uses a real bundled track');
+assert.match(js, /welcomeAudio\.play\(\)/, 'Use actual HTML audio playback');
+assert.match(js, /const openDoors[\s\S]*?startWelcomeMusic\(\)/, 'Play as part of the opening gesture');
+assert.match(js, /stopWelcomeMusic\(\)/, 'Stop ambient lobby music on editor entry');
+assert.match(css, /\.hy-sound\[aria-pressed="true"\]/, 'Sound button provides visible active state');
 console.log('PASS: Hỷ Studio 3D gateway integration, existing editor anchors, guest bypass, accessibility and navigation contracts.');
