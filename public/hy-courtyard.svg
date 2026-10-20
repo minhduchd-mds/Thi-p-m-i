@@ -1,0 +1,303 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Sân vườn Hỷ Studio với mái ngói, đèn lồng, hoa đào và cổng tròn">
+<defs>
+  <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#554133"/><stop offset=".32" stop-color="#b57957"/><stop offset=".7" stop-color="#f5c995"/><stop offset="1" stop-color="#df9d6b"/></linearGradient>
+  <radialGradient id="dawn"><stop stop-color="#ffe9b9"/><stop offset=".45" stop-color="#f4b98e"/><stop offset="1" stop-color="#6b4137"/></radialGradient>
+  <linearGradient id="wall" x2="1" y2=".15"><stop stop-color="#2d1c18"/><stop offset=".18" stop-color="#986244"/><stop offset=".48" stop-color="#e9b98e"/><stop offset=".78" stop-color="#965b43"/><stop offset="1" stop-color="#281713"/></linearGradient>
+  <linearGradient id="wood" x2="1" y2=".15"><stop stop-color="#24130e"/><stop offset=".36" stop-color="#9d5636"/><stop offset=".5" stop-color="#e6ac65"/><stop offset=".66" stop-color="#7a3d28"/><stop offset="1" stop-color="#28150f"/></linearGradient>
+  <linearGradient id="floor" x2="0" y2="1"><stop stop-color="#ad795d"/><stop offset=".4" stop-color="#efc9a2"/><stop offset="1" stop-color="#423029"/></linearGradient>
+  <linearGradient id="carpet" x2="0" y2="1"><stop stop-color="#ad4d4a"/><stop offset=".65" stop-color="#682326"/><stop offset="1" stop-color="#912d37"/></linearGradient>
+  <radialGradient id="lamp" cx=".5" cy=".36" r=".73"><stop stop-color="#fff2c3"/><stop offset=".56" stop-color="#ffca7d"/><stop offset="1" stop-color="#a65232"/></radialGradient>
+  <radialGradient id="bloom"><stop stop-color="#ffede4"/><stop offset=".56" stop-color="#f6b6b1"/><stop offset="1" stop-color="#a64b58"/></radialGradient>
+  <filter id="glow" x="-90%" y="-90%" width="280%" height="280%"><feGaussianBlur stdDeviation="18"/></filter>
+  <filter id="shadow" x="-40%" y="-40%" width="180%" height="190%"><feDropShadow dx="0" dy="14" stdDeviation="18" flood-opacity=".48" flood-color="#1a0c0a"/></filter>
+  <pattern id="tile" width="57" height="20" patternUnits="userSpaceOnUse"><rect width="57" height="20" fill="#271c1a"/><path d="M1 4Q13 0 27 4Q43 0 56 4M1 12Q13 8 27 12Q43 8 56 12M1 19H56" fill="none" stroke="#765746" stroke-width="4"/><path d="M0 8Q13 4 27 8Q43 4 56 8" stroke="#b08e6d" stroke-opacity=".48" stroke-width="2" fill="none"/></pattern>
+  <pattern id="grille" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M0 0H30V30H0ZM15 0V30M0 15H30M0 0L30 30M0 30L30 0" stroke="#925531" stroke-width="2.6" fill="none" opacity=".82"/></pattern>
+  <symbol id="lantern" viewBox="-36 -94 72 196">
+   <ellipse cx="0" cy="8" rx="28" ry="68" fill="#ffbf68" opacity=".55" filter="url(#glow)"/>
+   <rect x="-23" y="-66" width="46" height="114" rx="23" fill="url(#lamp)" stroke="#74412d" stroke-width="4"/>
+   <path d="M-12 -61V44M0 -64V47M12 -61V44" fill="none" stroke="#ad613c" stroke-width="2" opacity=".6"/>
+   <path d="M-20 -54Q0 -78 20 -54M-20 40Q0 60 20 40" fill="none" stroke="#64311f" stroke-width="6"/>
+   <path d="M0 -75V-94M0 57V79M-6 79L0 101L6 79" stroke="#d49d53" stroke-width="4" fill="none"/>
+  </symbol>
+  <symbol id="blossom" viewBox="-20 -20 40 40"><g fill="url(#bloom)" stroke="#c87977" stroke-width=".5"><ellipse ry="12" rx="6" transform="rotate(0) translate(0,-8)"/><ellipse ry="12" rx="6" transform="rotate(72) translate(0,-8)"/><ellipse ry="12" rx="6" transform="rotate(144) translate(0,-8)"/><ellipse ry="12" rx="6" transform="rotate(216) translate(0,-8)"/><ellipse ry="12" rx="6" transform="rotate(288) translate(0,-8)"/></g><circle r="3" fill="#e5ad56"/></symbol>
+</defs>
+<rect width="1536" height="1024" fill="url(#sky)"/>
+<circle cx="768" cy="400" r="334" fill="url(#dawn)" opacity=".76"/>
+<path d="M0 542Q110 429 229 462T462 451T738 469T1030 432T1280 469T1536 452V702H0Z" fill="#463932" opacity=".34"/>
+<path d="M0 586Q144 480 306 538T615 518T990 510T1218 538T1536 505V714H0Z" fill="#2c3431" opacity=".4"/>
+<!-- Rear pavilion, ancient tiled roof -->
+<path d="M348 337Q486 293 565 242L768 210L970 242Q1087 302 1195 337L1180 355Q1062 330 966 295H566Q445 344 357 357Z" fill="#221a17" stroke="#bd875a" stroke-width="7" filter="url(#shadow)"/>
+<path d="M391 332Q523 291 567 256L768 234L973 256Q1032 304 1157 332L1132 337H420Z" fill="url(#tile)"/>
+<rect x="466" y="339" width="607" height="377" fill="#5a3529" stroke="#a7774e" stroke-width="15"/>
+<rect x="505" y="372" width="530" height="321" fill="url(#grille)" opacity=".65"/>
+<path d="M587 703V500Q587 359 768 358Q949 359 949 500V703" fill="#281915" stroke="#d5a06e" stroke-width="25"/>
+<path d="M613 702V500Q613 391 768 391Q923 391 923 500V702" fill="url(#dawn)" stroke="#75442f" stroke-width="5"/>
+<path d="M651 679Q694 609 761 596T889 670" fill="none" stroke="#725a50" stroke-width="5" opacity=".52"/>
+<path d="M670 651Q740 590 800 648T905 635" fill="none" stroke="#523e3a" stroke-width="8" opacity=".24"/>
+<!-- Far mountain pavilion silhouette -->
+<g opacity=".69" fill="#644439" stroke="#d0a67d" stroke-width="2"><path d="M718 641V572H825V642Z"/><path d="M694 579Q767 550 848 579L844 588H699Z"/><path d="M723 547Q769 526 813 547L807 557H728Z"/><path d="M745 531V508H794V531Z"/></g>
+<!-- Side walls, timber windows -->
+<path d="M0 345L344 315L383 750L0 750Z" fill="url(#wall)" stroke="#4c2e22" stroke-width="12"/>
+<path d="M1536 345L1192 315L1153 750L1536 750Z" fill="url(#wall)" stroke="#4c2e22" stroke-width="12"/>
+<rect x="44" y="392" width="260" height="248" fill="url(#grille)" stroke="#5b3023" stroke-width="20"/>
+<rect x="1230" y="392" width="260" height="248" fill="url(#grille)" stroke="#5b3023" stroke-width="20"/>
+<g stroke="#bc8451" stroke-width="8" opacity=".92"><path d="M50 515H298M1240 515H1484"/><path d="M175 395V632M1360 395V632"/></g>
+<path d="M0 366Q180 335 350 365L327 388L0 402Z" fill="url(#tile)" stroke="#3b271d" stroke-width="18"/>
+<path d="M1536 366Q1356 335 1186 365L1209 388L1536 402Z" fill="url(#tile)" stroke="#3b271d" stroke-width="18"/>
+<!-- Perspective flagstone floor -->
+<path d="M0 721H1536V1024H0Z" fill="url(#floor)"/>
+<path d="M0 720H1536" stroke="#f2d5ad" stroke-width="12" opacity=".65"/>
+<g stroke="#c69472" stroke-width="3" opacity=".63"><path d="M768 717L-120 1024M768 717L128 1024M768 717L480 1024M768 717L1100 1024M768 717L1536 1024M768 717L1750 1024"/>
+<path d="M0 794H1536M0 874H1536M0 976H1536"/></g>
+<path d="M505 787H1031L1249 1013H286Z" fill="url(#carpet)" stroke="#d6a46b" stroke-width="14"/>
+<path d="M541 807H993L1168 984H369Z" fill="none" stroke="#edc38a" stroke-width="4" stroke-dasharray="3 13"/>
+<path d="M630 819H899L1020 959H517Z" fill="none" stroke="#c99159" stroke-width="8" opacity=".62"/>
+<!-- Garden arch light and low center table -->
+<ellipse cx="768" cy="797" rx="248" ry="39" fill="#f1cf9a" opacity=".18" filter="url(#glow)"/>
+<g filter="url(#shadow)"><rect x="652" y="761" width="231" height="22" rx="6" fill="url(#wood)" stroke="#cf995d" stroke-width="4"/><path d="M676 787L669 866H692L708 787M831 787L845 866H865L853 787" fill="#653521" stroke="#c08758" stroke-width="3"/><rect x="714" y="745" width="101" height="16" rx="4" fill="#7f4730"/></g>
+<ellipse cx="767" cy="738" rx="37" ry="22" fill="#e6b998"/><path d="M745 739Q768 754 790 739L778 767H757Z" fill="#efd1a7"/>
+<!-- Flower arrangement at center -->
+<g stroke="#79523b" stroke-width="4" fill="none"><path d="M768 740L748 686M768 740L797 687M768 740L773 672M768 739L720 710M770 735L821 712"/></g>
+<!-- warm lanterns around the entrance -->
+<g opacity=".95"><use href="#lantern" x="340" y="440" width="83" height="180"/><use href="#lantern" x="1113" y="440" width="83" height="180"/><use href="#lantern" x="510" y="405" width="58" height="127"/><use href="#lantern" x="970" y="405" width="58" height="127"/></g>
+<!-- Blooming trees wrapping around both side columns -->
+<g stroke-linecap="round" fill="none"><path d="M-45 88Q125 158 255 241T434 385M-23 198Q151 209 239 329M161 208Q209 114 353 105M1573 68Q1397 148 1282 249T1092 400M1569 193Q1398 206 1290 317M1380 181Q1310 95 1170 98" stroke="#38231c" stroke-width="22"/><path d="M-15 98Q161 157 369 335M1550 101Q1372 157 1163 333" stroke="#a26a4e" stroke-width="7"/></g>
+<use href="#blossom" transform="translate(45.0 54) rotate(0) scale(0.50)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1298.3 132) rotate(31) scale(0.63)" opacity="0.65"/>
+<use href="#blossom" transform="translate(430.4 196) rotate(62) scale(0.76)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1327.0 298) rotate(93) scale(0.89)" opacity="0.82"/>
+<use href="#blossom" transform="translate(401.7 338) rotate(124) scale(1.02)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1355.7 111) rotate(155) scale(1.15)" opacity="0.56"/>
+<use href="#blossom" transform="translate(373.0 130) rotate(186) scale(1.28)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1384.4 277) rotate(217) scale(0.51)" opacity="0.73"/>
+<use href="#blossom" transform="translate(344.3 272) rotate(248) scale(0.64)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1413.1 90) rotate(279) scale(0.77)" opacity="0.90"/>
+<use href="#blossom" transform="translate(315.6 64) rotate(310) scale(0.90)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1441.8 256) rotate(341) scale(1.03)" opacity="0.65"/>
+<use href="#blossom" transform="translate(286.9 206) rotate(12) scale(1.16)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1470.5 69) rotate(43) scale(1.29)" opacity="0.82"/>
+<use href="#blossom" transform="translate(258.2 348) rotate(74) scale(0.52)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1085.1 235) rotate(105) scale(0.65)" opacity="0.56"/>
+<use href="#blossom" transform="translate(229.5 140) rotate(136) scale(0.78)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1113.8 401) rotate(167) scale(0.91)" opacity="0.73"/>
+<use href="#blossom" transform="translate(200.8 282) rotate(198) scale(1.04)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1142.5 214) rotate(229) scale(1.17)" opacity="0.90"/>
+<use href="#blossom" transform="translate(172.1 74) rotate(260) scale(1.30)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1171.2 380) rotate(291) scale(0.53)" opacity="0.65"/>
+<use href="#blossom" transform="translate(143.4 216) rotate(322) scale(0.66)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1199.9 193) rotate(353) scale(0.79)" opacity="0.82"/>
+<use href="#blossom" transform="translate(114.7 358) rotate(24) scale(0.92)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1228.6 359) rotate(55) scale(1.05)" opacity="0.56"/>
+<use href="#blossom" transform="translate(86.0 150) rotate(86) scale(1.18)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1257.3 172) rotate(117) scale(1.31)" opacity="0.73"/>
+<use href="#blossom" transform="translate(57.3 292) rotate(148) scale(0.54)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1286.0 338) rotate(179) scale(0.67)" opacity="0.90"/>
+<use href="#blossom" transform="translate(442.7 84) rotate(210) scale(0.80)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1314.7 151) rotate(241) scale(0.93)" opacity="0.65"/>
+<use href="#blossom" transform="translate(414.0 226) rotate(272) scale(1.06)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1343.4 317) rotate(303) scale(1.19)" opacity="0.82"/>
+<use href="#blossom" transform="translate(385.3 368) rotate(334) scale(1.32)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1372.1 130) rotate(5) scale(0.55)" opacity="0.56"/>
+<use href="#blossom" transform="translate(356.6 160) rotate(36) scale(0.68)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1400.8 296) rotate(67) scale(0.81)" opacity="0.73"/>
+<use href="#blossom" transform="translate(327.9 302) rotate(98) scale(0.94)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1429.5 109) rotate(129) scale(1.07)" opacity="0.90"/>
+<use href="#blossom" transform="translate(299.2 94) rotate(160) scale(1.20)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1458.2 275) rotate(191) scale(1.33)" opacity="0.65"/>
+<use href="#blossom" transform="translate(270.5 236) rotate(222) scale(0.56)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1486.9 88) rotate(253) scale(0.69)" opacity="0.82"/>
+<use href="#blossom" transform="translate(241.8 378) rotate(284) scale(0.82)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1101.5 254) rotate(315) scale(0.95)" opacity="0.56"/>
+<use href="#blossom" transform="translate(213.1 170) rotate(346) scale(1.08)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1130.2 67) rotate(17) scale(1.21)" opacity="0.73"/>
+<use href="#blossom" transform="translate(184.4 312) rotate(48) scale(1.34)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1158.9 233) rotate(79) scale(0.57)" opacity="0.90"/>
+<use href="#blossom" transform="translate(155.7 104) rotate(110) scale(0.70)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1187.6 399) rotate(141) scale(0.83)" opacity="0.65"/>
+<use href="#blossom" transform="translate(127.0 246) rotate(172) scale(0.96)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1216.3 212) rotate(203) scale(1.09)" opacity="0.82"/>
+<use href="#blossom" transform="translate(98.3 388) rotate(234) scale(1.22)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1245.0 378) rotate(265) scale(1.35)" opacity="0.56"/>
+<use href="#blossom" transform="translate(69.6 180) rotate(296) scale(0.58)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1273.7 191) rotate(327) scale(0.71)" opacity="0.73"/>
+<use href="#blossom" transform="translate(455.0 322) rotate(358) scale(0.84)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1302.4 357) rotate(29) scale(0.97)" opacity="0.90"/>
+<use href="#blossom" transform="translate(426.3 114) rotate(60) scale(1.10)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1331.1 170) rotate(91) scale(1.23)" opacity="0.65"/>
+<use href="#blossom" transform="translate(397.6 256) rotate(122) scale(1.36)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1359.8 336) rotate(153) scale(0.59)" opacity="0.82"/>
+<use href="#blossom" transform="translate(368.9 398) rotate(184) scale(0.72)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1388.5 149) rotate(215) scale(0.85)" opacity="0.56"/>
+<use href="#blossom" transform="translate(340.2 190) rotate(246) scale(0.98)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1417.2 315) rotate(277) scale(1.11)" opacity="0.73"/>
+<use href="#blossom" transform="translate(311.5 332) rotate(308) scale(1.24)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1445.9 128) rotate(339) scale(1.37)" opacity="0.90"/>
+<use href="#blossom" transform="translate(282.8 124) rotate(10) scale(0.60)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1474.6 294) rotate(41) scale(0.73)" opacity="0.65"/>
+<use href="#blossom" transform="translate(254.1 266) rotate(72) scale(0.86)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1089.2 107) rotate(103) scale(0.99)" opacity="0.82"/>
+<use href="#blossom" transform="translate(225.4 58) rotate(134) scale(1.12)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1117.9 273) rotate(165) scale(1.25)" opacity="0.56"/>
+<use href="#blossom" transform="translate(196.7 200) rotate(196) scale(1.38)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1146.6 86) rotate(227) scale(0.61)" opacity="0.73"/>
+<use href="#blossom" transform="translate(168.0 342) rotate(258) scale(0.74)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1175.3 252) rotate(289) scale(0.87)" opacity="0.90"/>
+<use href="#blossom" transform="translate(139.3 134) rotate(320) scale(1.00)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1204.0 65) rotate(351) scale(1.13)" opacity="0.65"/>
+<use href="#blossom" transform="translate(110.6 276) rotate(22) scale(1.26)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1232.7 231) rotate(53) scale(1.39)" opacity="0.82"/>
+<use href="#blossom" transform="translate(81.9 68) rotate(84) scale(0.62)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1261.4 397) rotate(115) scale(0.75)" opacity="0.56"/>
+<use href="#blossom" transform="translate(53.2 210) rotate(146) scale(0.88)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1290.1 210) rotate(177) scale(1.01)" opacity="0.73"/>
+<use href="#blossom" transform="translate(438.6 352) rotate(208) scale(1.14)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1318.8 376) rotate(239) scale(1.27)" opacity="0.90"/>
+<use href="#blossom" transform="translate(409.9 144) rotate(270) scale(0.50)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1347.5 189) rotate(301) scale(0.63)" opacity="0.65"/>
+<use href="#blossom" transform="translate(381.2 286) rotate(332) scale(0.76)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1376.2 355) rotate(3) scale(0.89)" opacity="0.82"/>
+<use href="#blossom" transform="translate(352.5 78) rotate(34) scale(1.02)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1404.9 168) rotate(65) scale(1.15)" opacity="0.56"/>
+<use href="#blossom" transform="translate(323.8 220) rotate(96) scale(1.28)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1433.6 334) rotate(127) scale(0.51)" opacity="0.73"/>
+<use href="#blossom" transform="translate(295.1 362) rotate(158) scale(0.64)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1462.3 147) rotate(189) scale(0.77)" opacity="0.90"/>
+<use href="#blossom" transform="translate(266.4 154) rotate(220) scale(0.90)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1491.0 313) rotate(251) scale(1.03)" opacity="0.65"/>
+<use href="#blossom" transform="translate(237.7 296) rotate(282) scale(1.16)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1105.6 126) rotate(313) scale(1.29)" opacity="0.82"/>
+<use href="#blossom" transform="translate(209.0 88) rotate(344) scale(0.52)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1134.3 292) rotate(15) scale(0.65)" opacity="0.56"/>
+<use href="#blossom" transform="translate(180.3 230) rotate(46) scale(0.78)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1163.0 105) rotate(77) scale(0.91)" opacity="0.73"/>
+<use href="#blossom" transform="translate(151.6 372) rotate(108) scale(1.04)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1191.7 271) rotate(139) scale(1.17)" opacity="0.90"/>
+<use href="#blossom" transform="translate(122.9 164) rotate(170) scale(1.30)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1220.4 84) rotate(201) scale(0.53)" opacity="0.65"/>
+<use href="#blossom" transform="translate(94.2 306) rotate(232) scale(0.66)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1249.1 250) rotate(263) scale(0.79)" opacity="0.82"/>
+<use href="#blossom" transform="translate(65.5 98) rotate(294) scale(0.92)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1277.8 63) rotate(325) scale(1.05)" opacity="0.56"/>
+<use href="#blossom" transform="translate(450.9 240) rotate(356) scale(1.18)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1306.5 229) rotate(27) scale(1.31)" opacity="0.73"/>
+<use href="#blossom" transform="translate(422.2 382) rotate(58) scale(0.54)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1335.2 395) rotate(89) scale(0.67)" opacity="0.90"/>
+<use href="#blossom" transform="translate(393.5 174) rotate(120) scale(0.80)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1363.9 208) rotate(151) scale(0.93)" opacity="0.65"/>
+<use href="#blossom" transform="translate(364.8 316) rotate(182) scale(1.06)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1392.6 374) rotate(213) scale(1.19)" opacity="0.82"/>
+<use href="#blossom" transform="translate(336.1 108) rotate(244) scale(1.32)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1421.3 187) rotate(275) scale(0.55)" opacity="0.56"/>
+<use href="#blossom" transform="translate(307.4 250) rotate(306) scale(0.68)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1450.0 353) rotate(337) scale(0.81)" opacity="0.73"/>
+<use href="#blossom" transform="translate(278.7 392) rotate(8) scale(0.94)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1478.7 166) rotate(39) scale(1.07)" opacity="0.90"/>
+<use href="#blossom" transform="translate(250.0 184) rotate(70) scale(1.20)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1093.3 332) rotate(101) scale(1.33)" opacity="0.65"/>
+<use href="#blossom" transform="translate(221.3 326) rotate(132) scale(0.56)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1122.0 145) rotate(163) scale(0.69)" opacity="0.82"/>
+<use href="#blossom" transform="translate(192.6 118) rotate(194) scale(0.82)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1150.7 311) rotate(225) scale(0.95)" opacity="0.56"/>
+<use href="#blossom" transform="translate(163.9 260) rotate(256) scale(1.08)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1179.4 124) rotate(287) scale(1.21)" opacity="0.73"/>
+<use href="#blossom" transform="translate(135.2 402) rotate(318) scale(1.34)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1208.1 290) rotate(349) scale(0.57)" opacity="0.90"/>
+<use href="#blossom" transform="translate(106.5 194) rotate(20) scale(0.70)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1236.8 103) rotate(51) scale(0.83)" opacity="0.65"/>
+<use href="#blossom" transform="translate(77.8 336) rotate(82) scale(0.96)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1265.5 269) rotate(113) scale(1.09)" opacity="0.82"/>
+<use href="#blossom" transform="translate(49.1 128) rotate(144) scale(1.22)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1294.2 82) rotate(175) scale(1.35)" opacity="0.56"/>
+<use href="#blossom" transform="translate(434.5 270) rotate(206) scale(0.58)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1322.9 248) rotate(237) scale(0.71)" opacity="0.73"/>
+<use href="#blossom" transform="translate(405.8 62) rotate(268) scale(0.84)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1351.6 61) rotate(299) scale(0.97)" opacity="0.90"/>
+<use href="#blossom" transform="translate(377.1 204) rotate(330) scale(1.10)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1380.3 227) rotate(1) scale(1.23)" opacity="0.65"/>
+<use href="#blossom" transform="translate(348.4 346) rotate(32) scale(1.36)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1409.0 393) rotate(63) scale(0.59)" opacity="0.82"/>
+<use href="#blossom" transform="translate(319.7 138) rotate(94) scale(0.72)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1437.7 206) rotate(125) scale(0.85)" opacity="0.56"/>
+<use href="#blossom" transform="translate(291.0 280) rotate(156) scale(0.98)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1466.4 372) rotate(187) scale(1.11)" opacity="0.73"/>
+<use href="#blossom" transform="translate(262.3 72) rotate(218) scale(1.24)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1081.0 185) rotate(249) scale(1.37)" opacity="0.90"/>
+<use href="#blossom" transform="translate(233.6 214) rotate(280) scale(0.60)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1109.7 351) rotate(311) scale(0.73)" opacity="0.65"/>
+<use href="#blossom" transform="translate(204.9 356) rotate(342) scale(0.86)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1138.4 164) rotate(13) scale(0.99)" opacity="0.82"/>
+<use href="#blossom" transform="translate(176.2 148) rotate(44) scale(1.12)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1167.1 330) rotate(75) scale(1.25)" opacity="0.56"/>
+<use href="#blossom" transform="translate(147.5 290) rotate(106) scale(1.38)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1195.8 143) rotate(137) scale(0.61)" opacity="0.73"/>
+<use href="#blossom" transform="translate(118.8 82) rotate(168) scale(0.74)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1224.5 309) rotate(199) scale(0.87)" opacity="0.90"/>
+<use href="#blossom" transform="translate(90.1 224) rotate(230) scale(1.00)" opacity="0.56"/>
+<use href="#blossom" transform="translate(1253.2 122) rotate(261) scale(1.13)" opacity="0.65"/>
+<use href="#blossom" transform="translate(61.4 366) rotate(292) scale(1.26)" opacity="0.73"/>
+<use href="#blossom" transform="translate(1281.9 288) rotate(323) scale(1.39)" opacity="0.82"/>
+<use href="#blossom" transform="translate(446.8 158) rotate(354) scale(0.62)" opacity="0.90"/>
+<use href="#blossom" transform="translate(1310.6 101) rotate(25) scale(0.75)" opacity="0.56"/>
+<use href="#blossom" transform="translate(418.1 300) rotate(56) scale(0.88)" opacity="0.65"/>
+<use href="#blossom" transform="translate(1339.3 267) rotate(87) scale(1.01)" opacity="0.73"/>
+<use href="#blossom" transform="translate(389.4 92) rotate(118) scale(1.14)" opacity="0.82"/>
+<use href="#blossom" transform="translate(1368.0 80) rotate(149) scale(1.27)" opacity="0.90"/>
+<use href="#blossom" transform="translate(100 90) rotate(0) scale(0.17)" opacity=".58"/>
+<use href="#blossom" transform="translate(249 227) rotate(47) scale(0.24)" opacity=".58"/>
+<use href="#blossom" transform="translate(398 364) rotate(94) scale(0.30)" opacity=".58"/>
+<use href="#blossom" transform="translate(547 501) rotate(141) scale(0.36)" opacity=".58"/>
+<use href="#blossom" transform="translate(696 638) rotate(188) scale(0.43)" opacity=".58"/>
+<use href="#blossom" transform="translate(845 775) rotate(235) scale(0.49)" opacity=".58"/>
+<use href="#blossom" transform="translate(994 912) rotate(282) scale(0.56)" opacity=".58"/>
+<use href="#blossom" transform="translate(1143 159) rotate(329) scale(0.63)" opacity=".58"/>
+<use href="#blossom" transform="translate(1292 296) rotate(16) scale(0.17)" opacity=".58"/>
+<use href="#blossom" transform="translate(1441 433) rotate(63) scale(0.24)" opacity=".58"/>
+<use href="#blossom" transform="translate(220 570) rotate(110) scale(0.30)" opacity=".58"/>
+<use href="#blossom" transform="translate(369 707) rotate(157) scale(0.36)" opacity=".58"/>
+<use href="#blossom" transform="translate(518 844) rotate(204) scale(0.43)" opacity=".58"/>
+<use href="#blossom" transform="translate(667 91) rotate(251) scale(0.49)" opacity=".58"/>
+<use href="#blossom" transform="translate(816 228) rotate(298) scale(0.56)" opacity=".58"/>
+<use href="#blossom" transform="translate(965 365) rotate(345) scale(0.63)" opacity=".58"/>
+<use href="#blossom" transform="translate(1114 502) rotate(32) scale(0.17)" opacity=".58"/>
+<use href="#blossom" transform="translate(1263 639) rotate(79) scale(0.24)" opacity=".58"/>
+<use href="#blossom" transform="translate(1412 776) rotate(126) scale(0.30)" opacity=".58"/>
+<use href="#blossom" transform="translate(191 913) rotate(173) scale(0.36)" opacity=".58"/>
+<use href="#blossom" transform="translate(340 160) rotate(220) scale(0.43)" opacity=".58"/>
+<use href="#blossom" transform="translate(489 297) rotate(267) scale(0.49)" opacity=".58"/>
+<use href="#blossom" transform="translate(638 434) rotate(314) scale(0.56)" opacity=".58"/>
+<use href="#blossom" transform="translate(787 571) rotate(1) scale(0.63)" opacity=".58"/>
+<use href="#blossom" transform="translate(936 708) rotate(48) scale(0.17)" opacity=".58"/>
+<use href="#blossom" transform="translate(1085 845) rotate(95) scale(0.24)" opacity=".58"/>
+<use href="#blossom" transform="translate(1234 92) rotate(142) scale(0.30)" opacity=".58"/>
+<use href="#blossom" transform="translate(1383 229) rotate(189) scale(0.36)" opacity=".58"/>
+<use href="#blossom" transform="translate(162 366) rotate(236) scale(0.43)" opacity=".58"/>
+<use href="#blossom" transform="translate(311 503) rotate(283) scale(0.49)" opacity=".58"/>
+<use href="#blossom" transform="translate(460 640) rotate(330) scale(0.56)" opacity=".58"/>
+<use href="#blossom" transform="translate(609 777) rotate(17) scale(0.63)" opacity=".58"/>
+<use href="#blossom" transform="translate(758 914) rotate(64) scale(0.17)" opacity=".58"/>
+<use href="#blossom" transform="translate(907 161) rotate(111) scale(0.24)" opacity=".58"/>
+<use href="#blossom" transform="translate(1056 298) rotate(158) scale(0.30)" opacity=".58"/>
+<use href="#blossom" transform="translate(1205 435) rotate(205) scale(0.36)" opacity=".58"/>
+<use href="#blossom" transform="translate(1354 572) rotate(252) scale(0.43)" opacity=".58"/>
+<use href="#blossom" transform="translate(133 709) rotate(299) scale(0.49)" opacity=".58"/>
+<use href="#blossom" transform="translate(282 846) rotate(346) scale(0.56)" opacity=".58"/>
+<use href="#blossom" transform="translate(431 93) rotate(33) scale(0.63)" opacity=".58"/>
+<use href="#blossom" transform="translate(580 230) rotate(80) scale(0.17)" opacity=".58"/>
+<use href="#blossom" transform="translate(729 367) rotate(127) scale(0.24)" opacity=".58"/>
+<use href="#blossom" transform="translate(878 504) rotate(174) scale(0.30)" opacity=".58"/>
+<use href="#blossom" transform="translate(1027 641) rotate(221) scale(0.36)" opacity=".58"/>
+<use href="#blossom" transform="translate(1176 778) rotate(268) scale(0.43)" opacity=".58"/>
+<use href="#blossom" transform="translate(1325 915) rotate(315) scale(0.49)" opacity=".58"/>
+<use href="#blossom" transform="translate(104 162) rotate(2) scale(0.56)" opacity=".58"/>
+<use href="#blossom" transform="translate(253 299) rotate(49) scale(0.63)" opacity=".58"/>
+<use href="#blossom" transform="translate(402 436) rotate(96) scale(0.17)" opacity=".58"/>
+<use href="#blossom" transform="translate(551 573) rotate(143) scale(0.24)" opacity=".58"/>
+<use href="#blossom" transform="translate(700 710) rotate(190) scale(0.30)" opacity=".58"/>
+<use href="#blossom" transform="translate(849 847) rotate(237) scale(0.36)" opacity=".58"/>
+<use href="#blossom" transform="translate(998 94) rotate(284) scale(0.43)" opacity=".58"/>
+<use href="#blossom" transform="translate(1147 231) rotate(331) scale(0.49)" opacity=".58"/>
+<use href="#blossom" transform="translate(1296 368) rotate(18) scale(0.56)" opacity=".58"/>
+<use href="#blossom" transform="translate(1445 505) rotate(65) scale(0.63)" opacity=".58"/>
+<use href="#blossom" transform="translate(224 642) rotate(112) scale(0.17)" opacity=".58"/>
+<use href="#blossom" transform="translate(373 779) rotate(159) scale(0.24)" opacity=".58"/>
+<rect width="1536" height="1024" fill="#2d110d" opacity=".08"/><path d="M0 0H1536V1024H0Z" fill="none" stroke="#26120f" stroke-width="34" opacity=".24"/></svg>
