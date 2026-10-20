@@ -16,6 +16,100 @@
   const entrance = $('#hy-enter');
   const skip = $('#hy-skip');
   const back = gateway.querySelectorAll('[data-hy-back]');
+
+  // A genuine, bundled instrumental track. Start only inside a user interaction,
+  // because iOS/Safari/Chrome may block audible autoplay on initial page load.
+  const welcomeAudio = document.createElement('audio');
+  welcomeAudio.id = 'hy-gateway-music';
+  welcomeAudio.src = '/assets/music/duyen-ngoc-phuong-dong.mp3';
+  welcomeAudio.preload = 'auto';
+  welcomeAudio.loop = true;
+  welcomeAudio.volume = 0.32;
+  gateway.appendChild(welcomeAudio);
+
+  const soundToggle = document.createElement('button');
+  soundToggle.type = 'button';
+  soundToggle.id = 'hy-sound-toggle';
+  soundToggle.className = 'hy-sound';
+  gateway.appendChild(soundToggle);
+
+  let soundFadeTimer = null;
+  let userMutedWelcome = false;
+
+  const syncSoundButton = () => {
+    const playing = !welcomeAudio.paused;
+    soundToggle.textContent = playing ? '♫ Tắt nhạc' : '♫ Bật nhạc';
+    soundToggle.setAttribute('aria-label', playing ? 'Tắt nhạc sảnh Hỷ Studio' : 'Bật nhạc sảnh Hỷ Studio');
+    soundToggle.setAttribute('aria-pressed', String(playing));
+  };
+
+  const startWelcomeMusic = () => {
+    if (soundFadeTimer) window.clearInterval(soundFadeTimer);
+    soundFadeTimer = null;
+    welcomeAudio.volume = 0.32;
+    try {
+      // Crucial: play() is called synchronously from a click/keyboard action.
+      const result = welcomeAudio.play();
+      syncSoundButton();
+      if (result && typeof result.then === 'function') {
+        result.then(syncSoundButton).catch(() => {
+          syncSoundButton();
+          soundToggle.title = 'Trình duyệt chưa cho phép phát nhạc; nhấn Bật nhạc để thử lại.';
+        });
+      }
+    } catch (_) {
+      syncSoundButton();
+      soundToggle.title = 'Không thể phát nhạc; kiểm tra âm lượng và tệp nhạc.';
+    }
+  };
+
+  const stopWelcomeMusic = (fade = true) => {
+    if (soundFadeTimer) window.clearInterval(soundFadeTimer);
+    soundFadeTimer = null;
+    if (!fade || welcomeAudio.paused) {
+      welcomeAudio.pause();
+      welcomeAudio.currentTime = 0;
+      welcomeAudio.volume = 0.32;
+      syncSoundButton();
+      return;
+    }
+    const startingVolume = welcomeAudio.volume;
+    let frame = 0;
+    soundToggle.textContent = '♫ Bật nhạc';
+    soundToggle.setAttribute('aria-label', 'Bật nhạc sảnh Hỷ Studio');
+    soundToggle.setAttribute('aria-pressed', 'false');
+    soundFadeTimer = window.setInterval(() => {
+      frame += 1;
+      welcomeAudio.volume = Math.max(0, startingVolume * (1 - frame / 8));
+      if (frame >= 8) {
+        window.clearInterval(soundFadeTimer);
+        soundFadeTimer = null;
+        welcomeAudio.pause();
+        welcomeAudio.currentTime = 0;
+        welcomeAudio.volume = 0.32;
+        syncSoundButton();
+      }
+    }, 65);
+  };
+
+  soundToggle.addEventListener('click', () => {
+    if (welcomeAudio.paused) {
+      userMutedWelcome = false;
+      startWelcomeMusic();
+    } else {
+      userMutedWelcome = true;
+      stopWelcomeMusic(false);
+    }
+  });
+  welcomeAudio.addEventListener('ended', syncSoundButton);
+  welcomeAudio.addEventListener('pause', syncSoundButton);
+  welcomeAudio.addEventListener('play', syncSoundButton);
+  welcomeAudio.addEventListener('error', () => {
+    syncSoundButton();
+    soundToggle.title = 'Tệp nhạc chào mừng không tải được. Vui lòng kiểm tra kết nối.';
+  });
+  syncSoundButton();
+
   let openingTimer = null;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -40,6 +134,7 @@
   };
   const openDoors = () => {
     if (gateway.dataset.state !== 'closed') return;
+    if (!userMutedWelcome) startWelcomeMusic();
     if (reduceMotion) { finishOpening(); return; }
     gateway.dataset.state = 'opening';
     entrance.disabled = true;
@@ -48,6 +143,7 @@
   const gotoEditor = section => {
     if (openingTimer) clearTimeout(openingTimer);
     openingTimer = null;
+    stopWelcomeMusic();
     setShown(false);
     if (section === 'music') {
       document.querySelector('[data-tab="music"]')?.click();
@@ -63,8 +159,10 @@
     entrance.disabled = false;
     gateway.dataset.state = 'hall';
     skip.textContent = 'Vào trình thiết kế ↗';
+    document.getElementById('bg-music')?.pause();
     setShown(true);
     setPage(hall);
+    if (!userMutedWelcome) startWelcomeMusic();
   };
 
   const ownedList = $('#hy-owned-list');
@@ -130,7 +228,10 @@
   entrance.addEventListener('click', openDoors);
   skip.addEventListener('click', () => {
     if (gateway.dataset.state === 'hall') gotoEditor('design');
-    else finishOpening();
+    else {
+      if (!userMutedWelcome) startWelcomeMusic();
+      finishOpening();
+    }
   });
   back.forEach(btn => btn.addEventListener('click', () => setPage(hall)));
   gateway.querySelectorAll('[data-hy-action]').forEach(btn => {
