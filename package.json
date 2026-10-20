@@ -8,8 +8,9 @@
   },
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node --check public/hy-gateway.js && node test-gateway.js",
+    "check": "node --check server.js && node --check public/hy-gateway.js && node test-gateway.js && node test-gateway-interaction.js",
     "test:api": "node test-api.js",
-    "test:gateway": "node test-gateway.js"
+    "test:gateway": "node test-gateway.js",
+    "test:gateway-interaction": "node test-gateway-interaction.js"
   }
 }
