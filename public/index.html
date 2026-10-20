@@ -26,7 +26,7 @@
 @media(max-width:410px){.player-settings{grid-template-columns:1fr}.music-header{align-items:start}}
 .music-credit{display:block;margin:25px auto 0;text-align:center;font-size:10px;line-height:1.8;color:var(--card-accent);max-width:255px;text-decoration:underline;text-underline-offset:3px}
 </style>
-<link rel="stylesheet" href="/hy-gateway.css">
+<link rel="stylesheet" href="/hy-gateway.css?v=1.3.1">
 </head>
 <body>
 <section id="hy-gateway" class="hy-gateway" data-state="closed" role="dialog" aria-modal="true" aria-label="Sảnh chào Hỷ Studio" hidden>
@@ -40,7 +40,7 @@
         <div class="hy-door hy-door--left"><div class="hy-door__upper"></div><div class="hy-door__lower"></div><span class="hy-ring"></span></div>
         <div class="hy-door hy-door--right"><div class="hy-door__upper"></div><div class="hy-door__lower"></div><span class="hy-ring"></span></div>
       </div>
-      <div class="hy-opening"><p>Hai cánh cửa mở, một hành trình yêu thương bắt đầu.</p><button type="button" id="hy-enter" class="hy-enter">✧ Mở cửa bước vào</button></div>
+      <div class="hy-opening"><p>Hai cánh cửa mở, một hành trình yêu thương bắt đầu.</p><button type="button" id="hy-enter" class="hy-enter">✧ Mở cửa &amp; nghe nhạc ♫</button></div>
       <section id="hy-page-hall" class="hy-page hy-page--hall" aria-labelledby="hy-hall-heading">
         <span class="hy-overline">Chào mừng đến với Hỷ Studio</span>
         <h1 id="hy-hall-heading">Nơi câu chuyện tình yêu bắt đầu</h1>
@@ -246,5 +246,5 @@ $('save-top').addEventListener('click',saveCard);$('save-card').addEventListener
 (async()=>{loadDraft();await loadCardFromUrl();setMusic();refreshFilter();refresh();})();
 })();
 </script>
-<script src="/hy-gateway.js" defer></script>
+<script src="/hy-gateway.js?v=1.3.1" defer></script>
 </body></html>
