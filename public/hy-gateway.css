@@ -339,3 +339,44 @@ body.hy-intro-active{overflow:hidden}
 /* SVG vector carvings remain sharp on high-density/4K monitors. */
 .hy-door__upper::before{width:clamp(95px,14vw,182px);height:clamp(95px,14vw,182px)}
 @media(max-width:560px){.hy-door__upper::before{width:75px;height:75px}}
+
+/* v1.7 - Photographic mahogany material in WebP.
+   Carved patterns remain genuine SVG vectors. The material is painted on
+   the hinged door faces and timber frame, never as a flat full-scene overlay. */
+.hy-door--left,
+.hy-door--right{
+  background-color:#673a29;
+  background-image:
+    linear-gradient(100deg,rgba(27,10,6,.43),rgba(122,49,25,.04) 28%,rgba(38,10,5,.26) 72%,rgba(14,5,3,.64)),
+    url('/assets/textures/wood-mahogany.webp');
+  background-size:100% 100%,120px auto;
+  background-repeat:no-repeat,repeat;
+  background-position:center center;
+}
+.hy-door__upper,
+.hy-door__lower{
+  background-color:#542717;
+  background-image:
+    linear-gradient(135deg,rgba(15,4,2,.23),rgba(187,101,45,.08) 49%,rgba(20,6,3,.28)),
+    url('/assets/textures/wood-mahogany.webp');
+  background-size:100% 100%,140px auto;
+  background-repeat:no-repeat,repeat;
+  background-position:center center;
+}
+.hy-portico:after{
+  background-image:url('/assets/textures/wood-mahogany.webp'),url('/assets/textures/wood-mahogany.webp');
+  background-position:left center,right center;
+  background-size:clamp(19px,3vw,44px) auto;
+  background-repeat:repeat-y;
+}
+.hy-plate{
+  background-image:
+    linear-gradient(110deg,rgba(42,17,10,.82),rgba(115,47,28,.43) 50%,rgba(38,11,8,.83)),
+    url('/assets/textures/wood-mahogany.webp');
+  background-size:100% 100%,100px auto;
+  background-position:center;
+}
+@media(max-width:560px){
+  .hy-door--left,.hy-door--right{background-size:100% 100%,86px auto}
+  .hy-door__upper,.hy-door__lower{background-size:100% 100%,100px auto}
+}

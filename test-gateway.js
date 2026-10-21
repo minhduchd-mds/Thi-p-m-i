@@ -7,8 +7,8 @@ const css = fs.readFileSync('public/hy-gateway.css', 'utf8');
 const js = fs.readFileSync('public/hy-gateway.js', 'utf8');
 
 new vm.Script(js, { filename: 'public/hy-gateway.js' });
-assert.match(html, /href="\/hy-gateway\.css\?v=1\.6\.0"/);
-assert.match(html, /src="\/hy-gateway\.js\?v=1\.6\.0" defer/);
+assert.match(html, /href="\/hy-gateway\.css\?v=1\.7\.0"/);
+assert.match(html, /src="\/hy-gateway\.js\?v=1\.7\.0" defer/);
 assert.match(html, /id="hy-gateway"[^>]*hidden/);
 for (const id of ['hy-page-hall','hy-page-library','hy-page-manager','hy-skip','hy-enter','hy-owned-list','chinh-sua','mau-thiep','panel-music','phone-screen','open-envelope','rsvp-form','save-card']) {
   assert.ok(html.includes('id="' + id + '"'), 'Missing UI anchor: ' + id);
@@ -53,7 +53,16 @@ for (const file of ornaments) {
   assert.ok(css.includes('/assets/ornaments/' + file) || html.includes('/assets/ornaments/' + file),
     'SVG asset is not used in the UI: ' + file);
 }
-assert.ok(!html.includes('.webp') && !css.includes('ornaments/carved-door.webp') && !css.includes('ornaments/song-hy.webp'), 'UI must not load raster ornaments');
+assert.ok(!css.includes('ornaments/carved-door.webp') && !css.includes('ornaments/song-hy.webp'), 'Decorative ornaments must remain vectors');
+const woodPath = 'public/assets/textures/wood-mahogany.webp';
+assert.ok(fs.existsSync(woodPath), 'Missing real wood WebP material');
+const wood = fs.readFileSync(woodPath);
+assert.equal(wood.subarray(0,4).toString('ascii'),'RIFF','Wood file must be RIFF');
+assert.equal(wood.subarray(8,12).toString('ascii'),'WEBP','Wood file must be WebP');
+assert.equal(wood.readUInt32LE(4)+8,wood.length,'Wood material must not be truncated');
+assert.match(css, /\.hy-door--left,[\s\S]*?wood-mahogany\.webp/, 'Wood detail must be visible on door face');
+assert.match(css, /\.hy-portico:after[\s\S]*?wood-mahogany\.webp/, 'Wood detail must be visible on gateway frame');
+
 assert.match(html, /hy-art--seal/, 'Wedding seal must be mounted on the closed gate');
 assert.match(html, /hy-art--plum/, 'Generated blossom branch must be mounted');
 assert.match(css, /hy-gateway\[data-state="opening"\] \.hy-art--seal/, 'Seal must clear the doorway as doors open');
