@@ -7,8 +7,8 @@ const css = fs.readFileSync('public/hy-gateway.css', 'utf8');
 const js = fs.readFileSync('public/hy-gateway.js', 'utf8');
 
 new vm.Script(js, { filename: 'public/hy-gateway.js' });
-assert.match(html, /href="\/hy-gateway\.css\?v=1\.3\.1"/);
-assert.match(html, /src="\/hy-gateway\.js\?v=1\.3\.1" defer/);
+assert.match(html, /href="\/hy-gateway\.css\?v=1\.5\.0"/);
+assert.match(html, /src="\/hy-gateway\.js\?v=1\.5\.0" defer/);
 assert.match(html, /id="hy-gateway"[^>]*hidden/);
 for (const id of ['hy-page-hall','hy-page-library','hy-page-manager','hy-skip','hy-enter','hy-owned-list','chinh-sua','mau-thiep','panel-music','phone-screen','open-envelope','rsvp-form','save-card']) {
   assert.ok(html.includes('id="' + id + '"'), 'Missing UI anchor: ' + id);
@@ -41,4 +41,18 @@ assert.match(js, /welcomeAudio\.play\(\)/, 'Use actual HTML audio playback');
 assert.match(js, /const openDoors[\s\S]*?startWelcomeMusic\(\)/, 'Play as part of the opening gesture');
 assert.match(js, /stopWelcomeMusic\(\)/, 'Stop ambient lobby music on editor entry');
 assert.match(css, /\.hy-sound\[aria-pressed="true"\]/, 'Sound button provides visible active state');
+const ornaments = ['carved-door.webp','song-hy.webp','gold-corner.webp','plum-branch.webp'];
+for (const file of ornaments) {
+  const assetPath = 'public/assets/ornaments/' + file;
+  assert.ok(fs.existsSync(assetPath), 'Missing generated ornamental asset: ' + file);
+  const bytes = fs.readFileSync(assetPath);
+  assert.ok(bytes.length > 1200, 'Image asset is unexpectedly empty: ' + file);
+  assert.equal(bytes.subarray(0,4).toString('ascii'), 'RIFF', 'WebP container signature invalid: ' + file);
+  assert.equal(bytes.subarray(8,12).toString('ascii'), 'WEBP', 'Invalid WebP signature: ' + file);
+  assert.ok(css.includes('/assets/ornaments/' + file) || html.includes('/assets/ornaments/' + file),
+    'Ornament must be rendered in the UI: ' + file);
+}
+assert.match(html, /hy-art--seal/, 'Wedding seal must be mounted on the closed gate');
+assert.match(html, /hy-art--plum/, 'Generated blossom branch must be mounted');
+assert.match(css, /hy-gateway\[data-state="opening"\] \.hy-art--seal/, 'Seal must clear the doorway as doors open');
 console.log('PASS: Hỷ Studio 3D gateway integration, existing editor anchors, guest bypass, accessibility and navigation contracts.');
