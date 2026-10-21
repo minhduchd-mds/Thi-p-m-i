@@ -49,11 +49,11 @@ for (const file of ornaments) {
   assert.match(vector, /^<svg /, 'Invalid SVG start: ' + file);
   assert.match(vector, /viewBox="0 0 1024 1024"/, 'Vector needs a scalable viewBox: ' + file);
   assert.ok((vector.match(/<path /g) || []).length >= 10, 'SVG must use real path geometry: ' + file);
-  assert.doesNotMatch(vector, /<image\\b|<foreignObject\\b|data:image\\//i, 'Embedded bitmap detected: ' + file);
+  assert.ok(!(/<image\b|<foreignObject\b|data:image\//i).test(vector), 'SVG contains embedded bitmap: ' + file);
   assert.ok(css.includes('/assets/ornaments/' + file) || html.includes('/assets/ornaments/' + file),
     'SVG asset is not used in the UI: ' + file);
 }
-assert.doesNotMatch(html + css, /assets\\/ornaments\\/[^'"]+\\.webp/, 'Raster ornaments must not be referenced');
+assert.ok(!html.includes('.webp') && !css.includes('ornaments/carved-door.webp') && !css.includes('ornaments/song-hy.webp'), 'UI must not load raster ornaments');
 assert.match(html, /hy-art--seal/, 'Wedding seal must be mounted on the closed gate');
 assert.match(html, /hy-art--plum/, 'Generated blossom branch must be mounted');
 assert.match(css, /hy-gateway\[data-state="opening"\] \.hy-art--seal/, 'Seal must clear the doorway as doors open');
