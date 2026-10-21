@@ -49,6 +49,7 @@ for (const file of ornaments) {
   assert.ok(bytes.length > 1200, 'Image asset is unexpectedly empty: ' + file);
   assert.equal(bytes.subarray(0,4).toString('ascii'), 'RIFF', 'WebP container signature invalid: ' + file);
   assert.equal(bytes.subarray(8,12).toString('ascii'), 'WEBP', 'Invalid WebP signature: ' + file);
+  assert.equal(bytes.readUInt32LE(4) + 8, bytes.length, 'Truncated or oversized generated WebP: ' + file);
   assert.ok(css.includes('/assets/ornaments/' + file) || html.includes('/assets/ornaments/' + file),
     'Ornament must be rendered in the UI: ' + file);
 }
