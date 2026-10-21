@@ -273,3 +273,65 @@ body.hy-intro-active{overflow:hidden}
  .hy-page--hall h1{font-size:28px}
  .hy-plate{top:22%}
 }
+
+/* Hỷ Studio v1.5 image ornament integration — images generated for this project.
+   The gate keeps rotating as two actual hinged DOM elements; the ornament
+   layers are decorations only, never clickable and never above interaction UI. */
+.hy-art{position:absolute;display:block;pointer-events:none;user-select:none;object-fit:contain;-webkit-user-drag:none}
+.hy-art--seal{
+  left:50%;top:53%;width:clamp(75px,8.5vw,118px);height:auto;
+  transform:translate(-50%,-50%);z-index:8;
+  filter:drop-shadow(0 4px 12px #1c0a08b5);
+  transition:opacity .6s, transform 1.3s;
+}
+.hy-gateway[data-state="opening"] .hy-art--seal,
+.hy-gateway[data-state="hall"] .hy-art--seal{
+  opacity:0;transform:translate(-50%,-45%) scale(.56)
+}
+.hy-art--plum{
+  right:1.5%;top:34%;width:clamp(94px,13vw,158px);
+  z-index:7;opacity:.85;transform:rotate(6deg);
+  filter:drop-shadow(0 5px 9px #250c0973);
+}
+.hy-gateway[data-state="hall"] .hy-art--plum{z-index:4;opacity:.48}
+.hy-door__upper::before{
+  content:'';display:block;position:absolute;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  width:clamp(70px,10vw,125px);height:clamp(70px,10vw,125px);
+  background: url('/assets/ornaments/carved-door.webp') center/contain no-repeat;
+  filter:drop-shadow(0 4px 6px #190804a1);
+  pointer-events:none;opacity:.92;
+}
+.hy-door--right .hy-door__upper::before{transform:translate(-50%,-50%) scaleX(-1)}
+.hy-page:not(.hy-page--hall)::before{
+  content:'';position:absolute;left:9px;top:12px;
+  width:clamp(56px,9vw,112px);aspect-ratio:1;
+  background:url('/assets/ornaments/gold-corner.webp') left top/contain no-repeat;
+  opacity:.8;pointer-events:none;z-index:0;
+}
+.hy-page:not(.hy-page--hall)>*{position:relative;z-index:1}
+.hy-template-card[data-theme="red"] .hy-template-visual{
+  background-image: url('/assets/ornaments/song-hy.webp'),linear-gradient(155deg,#b34047,#7f2231);
+  background-repeat:no-repeat;background-position:center 33%,center;
+  background-size:76px 76px,cover;
+}
+.hy-template-card[data-theme="red"] .hy-template-visual>span{opacity:0}
+.hy-template-card[data-theme="jade"] .hy-template-visual{
+  background-image:url('/assets/ornaments/plum-branch.webp'),linear-gradient(145deg,#edf6e7,#d8e8d3);
+  background-repeat:no-repeat;background-size:80px 80px,cover;
+  background-position:center 26%,center;
+}
+.hy-template-card[data-theme="pink"] .hy-template-visual{
+  background-image:url('/assets/ornaments/gold-corner.webp'),linear-gradient(145deg,#f8e9e2,#f1d1cf);
+  background-repeat:no-repeat;background-size:80px 80px,cover;
+  background-position:9px 9px,center;
+}
+@media(max-width:560px){
+  .hy-art--seal{width:72px;top:50%}
+  .hy-art--plum{width:82px;right:-2%;top:38%;opacity:.8}
+  .hy-door__upper::before{width:64px;height:64px}
+  .hy-page:not(.hy-page--hall)::before{width:62px;opacity:.62}
+}
+@media(prefers-reduced-motion:reduce){
+  .hy-art--seal{transition:none}
+}
