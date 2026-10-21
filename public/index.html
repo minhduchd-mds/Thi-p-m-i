@@ -26,7 +26,7 @@
 @media(max-width:410px){.player-settings{grid-template-columns:1fr}.music-header{align-items:start}}
 .music-credit{display:block;margin:25px auto 0;text-align:center;font-size:10px;line-height:1.8;color:var(--card-accent);max-width:255px;text-decoration:underline;text-underline-offset:3px}
 </style>
-<link rel="stylesheet" href="/hy-gateway.css?v=1.3.1">
+<link rel="stylesheet" href="/hy-gateway.css?v=1.5.0">
 </head>
 <body>
 <section id="hy-gateway" class="hy-gateway" data-state="closed" role="dialog" aria-modal="true" aria-label="Sảnh chào Hỷ Studio" hidden>
@@ -36,10 +36,12 @@
       <span class="hy-lantern left" aria-hidden="true"></span><span class="hy-lantern right" aria-hidden="true"></span>
       <div class="hy-plate" aria-label="Hỷ Studio - Thiệp cưới tương tác"><strong>Hỷ Studio</strong><span>THIỆP CƯỚI TƯƠNG TÁC</span></div>
       <div class="hy-courtyard" aria-hidden="true"><div class="hy-arch"></div></div>
+      <img class="hy-art hy-art--plum" src="/assets/ornaments/plum-branch.webp" width="158" height="158" alt="" aria-hidden="true" decoding="async" />
       <div class="hy-front" aria-hidden="true">
         <div class="hy-door hy-door--left"><div class="hy-door__upper"></div><div class="hy-door__lower"></div><span class="hy-ring"></span></div>
         <div class="hy-door hy-door--right"><div class="hy-door__upper"></div><div class="hy-door__lower"></div><span class="hy-ring"></span></div>
       </div>
+      <img class="hy-art hy-art--seal" src="/assets/ornaments/song-hy.webp" width="118" height="118" alt="" aria-hidden="true" decoding="async" />
       <div class="hy-opening"><p>Hai cánh cửa mở, một hành trình yêu thương bắt đầu.</p><button type="button" id="hy-enter" class="hy-enter">✧ Mở cửa &amp; nghe nhạc ♫</button></div>
       <section id="hy-page-hall" class="hy-page hy-page--hall" aria-labelledby="hy-hall-heading">
         <span class="hy-overline">Chào mừng đến với Hỷ Studio</span>
@@ -246,5 +248,5 @@ $('save-top').addEventListener('click',saveCard);$('save-card').addEventListener
 (async()=>{loadDraft();await loadCardFromUrl();setMusic();refreshFilter();refresh();})();
 })();
 </script>
-<script src="/hy-gateway.js?v=1.3.1" defer></script>
+<script src="/hy-gateway.js?v=1.5.0" defer></script>
 </body></html>
