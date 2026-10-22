@@ -214,6 +214,7 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await expect(viewer.locator('#gift-details')).toBeHidden();
     await expect(viewer.locator('#poster')).toBeHidden();
     await expect(viewer.locator('.book-back')).toBeVisible();
+    await expect(viewer.locator('#back-couple')).toContainText('Minh Anh & Hoàng Nam');
     await capture(viewer,testInfo,'11-extra-custom-page');
     await viewer.close();
   });
