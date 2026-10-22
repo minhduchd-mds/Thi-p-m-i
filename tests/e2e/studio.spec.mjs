@@ -117,7 +117,7 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await page.locator('#do-publish').click();
     await expect(page.locator('#publish-link-box')).toBeVisible({ timeout: 15000 });
     const url=await page.locator('#published-url').inputValue();
-    expect(url).toMatch(/\/view\.html\?card=[0-9a-f-]+/);
+    expect(url).toMatch(/\/i\/HY-[A-HJ-NP-Z2-9]{12}$/);
     const visitor=await page.context().newPage();
     await visitor.goto(url);
     await expect(visitor.locator('#viewer')).toBeVisible();
