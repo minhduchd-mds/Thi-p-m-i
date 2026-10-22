@@ -12,6 +12,8 @@
     "test:api": "node test-api.js",
     "test:gateway": "node test-gateway.js",
     "test:gateway-interaction": "node test-gateway-interaction.js",
-    "test:studio": "node test-studio.mjs"
+    "test:studio": "node test-studio.mjs",
+    "test:e2e": "playwright test --config=playwright.config.mjs",
+    "test:e2e:headed": "playwright test --config=playwright.config.mjs --headed"
   }
 }

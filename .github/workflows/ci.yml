@@ -3,6 +3,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -55,3 +56,32 @@ jobs:
           grep -q 'class="stage-block' /tmp/hy-studio-browser-dom.html
           grep -q 'class="asset-card' /tmp/hy-studio-browser-dom.html
           echo "PASS: 1366px editor renders dynamic canvas layers and asset catalog in Chrome"
+
+  browser-e2e:
+    name: Playwright E2E · Drag/Drop · Themes · Export · RSVP
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright test runner
+        run: npm install --no-save --no-audit --no-fund @playwright/test@1.56.1
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Run functional + visual E2E
+        run: npx playwright test --config=playwright.config.mjs
+        env:
+          CI: 'true'
+      - name: Upload screenshots, traces and HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hy-studio-playwright-${{ github.run_number }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14
+          if-no-files-found: warn
