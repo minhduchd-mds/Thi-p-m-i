@@ -61,11 +61,11 @@ function renderFields(){
   if(key==="date")el.type="date";else if(key==="time")el.type="time";else el.type="text";
   el.name=key;el.id="field-"+key;el.value=doc.fields[key]||"";
   el.maxLength=key==="message"?300:200;
-  el.addEventListener("focus",()=>focusSnapshot=clone(doc));
+  el.addEventListener("focus",()=>{focusSnapshot=clone(doc);el.dataset.focusValue=el.value;});
   el.addEventListener("input",()=>{
    doc.fields[key]=el.value;renderCanvas();scheduleSave();
   });
-  el.addEventListener("change",()=>{if(focusSnapshot)checkpoint(focusSnapshot);focusSnapshot=null;});
+  el.addEventListener("change",()=>{if(focusSnapshot&&el.dataset.focusValue!==el.value)checkpoint(focusSnapshot);focusSnapshot=null;});
   form.append(lbl,el);
  }
  $("music-choice").value=doc.music;
@@ -162,7 +162,7 @@ function propUpdate(el,commit=false){
   const n=Number(value);if(Number.isFinite(n))b[prop]=Math.max(prop==="w"||prop==="h"?20:-500,Math.min(1500,n));
  }else if(prop==="opacity")b.opacity=Math.max(0,Math.min(1,Number(value)/100));
  else b[prop]=value;
- renderCanvas();if(commit){if(focusSnapshot){checkpoint(focusSnapshot);focusSnapshot=null;}renderLayers();}
+ renderCanvas();if(commit){if(focusSnapshot&&el.dataset.focusValue!==el.value)checkpoint(focusSnapshot);focusSnapshot=null;renderLayers();}
  scheduleSave();
 }
 function startPointer(e){
@@ -218,7 +218,7 @@ async function sendPublish(){
   if(!r.ok)throw Error(result.error||"Lỗi HTTP "+r.status);
   if(action==="POST"){cardId=result.id;editToken=result.editToken;try{localStorage.setItem(OWNER+cardId,editToken);}catch(e){}}
   if(!cardId)throw Error("Máy chủ không trả ID thiệp");
-  history.replaceState({}, "", "/studio.html?edit="+encodeURIComponent(cardId));
+  window.history.replaceState({}, "", "/studio.html?edit="+encodeURIComponent(cardId));
   const link=location.origin+"/view.html?card="+encodeURIComponent(cardId);
   $("published-url").value=link;$("publish-link-box").hidden=false;
   $("publish-info").textContent="Đã lưu thiệp. Link xem thiệp bên dưới dành cho khách, không chứa quyền chỉnh sửa.";
@@ -263,7 +263,7 @@ area.addEventListener("drop",e=>{
  if(!["text","frame","shape","image",...assets.map(x=>x.id)].includes(kind))return;
  const r=stage.getBoundingClientRect();add(kind,Math.max(0,Math.round((e.clientX-r.left)/zoom-80)),Math.max(0,Math.round((e.clientY-r.top)/zoom-50)));
 });
-$("inspector-content").addEventListener("focusin",e=>{if(e.target.matches("[data-prop]"))focusSnapshot=clone(doc);});
+$("inspector-content").addEventListener("focusin",e=>{if(e.target.matches("[data-prop]")){focusSnapshot=clone(doc);e.target.dataset.focusValue=e.target.value;}});
 $("inspector-content").addEventListener("input",e=>{if(e.target.matches("[data-prop]"))propUpdate(e.target,false);});
 $("inspector-content").addEventListener("change",e=>{if(e.target.matches("[data-prop]"))propUpdate(e.target,true);});
 $("inspector-content").addEventListener("click",e=>{
