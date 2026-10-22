@@ -3,7 +3,7 @@
 <meta name="theme-color" content="#f8f5f1"><title>Hỷ Studio · Trình thiết kế thiệp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Dancing+Script:wght@500;600;700&family=Noto+Serif:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/studio.css?v=2.2.0"></head>
+<link rel="stylesheet" href="/studio.css?v=2.3.0"></head>
 <body>
 <div id="studio" class="studio">
 <header class="topbar">
@@ -18,7 +18,7 @@
    <button id="undo" title="Hoàn tác (Ctrl/⌘ Z)" aria-label="Hoàn tác">↶</button>
    <button id="redo" title="Làm lại (Ctrl/⌘ Shift Z)" aria-label="Làm lại">↷</button>
    <button id="preview" class="secondary">Xem trước</button>
-   <button id="save-local" class="secondary">Lưu nháp</button>
+   <button id="save-local" class="secondary">Lưu nháp</button><button id="manage" class="secondary">Thiệp của tôi</button>
    <button id="publish" class="primary">Xuất bản ↗</button>
  </div>
 </header>
@@ -51,7 +51,7 @@
    <div id="asset-grid" class="asset-grid" aria-label="Thư viện hoạ tiết"></div>
    <div class="asset-tip">SVG sắc nét · Vật liệu gỗ WebP</div>
    <div class="group-label">XUẤT THIỆP</div>
-   <div class="export-stack"><button id="export-webp" class="export">↓ Tải WebP mặt đang chọn</button><button id="export-png" class="export">↓ Tải PNG mặt đang chọn</button></div>
+   <div class="export-stack"><button id="export-pdf-all" class="export">↓ PDF toàn bộ trang · 300 dpi</button><button id="export-pdf-page" class="export">↓ PDF trang đang chọn</button><button id="export-webp" class="export">↓ Tải WebP mặt đang chọn</button><button id="export-png" class="export">↓ Tải PNG mặt đang chọn</button></div>
   </div>
   <div id="fields-panel" class="palette-panel" hidden>
    <p class="panel-hint">Thông tin được liên kết trên mọi trang. Người dùng vẫn chỉnh tự do từng khối.</p><form id="fields-form" autocomplete="off"></form>
@@ -83,9 +83,30 @@
   <div id="inspector-content"></div>
  </aside>
 </div>
-<div class="statusbar"><span><span class="status-light"></span> Hỷ Studio Editor v2.2 · Nhiều trang</span><span id="status" role="status" aria-live="polite">Sẵn sàng thiết kế</span></div>
+<div class="statusbar"><span><span class="status-light"></span> Hỷ Studio Editor v2.3 · Xuất bản & PDF</span><span id="status" role="status" aria-live="polite">Sẵn sàng thiết kế</span></div>
 </div>
 <input id="upload-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
-<dialog id="publish-dialog"><form method="dialog"><h2>Xuất bản thiệp cưới</h2><p id="publish-info">Lưu thiệp lên máy chủ để tạo liên kết chia sẻ. Thiệp có hiệu lực trong 30 ngày.</p><div id="publish-link-box" hidden><input id="published-url" readonly aria-label="Liên kết thiệp"><button id="copy-published" type="button">Sao chép</button></div><div class="dialog-actions"><button value="close">Đóng</button><button id="do-publish" type="button" class="primary">Lưu và lấy liên kết</button></div></form></dialog>
-<script type="module" src="/studio.mjs?v=2.2.0"></script>
+<dialog id="publish-dialog"><form method="dialog"><h2>Xuất bản thiệp cưới</h2><p id="publish-info">Lưu thiệp lên máy chủ để tạo liên kết chia sẻ. Thiệp có hiệu lực trong 30 ngày.</p><div id="publish-link-box" hidden>
+  <div class="published-result"><img id="share-qr" alt="QR mở thiệp tương tác cho khách" width="132" height="132"><div>
+   <strong id="public-code" class="public-code"></strong><small id="public-expiry"></small>
+   <label for="published-url" class="field-label">Đường dẫn khách mời · Không chứa quyền chỉnh sửa</label>
+   <input id="published-url" readonly aria-label="Liên kết thiệp">
+   <div class="share-buttons"><button id="copy-published" type="button">Sao chép link</button><button id="download-share-qr" type="button">Mở mã QR</button></div>
+  </div></div>
+  <small class="sharing-note">QR này mở thiệp cưới, khác với VietQR mừng cưới.</small>
+ </div><div class="dialog-actions"><button value="close">Đóng</button><button id="do-publish" type="button" class="primary">Lưu và lấy liên kết</button></div></form></dialog>
+<dialog id="manage-dialog">
+ <form method="dialog"><h2>Quản lý thiệp đã xuất bản</h2>
+ <p>Thiệp được lưu trên Supabase, link giữ nguyên khi chỉnh sửa. Quyền quản lý chỉ có trên thiết bị đã tạo thiệp.</p>
+ <label for="managed-select" class="field-label">Thiệp trên thiết bị này</label><select id="managed-select"></select>
+ <div id="manage-information" hidden>
+  <p id="manage-summary"></p><label for="manage-link" class="field-label">Link công khai</label>
+  <input id="manage-link" readonly>
+  <div class="inspect-actions"><button id="manage-copy" type="button">Sao chép link</button><button id="manage-rsvps" type="button">Xem RSVP</button><button id="manage-extend" type="button">Gia hạn 30 ngày</button><button id="manage-toggle" type="button">Thu hồi link</button></div>
+  <div id="manage-rsvp-list" class="manage-rsvp-list" hidden></div>
+ </div>
+ <p id="manage-message" role="status" aria-live="polite"></p>
+ <div class="dialog-actions"><button value="close">Đóng</button></div></form>
+</dialog>
+<script type="module" src="/studio.mjs?v=2.3.0"></script>
 </body></html>

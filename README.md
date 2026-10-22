@@ -1,3 +1,14 @@
+## v2.3 — PDF, link định danh, QR thiệp và quản lý xuất bản (22/10/2026)
+
+- PDF: xuất tất cả trang hoặc trang đang chọn, kích thước in 120 × 180 mm, ảnh 1440 × 2160 ~305 dpi. PDF không chứa nhạc/animation.
+- Link công khai: /i/HY-XXXXXXXXXXXX. Mã dùng random crypto và PostgreSQL UNIQUE index, UUID nội bộ độc lập, không chứa edit token.
+- Hosting: Vercel rewrite /api/* đến Supabase Edge Function studio-api trong Supabase hy-studio (hoạt động). Giữ nguyên Edge Function api cũ.
+- Quyền sửa: chỉ chủ thiệp giữ token trên thiết bị; Supabase chỉ lưu hash SHA-256. Quản lý link và xem RSVP yêu cầu Bearer token.
+- Quản lý: danh sách thiệp xuất bản trên thiết bị, thống kê RSVP, gia hạn 30 ngày (tối đa 365 ngày từ khi tạo), thu hồi/khôi phục; link không đổi khi sửa.
+- QR dẫn đến link công khai dùng api.qrserver.com (gửi link public tới dịch vụ thứ ba); khác với VietQR chuyển khoản.
+- Khi không có backend đám mây, server.js chạy kiểm thử bằng filesystem và có cùng URL/API. CI có Playwright thử PDF và mã link.
+- Giới hạn: QR do dịch vụ ngoài có thể gặp chặn tải/CORS khi xuất PDF/PNG; editor phải báo lỗi chứ không tạo bản thiếu QR.
+
 ## v2.2 — Trình thiết kế nhiều trang, bản đồ và VietQR
 
 - Editor làm mới theo 3 phong cách **Hồng Hỷ / Ngọc Uyển / Hoa Vân**, các khối hoạ tiết SVG và chất liệu WebP, hai mặt gập có animation.

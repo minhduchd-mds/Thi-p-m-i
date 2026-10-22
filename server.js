@@ -13,6 +13,11 @@ const TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const LIMIT_BYTES = 1_700_000;
 const MUSIC_LIMIT_BYTES = 8 * 1024 * 1024;
 const MUSIC_DIR = path.join(DATA_DIR,'music');
+const CODE_DIR = path.join(DATA_DIR,'codes');
+const CODE_ABC='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const codeValid=code=>/^HY-[A-HJ-NP-Z2-9]{12}$/.test(code);
+async function allocateCode(id){await fs.mkdir(CODE_DIR,{recursive:true});for(let i=0;i<8;i++){const code='HY-'+[...randomBytes(12)].map(b=>CODE_ABC[b&31]).join('');try{await fs.writeFile(path.join(CODE_DIR,code),id,{flag:'wx'});return code}catch(e){if(e.code!=='EEXIST')throw e}}throw Object.assign(new Error('Không cấp được mã thiệp'),{status:503})}
+
 const recentRequests = new Map();
 
 const response = (res,code,value)=>{
@@ -133,8 +138,9 @@ function sanitizeRSVP(raw){
 const filepath=id=>path.join(DATA_DIR,`${id}.json`);
 function idValid(id){return /^[0-9a-f]{8}-[0-9a-f-]{27,36}$/.test(id)}
 async function load(id){
+  if(codeValid(id)){try{id=(await fs.readFile(path.join(CODE_DIR,id),'utf8')).trim()}catch(e){if(e.code==='ENOENT')return null;throw e}}
   if(!idValid(id))return null;
-  try{const record=JSON.parse(await fs.readFile(filepath(id),'utf8'));if(new Date(record.expiresAt).getTime()<=Date.now()){await fs.unlink(filepath(id)).catch(()=>{});await fs.unlink(path.join(MUSIC_DIR,`${id}.mp3`)).catch(()=>{});return 'expired'}return record;}catch(e){if(e.code==='ENOENT')return null;throw e}
+  try{const record=JSON.parse(await fs.readFile(filepath(id),'utf8'));if(new Date(record.expiresAt).getTime()<=Date.now()){await fs.unlink(filepath(id)).catch(()=>{});await fs.unlink(path.join(MUSIC_DIR,`${id}.mp3`)).catch(()=>{});if(record.shortCode)await fs.unlink(path.join(CODE_DIR,record.shortCode)).catch(()=>{});return 'expired'}return record;}catch(e){if(e.code==='ENOENT')return null;throw e}
 }
 async function store(record){const f=filepath(record.id),temp=`${f}.${randomUUID()}.tmp`;await fs.writeFile(temp,JSON.stringify(record),'utf8');await fs.rename(temp,f)}
 function authorize(req,record){const supplied=(req.headers.authorization||'').replace(/^Bearer\s+/i,'');if(!supplied||supplied.length!==record.editToken.length)return false;return timingSafeEqual(Buffer.from(supplied),Buffer.from(record.editToken));}
@@ -182,11 +188,11 @@ async function handleAPI(req,res,p){
     if(!requestLimit(req))return response(res,429,{error:'Vui lòng thử lại sau.'});
     const body=await readJSON(req);const data=sanitizeData(body.data);
     const id=randomUUID(),createdAt=new Date().toISOString(),expiresAt=new Date(Date.now()+TTL_MS).toISOString(),editToken=randomBytes(24).toString('hex');
-    const record={id,createdAt,expiresAt,editToken,data,rsvps:[]};await store(record);
-    return response(res,201,{id,createdAt,expiresAt,editToken});
+    const code=await allocateCode(id);const record={id,shortCode:code,revoked:false,createdAt,expiresAt,editToken,data,rsvps:[]};await store(record);
+    return response(res,201,{id,code,createdAt,expiresAt,editToken});
   }
   if(seg[0]!=='api'||seg[1]!=='cards'||seg.length<3||seg.length>4)return response(res,404,{error:'Đường dẫn không tồn tại'});
-  const id=seg[2],record=await load(id);
+  const requestedId=seg[2],record=await load(requestedId),id=record&&record!=='expired'?record.id:requestedId;
   if(record==='expired')return response(res,410,{error:'Thiệp đã hết thời hạn 30 ngày và được xóa.'});
   if(!record)return response(res,404,{error:'Không tìm thấy thiệp'});
   if(seg.length===4&&seg[3]==='music'){
@@ -203,13 +209,17 @@ async function handleAPI(req,res,p){
       return response(res,200,{ok:true,bytes:music.length,expiresAt:record.expiresAt});
     }
   }
-  if(seg.length===3&&req.method==='GET')return response(res,200,{id:record.id,data:record.data,createdAt:record.createdAt,expiresAt:record.expiresAt});
+  if(seg.length===3&&req.method==='GET'){
+    if(record.revoked)return response(res,410,{error:'Liên kết thiệp đã bị thu hồi'});
+    return response(res,200,{id:record.id,code:record.shortCode||null,data:record.data,createdAt:record.createdAt,expiresAt:record.expiresAt});
+  }
   if(seg.length===3&&req.method==='PUT'){
     if(!authorize(req,record))return response(res,403,{error:'Không có quyền sửa thiệp'});
     const body=await readJSON(req);record.data=sanitizeData(body.data);await store(record);
-    return response(res,200,{id:record.id,createdAt:record.createdAt,expiresAt:record.expiresAt});
+    return response(res,200,{id:record.id,code:record.shortCode||null,createdAt:record.createdAt,expiresAt:record.expiresAt});
   }
   if(seg[3]==='rsvp'&&req.method==='POST'){
+    if(record.revoked)return response(res,410,{error:'Liên kết thiệp đã bị thu hồi'});
     if(!requestLimit(req))return response(res,429,{error:'Vui lòng thử lại sau.'});
     const body=await readJSON(req);const reply=sanitizeRSVP(body);
     if(record.rsvps.length>=500)return response(res,429,{error:'Đã đạt giới hạn phản hồi của thiệp'});
@@ -219,10 +229,30 @@ async function handleAPI(req,res,p){
     if(!authorize(req,record))return response(res,403,{error:'Không có quyền xem phản hồi'});
     return response(res,200,{rsvps:record.rsvps,count:record.rsvps.length,expiresAt:record.expiresAt});
   }
+  if(seg[3]==='manage'&&req.method==='GET'){
+    if(!authorize(req,record))return response(res,403,{error:'Không có quyền quản lý thiệp'});
+    return response(res,200,{id:record.id,code:record.shortCode||null,revoked:!!record.revoked,
+      createdAt:record.createdAt,updatedAt:record.updatedAt||record.createdAt,expiresAt:record.expiresAt,
+      rsvpCount:record.rsvps.length,title:(record.data.bride||'')+' & '+(record.data.groom||'')});
+  }
+  if(['revoke','restore','extend'].includes(seg[3])&&req.method==='POST'){
+    if(!authorize(req,record))return response(res,403,{error:'Không có quyền quản lý thiệp'});
+    if(!requestLimit(req))return response(res,429,{error:'Vui lòng thử lại sau'});
+    if(seg[3]==='revoke')record.revoked=true;
+    if(seg[3]==='restore')record.revoked=false;
+    if(seg[3]==='extend'){
+      const limit=Date.parse(record.createdAt)+365*86400000;
+      const next=Math.min(limit,Date.parse(record.expiresAt)+TTL_MS);
+      if(next<=Date.parse(record.expiresAt))return response(res,409,{error:'Đã đạt giới hạn gia hạn'});
+      record.expiresAt=new Date(next).toISOString();
+    }
+    record.updatedAt=new Date().toISOString();await store(record);
+    return response(res,200,{ok:true,code:record.shortCode||null,revoked:!!record.revoked,expiresAt:record.expiresAt});
+  }
   return response(res,405,{error:'Phương thức không được hỗ trợ'});
 }
 async function serveStatic(req,res,p){
-  const rel=(p==='/'?'/index.html':p).replace(/^\/+/,''),file=path.resolve(PUBLIC_DIR,rel);
+  const rel=(p==='/'?'/index.html':codeValid(p.slice(3))&&p.startsWith('/i/')?'/view.html':p).replace(/^\/+/,''),file=path.resolve(PUBLIC_DIR,rel);
   if(!file.startsWith(PUBLIC_DIR+path.sep))return response(res,403,{error:'Đường dẫn không hợp lệ'});
   const type=path.extname(file).toLowerCase();
   const allowed={'.html':'text/html; charset=utf-8','.wav':'audio/wav','.mp3':'audio/mpeg','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.mjs':'text/javascript; charset=utf-8'};

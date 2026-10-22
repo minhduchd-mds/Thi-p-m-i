@@ -1,9 +1,16 @@
+import {downloadPDF} from "./pdf-export.mjs";
 import {BANKS,blankGift,safeGift,giftReady,googleMapsUrl,newExtraPage,allPages,pageById,pageSurface} from "./card-extras.mjs";
 import {W,H,themes,assets,songs,fieldsDefault,createDoc,migrate,sanitize,clone,blockText,blockName,addBlock,surfaceDoc,faces} from "/editor-core.mjs";
 import {renderStage,downloadPoster} from "/editor-render.mjs";
 const $=id=>document.getElementById(id);
 const STORE="hy-studio-editor-v2";
 const OWNER="hy-studio-owner-";
+const PUBLISHED="hy-studio-published-v1";
+const SHARE_QR="https://api.qrserver.com/v1/create-qr-code/?size=256x256&margin=12&data=";
+const publicLink=(code,id)=>location.origin+(code?"/i/"+encodeURIComponent(code):"/view.html?card="+encodeURIComponent(id));
+function publishedIndex(){try{return JSON.parse(localStorage.getItem(PUBLISHED)||"[]").filter(x=>x?.id).slice(0,80)}catch{return []}}
+function storePublished(record){const entries=publishedIndex().filter(x=>x.id!==record.id);entries.unshift(record);try{localStorage.setItem(PUBLISHED,JSON.stringify(entries.slice(0,80)))}catch(e){notify("Bộ nhớ quản lý thiệp đã đầy");}}
+
 let doc=createDoc(new URLSearchParams(location.search).get("theme")||"red");
 let selected="",activeFace="cover",zoom=.55,history=[],future=[],dirty=false,cardId=null,editToken=null;
 let pointer=null,focusSnapshot=null,gridOn=false,draftTimer=0;
@@ -254,7 +261,7 @@ function preview(){
  saveDraft();window.open("/view.html?preview=1&animate=1","_blank","noopener");
 }
 async function publish(){
- $("publish-dialog").showModal();$("publish-info").textContent="Tạo link thiệp có hiệu lực 30 ngày. Bản xem trước tĩnh của Vercel không chạy API lưu thiệp; nếu chưa cấu hình backend, hãy dùng Lưu nháp / Xuất WebP.";
+ $("publish-dialog").showModal();$("publish-info").textContent="Xuất bản thiệp lên Supabase và tạo mã duy nhất. Liên kết công khai có hiệu lực ban đầu 30 ngày; anh có thể chỉnh sửa hoặc thu hồi trong mục Thiệp của tôi.";
  $("publish-link-box").hidden=true;
 }
 async function sendPublish(){
@@ -270,8 +277,15 @@ async function sendPublish(){
   if(action==="POST"){cardId=result.id;editToken=result.editToken;try{localStorage.setItem(OWNER+cardId,editToken);}catch(e){}}
   if(!cardId)throw Error("Máy chủ không trả ID thiệp");
   window.history.replaceState({}, "", "/studio.html?edit="+encodeURIComponent(cardId));
-  const link=location.origin+"/view.html?card="+encodeURIComponent(cardId);
+  const code=result.code||publishedIndex().find(x=>x.id===cardId)?.code||"";
+  const link=publicLink(code,cardId);
   $("published-url").value=link;$("publish-link-box").hidden=false;
+  $("public-code").textContent=code||cardId;
+  $("public-expiry").textContent="Có hiệu lực đến "+new Date(result.expiresAt).toLocaleDateString("vi-VN");
+  $("share-qr").src=SHARE_QR+encodeURIComponent(link);
+  $("share-qr").onerror=()=>{$("share-qr").alt="Chưa tải được ảnh QR; vẫn có thể sao chép liên kết"};
+  const fields=safe.fields||{};
+  storePublished({id:cardId,code,name:(fields.bride||"")+" & "+(fields.groom||""),expiresAt:result.expiresAt});
   $("publish-info").textContent="Đã lưu thiệp. Link xem thiệp bên dưới dành cho khách, không chứa quyền chỉnh sửa.";
   notify("Đã xuất bản thiệp đến "+new Date(result.expiresAt).toLocaleDateString("vi-VN"));saveDraft();
  }catch(e){
@@ -279,6 +293,71 @@ async function sendPublish(){
   notify("Xuất bản chưa thành công — bản nháp vẫn an toàn");
  }finally{btn.disabled=false;}
 }
+
+function openManager(){
+ $("manage-dialog").showModal();
+ const select=$("managed-select");select.replaceChildren();
+ const list=publishedIndex();
+ if(!list.length){$("manage-information").hidden=true;$("manage-message").textContent="Chưa có thiệp xuất bản trên trình duyệt này.";return;}
+ for(const item of list){
+  const option=document.createElement("option");option.value=item.id;
+  option.textContent=(item.name||"Thiệp cưới")+" · "+(item.code||item.id.slice(0,8));
+  select.append(option);
+ }
+ if(cardId&&list.some(x=>x.id===cardId))select.value=cardId;
+ loadManagement();
+}
+const managerHeaders=id=>{
+ const token=localStorage.getItem(OWNER+id);
+ if(!token)throw Error("Thiếu quyền quản lý trên thiết bị này. Chỉ chủ thiệp đã xuất bản mới được thực hiện thao tác.");
+ return {Authorization:"Bearer "+token};
+};
+async function loadManagement(){
+ const id=$("managed-select").value;
+ if(!id){$("manage-information").hidden=true;return;}
+ $("manage-message").textContent="Đang tải dữ liệu thiệp…";
+ try{
+  const r=await fetch("/api/cards/"+encodeURIComponent(id)+"/manage",{headers:managerHeaders(id)});
+  const info=await r.json();if(!r.ok)throw Error(info.error||"Không đọc được thông tin");
+  $("manage-information").hidden=false;
+  $("manage-summary").textContent=(info.title||"Thiệp cưới")+" · Mã "+(info.code||id)+" · "+(info.revoked?"Đã thu hồi":"Đang hoạt động")+" · "+(info.rsvpCount||0)+" RSVP · Hết hạn "+new Date(info.expiresAt).toLocaleDateString("vi-VN");
+  $("manage-link").value=publicLink(info.code,id);
+  $("manage-toggle").dataset.action=info.revoked?"restore":"revoke";
+  $("manage-toggle").textContent=info.revoked?"Khôi phục link":"Thu hồi link";
+  $("manage-rsvp-list").hidden=true;
+  $("manage-message").textContent="";
+ }catch(e){$("manage-information").hidden=true;$("manage-message").textContent=e.message;}
+}
+async function modifyLink(action){
+ const id=$("managed-select").value;if(!id)return;
+ if(action==="revoke"&&!confirm("Thu hồi link sẽ ngăn khách mở thiệp và gửi RSVP. Anh có thể khôi phục trước khi hết hạn. Tiếp tục?"))return;
+ const buttons=["manage-toggle","manage-extend"].map($);buttons.forEach(x=>x.disabled=true);
+ try{
+  const r=await fetch("/api/cards/"+encodeURIComponent(id)+"/"+action,{method:"POST",headers:managerHeaders(id)});
+  const body=await r.json();if(!r.ok)throw Error(body.error||"Không thể cập nhật liên kết");
+  const saved=publishedIndex().find(x=>x.id===id);
+  if(saved)storePublished({...saved,expiresAt:body.expiresAt});
+  await loadManagement();
+  $("manage-message").textContent=action==="extend"?"Đã gia hạn thêm 30 ngày":"Trạng thái link đã được cập nhật";
+ }catch(e){$("manage-message").textContent=e.message;}finally{buttons.forEach(x=>x.disabled=false);}
+}
+async function showRSVPs(){
+ const id=$("managed-select").value;if(!id)return;
+ try{
+  const r=await fetch("/api/cards/"+encodeURIComponent(id)+"/rsvps",{headers:managerHeaders(id)});
+  const result=await r.json();if(!r.ok)throw Error(result.error||"Lỗi tải phản hồi");
+  const list=$("manage-rsvp-list");list.replaceChildren();list.hidden=false;
+  const title=document.createElement("strong");title.textContent="Đã nhận "+(result.count||0)+" phản hồi";list.append(title);
+  for(const item of result.rsvps||[]){
+   const card=document.createElement("article");card.className="rsvp-entry";
+   const name=document.createElement("b");name.textContent=item.name||"Khách mời";
+   const status=document.createElement("span");status.textContent=item.attendance==="yes"?"Sẽ tham dự":item.attendance==="no"?"Không tham dự":"Gửi lời chúc";
+   const wish=document.createElement("p");wish.textContent=item.wish||"";
+   card.append(name,status,wish);list.append(card);
+  }
+ }catch(e){$("manage-message").textContent=e.message;}
+}
+
 async function boot(){
  try{const s=JSON.parse(localStorage.getItem(STORE)||"null");if(s?.doc)doc=migrate(s.doc);}catch(e){}
  const params=new URLSearchParams(location.search);
@@ -349,6 +428,21 @@ $("export-png").addEventListener("click",async()=>{try{notify("Đang tạo PNG�
 $("publish").addEventListener("click",publish);
 $("do-publish").addEventListener("click",sendPublish);
 $("copy-published").addEventListener("click",()=>navigator.clipboard.writeText($("published-url").value).then(()=>notify("Đã sao chép link thiệp")));
+$("download-share-qr").addEventListener("click",()=>window.open($("share-qr").src,"_blank","noopener"));
+$("manage").addEventListener("click",openManager);
+$("managed-select").addEventListener("change",loadManagement);
+$("manage-copy").addEventListener("click",()=>navigator.clipboard.writeText($("manage-link").value).then(()=>{$("manage-message").textContent="Đã sao chép link thiệp"}));
+$("manage-rsvps").addEventListener("click",showRSVPs);
+$("manage-extend").addEventListener("click",()=>modifyLink("extend"));
+$("manage-toggle").addEventListener("click",()=>modifyLink($("manage-toggle").dataset.action||"revoke"));
+$("export-pdf-all").addEventListener("click",async()=>{
+ try{notify("Đang kết xuất PDF toàn bộ trang, vui lòng chờ…");await downloadPDF(sanitize(doc),{all:true});notify("Đã tải PDF toàn bộ trang · 120 × 180 mm");}
+ catch(e){notify("Xuất PDF thất bại: "+e.message);}
+});
+$("export-pdf-page").addEventListener("click",async()=>{
+ try{notify("Đang kết xuất PDF trang đã chọn…");await downloadPDF(sanitize(doc),{all:false,pageId:activeFace});notify("Đã tải PDF trang "+activePage().title);}
+ catch(e){notify("Xuất PDF thất bại: "+e.message);}
+});
 document.addEventListener("keydown",e=>{
  const focused=/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||"");
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();if(e.shiftKey)redo();else undo();return;}

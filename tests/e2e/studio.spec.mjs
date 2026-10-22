@@ -275,6 +275,61 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await capture(page,testInfo,'13-mobile-open-multipage');
   });
 
+  test('PDF in 120×180mm nhiều trang và trang đang chọn',async({page},testInfo)=>{
+    await ready(page);
+    await page.locator('[data-new-page="map"]').click();
+    const down=page.waitForEvent('download');
+    await page.locator('#export-pdf-all').click();
+    const pdf=await down;
+    expect(pdf.suggestedFilename()).toMatch(/-toan-bo\.pdf$/);
+    const content=await fs.readFile(await pdf.path());
+    expect(content.subarray(0,8).toString()).toBe('%PDF-1.4');
+    expect((content.toString('latin1').match(/\/Type \/Page\s/g)||[]).length).toBe(3);
+    expect(content.toString('latin1')).toContain('/MediaBox [0 0 340.15748 510.23622]');
+    const single=page.waitForEvent('download');
+    await page.locator('#export-pdf-page').click();
+    const pagePdf=await single;
+    const bytes=await fs.readFile(await pagePdf.path());
+    expect((bytes.toString('latin1').match(/\/Type \/Page\s/g)||[]).length).toBe(1);
+    await capture(page,testInfo,'14-pdf-multipage');
+  });
+
+  test('Xuất bản mã HY duy nhất, link đẹp, thu hồi, gia hạn và khôi phục',async({page},testInfo)=>{
+    await ready(page);
+    await page.locator('#publish').click();
+    await page.locator('#do-publish').click();
+    await expect(page.locator('#publish-link-box')).toBeVisible({timeout:15000});
+    const code=await page.locator('#public-code').innerText();
+    expect(code).toMatch(/^HY-[A-HJ-NP-Z2-9]{12}$/);
+    const link=await page.locator('#published-url').inputValue();
+    expect(link).toContain('/i/'+code);
+    await expect(page.locator('#share-qr')).toHaveAttribute('src',/api\.qrserver\.com\/v1\/create-qr-code/);
+    const view=await page.context().newPage();
+    await view.goto(link);
+    await expect(view.locator('#viewer')).toBeVisible();
+    await expect(view.locator('#inside-poster')).toBeVisible();
+    await page.locator('#publish-dialog button[value="close"]').click();
+    await page.locator('#manage').click();
+    await expect(page.locator('#manage-information')).toBeVisible();
+    await expect(page.locator('#manage-summary')).toContainText(code);
+    const initial=await page.locator('#manage-summary').innerText();
+    await page.locator('#manage-extend').click();
+    await expect(page.locator('#manage-message')).toContainText('Đã gia hạn');
+    const updated=await page.locator('#manage-summary').innerText();
+    expect(updated).not.toBe(initial);
+    page.once('dialog',dialog=>dialog.accept());
+    await page.locator('#manage-toggle').click();
+    await expect(page.locator('#manage-summary')).toContainText('Đã thu hồi');
+    await view.reload();
+    await expect(view.locator('#loading')).toContainText('Không thể mở thiệp');
+    await page.locator('#manage-toggle').click();
+    await expect(page.locator('#manage-summary')).toContainText('Đang hoạt động');
+    await view.reload();
+    await expect(view.locator('#viewer')).toBeVisible();
+    await capture(page,testInfo,'15-owner-publication-dashboard');
+    await view.close();
+  });
+
   test('Xem trước trên mobile 390 × 844 không tràn ngang', async ({ page }, testInfo) => {
     await ready(page);
     await page.locator('#save-local').click();

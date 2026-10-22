@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://ogzwyibvvsvuufoghudl.supabase.co/functions/v1/studio-api/api/:path*"
+    },
+    {
+      "source": "/i/:code",
+      "destination": "/view.html?code=:code"
+    }
+  ]
+}
