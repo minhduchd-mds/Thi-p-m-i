@@ -52,18 +52,23 @@ function sanitizeData(raw){
   // v2 visual editor document is stored alongside legacy v1 fields.
   if(raw.document!==undefined){
     const d=raw.document;
-    if(!d||d.schemaVersion!==2||!['red','jade','pink'].includes(d.theme)||!Array.isArray(d.blocks)||d.blocks.length>80||(d.insideBlocks!==undefined&&(!Array.isArray(d.insideBlocks)||d.insideBlocks.length>80))){
+    if(!d||d.schemaVersion!==2||!['red','jade','pink'].includes(d.theme)||!Array.isArray(d.blocks)||d.blocks.length>80||(d.insideBlocks!==undefined&&(!Array.isArray(d.insideBlocks)||d.insideBlocks.length>80))||(d.extraPages!==undefined&&(!Array.isArray(d.extraPages)||d.extraPages.length>20))){
       throw Object.assign(new Error('Tài liệu thiết kế không hợp lệ'),{status:400});
     }
     const f={};
-    const names={bride:30,groom:30,date:10,time:5,venue:100,address:180,guest:50,message:300};
+    const names={bride:30,groom:30,date:10,time:5,venue:100,address:180,mapUrl:2048,guest:50,message:300};
     for(const [key,max] of Object.entries(names))f[key]=cleanString(d.fields?.[key],max);
+    if(f.mapUrl){
+      try{const u=new URL(f.mapUrl);
+        if(u.protocol!=='https:'||!['google.com','www.google.com','maps.google.com','maps.app.goo.gl'].includes(u.hostname))f.mapUrl='';
+      }catch(e){f.mapUrl='';}
+    }
     const officialAssets=new Set(['/assets/ornaments/song-hy.svg','/assets/ornaments/carved-door.svg','/assets/ornaments/gold-corner.svg','/assets/ornaments/plum-branch.svg','/assets/textures/wood-mahogany.webp']);
     const finite=(v,min,max,def)=>Number.isFinite(Number(v))?Math.min(max,Math.max(min,Number(v))):def;
     const normalizeBlocks = source => {
     const blocks=[],ids=new Set();
     for(const input of source){
-      if(!input||!['text','image','ornament','frame','shape'].includes(input.type))continue;
+      if(!input||!['text','image','ornament','frame','shape','map','qr'].includes(input.type))continue;
       const id=cleanString(input.id,70);
       if(!/^[a-zA-Z0-9_-]+$/.test(id)||ids.has(id))throw Object.assign(new Error('Mã khối thiết kế không hợp lệ'),{status:400});
       ids.add(id);
@@ -92,8 +97,27 @@ function sanitizeData(raw){
     };
     const blocks=normalizeBlocks(d.blocks);
     const insideBlocks=d.insideBlocks===undefined?[]:normalizeBlocks(d.insideBlocks);
+    const extraPages=[],pageIds=new Set(['cover','inside']);
+    for(const page of d.extraPages||[]){
+      if(!page||!['map','gift','custom'].includes(page.kind)||!Array.isArray(page.blocks)||page.blocks.length>80){
+        throw Object.assign(new Error('Trang thiệp không hợp lệ'),{status:400});
+      }
+      const id=cleanString(page.id,70);
+      if(!/^[a-zA-Z0-9_-]+$/.test(id)||pageIds.has(id))throw Object.assign(new Error('Mã trang thiệp không hợp lệ'),{status:400});
+      pageIds.add(id);
+      extraPages.push({id,kind:page.kind,title:cleanString(page.title,65)||'Trang mới',blocks:normalizeBlocks(page.blocks)});
+    }
+    const allowedBanks=new Set(['VCB','TCB','MB','ACB','BIDV','CTG','VPB','TPB','STB','VIB','HDB','OCB','MSB','SHB']);
+    const inputGift=d.gift||{};
+    const gift={
+      bank:allowedBanks.has(inputGift.bank)?inputGift.bank:'VCB',
+      account:/^[0-9]{6,19}$/.test(String(inputGift.account||''))?String(inputGift.account):'',
+      holder:cleanString(inputGift.holder,70),
+      amount:/^[0-9]{1,10}$/.test(String(inputGift.amount||''))?String(inputGift.amount):'',
+      note:cleanString(inputGift.note,90)
+    };
     const document={schemaVersion:2,theme:d.theme,layoutId:cleanString(d.layoutId,60),width:720,height:1080,
-      fields:f,music:data.music,blocks,insideBlocks};
+      fields:f,music:data.music,blocks,insideBlocks,extraPages,gift};
     if(JSON.stringify(document).length>1_300_000)throw Object.assign(new Error('Thiệp có quá nhiều dữ liệu ảnh'),{status:413});
     data.document=document;
   }

@@ -1,3 +1,4 @@
+import {vietQRUrl,giftReady,googleMapsUrl} from "./card-extras.mjs";
 import {W,H,themes,insidePalette,assetUrl,blockText} from "/editor-core.mjs";
 export const palette=doc=>doc.face==="inside"?insidePalette[doc.theme]:themes[doc.theme];
 export const paintBackground=(el,doc)=>{
@@ -34,6 +35,23 @@ export function renderStage(el,doc,selected=""){
    img.draggable=false;
    img.style.objectFit=block.type==="ornament"?"contain":(block.fit||"cover");
    item.appendChild(img);
+  }else if(block.type==="map"){
+   item.classList.add("map-block");
+   const pin=document.createElement("span");pin.className="map-pin";pin.textContent="⌖";
+   const place=document.createElement("span");place.className="map-place";place.textContent=doc.fields.venue||"Địa điểm tổ chức";
+   const address=document.createElement("span");address.className="map-address";address.textContent=doc.fields.address||"Nhập địa chỉ để mở bản đồ";
+   const action=document.createElement("span");action.className="map-link-label";action.textContent=googleMapsUrl(doc.fields)?"↗ Xem trên Google Maps":"Nhập địa điểm trong tab Nội dung";
+   item.append(pin,place,address,action);
+  }else if(block.type==="qr"){
+   item.classList.add("gift-qr-block");
+   const url=vietQRUrl(doc.gift);
+   if(url){
+    const qr=document.createElement("img");qr.alt="QR mừng cưới — kiểm tra người nhận trước khi chuyển";qr.src=url;qr.loading="lazy";qr.referrerPolicy="no-referrer";qr.style.objectFit="contain";
+    const account=document.createElement("span");account.className="gift-qr-caption";account.textContent=doc.gift.holder+" · "+doc.gift.account;
+    item.append(qr,account);
+   }else{
+    const empty=document.createElement("span");empty.className="gift-qr-placeholder";empty.textContent="▦\nThiết lập ngân hàng, số tài khoản và người nhận trong tab Nội dung";item.append(empty);
+   }
   }else if(block.type==="frame"){
    item.style.border="5px double "+palette(doc).gold;
    item.style.boxShadow="inset 0 0 0 8px "+palette(doc).bg1;
@@ -89,6 +107,24 @@ export async function drawPoster(doc,scale=2){
     let iw=img.width*ratio,ih=img.height*ratio;
     if(block.type==="image"&&block.fit!=="contain"){ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();}
     ctx.drawImage(img,x+(w-iw)/2,y+(h-ih)/2,iw,ih);
+   }
+  }else if(block.type==="map"){
+   ctx.fillStyle="#e8ded2";ctx.fillRect(x,y,w,h);
+   ctx.strokeStyle=theme.gold;ctx.lineWidth=4;ctx.strokeRect(x+3,y+3,w-6,h-6);
+   ctx.textAlign="center";ctx.fillStyle="#8d3b42";ctx.font="500 64px serif";ctx.fillText("⌖",0,y+95);
+   ctx.fillStyle="#57453d";ctx.font="600 25px serif";ctx.fillText((doc.fields.venue||"Địa điểm tổ chức").slice(0,30),0,y+154,w-32);
+   ctx.font="19px sans-serif";ctx.fillText((doc.fields.address||"Địa chỉ sẽ xuất hiện tại đây").slice(0,55),0,y+201,w-30);
+   ctx.fillStyle="#974f4b";ctx.font="600 18px sans-serif";ctx.fillText("↗ Google Maps",0,y+h-32);
+  }else if(block.type==="qr"){
+   ctx.fillStyle="#fff";ctx.fillRect(x,y,w,h);
+   const url=vietQRUrl(doc.gift);
+   if(url){
+    const qr=await getImg(url);
+    if(qr){const side=Math.min(w,h-32);ctx.drawImage(qr,x+(w-side)/2,y,side,side);}
+    else {ctx.textAlign="center";ctx.fillStyle="#6b5042";ctx.font="19px sans-serif";ctx.fillText("Mở thiệp web để quét VietQR",0,0,w-12);}
+    ctx.fillStyle="#564334";ctx.font="18px sans-serif";ctx.textAlign="center";ctx.fillText((doc.gift.holder+" · "+doc.gift.account).slice(0,38),0,y+h-15,w-12);
+   }else{
+    ctx.textAlign="center";ctx.fillStyle="#a06a6a";ctx.font="22px sans-serif";ctx.fillText("Chưa thiết lập tài khoản",0,0,w-20);
    }
   }else if(block.type==="frame"){
    ctx.strokeStyle=theme.gold;ctx.lineWidth=5;ctx.strokeRect(x+3,y+3,w-6,h-6);

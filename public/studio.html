@@ -3,16 +3,16 @@
 <meta name="theme-color" content="#f8f5f1"><title>Hỷ Studio · Trình thiết kế thiệp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Dancing+Script:wght@500;600;700&family=Noto+Serif:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/studio.css?v=2.1.0"></head>
+<link rel="stylesheet" href="/studio.css?v=2.2.0"></head>
 <body>
 <div id="studio" class="studio">
 <header class="topbar">
  <a href="/" class="brand" aria-label="Về sảnh Hỷ Studio"><span class="brand-icon">囍</span><span><b>Hỷ Studio</b><small>WEDDING DESIGN</small></span></a>
  <div class="top-title"><strong>Thiết kế thiệp mời</strong><span id="autosave-label">Bản nháp tự động</span></div>
- <div class="top-themes" role="group" aria-label="Chọn phong cách">
-   <button data-theme="red" class="theme-button active">Hồng Hỷ</button>
-   <button data-theme="jade" class="theme-button">Ngọc Uyển</button>
-   <button data-theme="pink" class="theme-button">Hoa Vân</button>
+ <div class="top-themes" role="group" aria-label="Bộ mẫu thiệp">
+   <button data-theme="red" class="theme-button active"><span class="theme-thumb thumb-red">囍</span><span><strong>Hồng Hỷ</strong><small>Đỏ son · Truyền thống</small></span></button>
+   <button data-theme="jade" class="theme-button"><span class="theme-thumb thumb-jade">囍</span><span><strong>Ngọc Uyển</strong><small>Ngọc xanh · Thanh nhã</small></span></button>
+   <button data-theme="pink" class="theme-button"><span class="theme-thumb thumb-pink">✿</span><span><strong>Hoa Vân</strong><small>Hồng lụa · Nghệ thuật</small></span></button>
  </div>
  <div class="top-actions">
    <button id="undo" title="Hoàn tác (Ctrl/⌘ Z)" aria-label="Hoàn tác">↶</button>
@@ -31,13 +31,21 @@
    <button class="palette-tab" data-panel="layers">Lớp</button>
   </div>
   <div id="blocks-panel" class="palette-panel">
-   <p class="panel-hint">Chọn Bìa ngoài / Mặt trong trên canvas. Kéo khối vào mặt đang thiết kế.</p>
+   <p class="panel-hint">Chọn trang ở phía trên khung vẽ. Kéo hoặc chạm để thêm vật liệu và hoạ tiết.</p>
+   <div class="group-label">BỔ SUNG TRANG THIỆP</div>
+   <div class="page-template-grid">
+    <button data-new-page="map" type="button"><span>⌖</span><b>Địa điểm</b><small>Chỉ đường</small></button>
+    <button data-new-page="gift" type="button"><span>♡</span><b>Mừng cưới</b><small>VietQR</small></button>
+    <button data-new-page="custom" type="button"><span>✦</span><b>Trang mới</b><small>Tự thiết kế</small></button>
+   </div>
    <div class="group-label">KHỐI THIẾT KẾ</div>
    <div id="block-tools" class="tool-list">
     <button class="tool" draggable="true" data-add="text"><span class="tool-glyph">T</span><span><b>Văn bản</b><small>Tiêu đề, lời chúc</small></span><span class="tool-add">+</span></button>
     <button class="tool" draggable="true" data-add="image"><span class="tool-glyph">▧</span><span><b>Ảnh / WebP</b><small>Ảnh nền, ảnh cưới</small></span><span class="tool-add">+</span></button>
     <button class="tool" draggable="true" data-add="frame"><span class="tool-glyph">▣</span><span><b>Khung viền</b><small>Khung kép trang trí</small></span><span class="tool-add">+</span></button>
     <button class="tool" draggable="true" data-add="shape"><span class="tool-glyph">◇</span><span><b>Hình khối</b><small>Dải màu, dấu nhấn</small></span><span class="tool-add">+</span></button>
+    <button class="tool" draggable="true" data-add="map"><span class="tool-glyph">⌖</span><span><b>Khối bản đồ</b><small>Vị trí, chỉ đường</small></span><span class="tool-add">+</span></button>
+    <button class="tool" draggable="true" data-add="qr"><span class="tool-glyph">▦</span><span><b>VietQR chuyển khoản</b><small>Số tài khoản của chủ thiệp</small></span><span class="tool-add">+</span></button>
    </div>
    <div class="group-label">HOẠ TIẾT CỔ ĐIỂN</div>
    <div id="asset-grid" class="asset-grid" aria-label="Thư viện hoạ tiết"></div>
@@ -46,15 +54,28 @@
    <div class="export-stack"><button id="export-webp" class="export">↓ Tải WebP mặt đang chọn</button><button id="export-png" class="export">↓ Tải PNG mặt đang chọn</button></div>
   </div>
   <div id="fields-panel" class="palette-panel" hidden>
-   <p class="panel-hint">Nội dung tự cập nhật theo bố cục</p><form id="fields-form" autocomplete="off"></form>
+   <p class="panel-hint">Thông tin được liên kết trên mọi trang. Người dùng vẫn chỉnh tự do từng khối.</p><form id="fields-form" autocomplete="off"></form>
+   <div class="group-label">VỊ TRÍ & GOOGLE MAPS</div>
+   <a id="map-preview-link" href="#" target="_blank" rel="noopener noreferrer" class="editor-map-link">⌖ Xem chỉ đường Google Maps ↗</a>
+   <div class="group-label">MỪNG CƯỚI · VIETQR</div>
+   <p class="panel-hint">Chỉ nhập thông tin tài khoản mà chủ thiệp đồng ý công khai. QR chỉ hỗ trợ chuyển khoản, không xác nhận thanh toán.</p>
+   <div id="bank-fields">
+    <label class="field-label" for="gift-bank">Ngân hàng</label><select id="gift-bank" data-gift="bank"></select>
+    <label class="field-label" for="gift-account">Số tài khoản (6–19 chữ số)</label><input id="gift-account" data-gift="account" inputmode="numeric" maxlength="19" placeholder="Nhập số tài khoản">
+    <label class="field-label" for="gift-holder">Tên chủ tài khoản</label><input id="gift-holder" data-gift="holder" maxlength="70" placeholder="Tên người nhận">
+    <label class="field-label" for="gift-amount">Số tiền gợi ý (không bắt buộc)</label><input id="gift-amount" data-gift="amount" inputmode="numeric" maxlength="10" placeholder="Bỏ trống để khách tự nhập">
+    <label class="field-label" for="gift-note">Nội dung chuyển khoản</label><input id="gift-note" data-gift="note" maxlength="90" placeholder="Mung cuoi">
+   </div>
+   <span id="gift-status" class="gift-status" role="status">Chưa có thông tin ngân hàng</span>
    <label class="field-label" for="music-choice">Nhạc nền thiệp</label><select id="music-choice"><option value="loi-hen-tram-nam">Lời Hẹn Trăm Năm</option><option value="duyen-ngoc-phuong-dong">Duyên Ngọc Phương Đông</option><option value="ngay-vui-chung-doi">Ngày Vui Chung Đôi</option><option value="binh-minh-hanh-phuc">Bình Minh Hạnh Phúc</option><option value="none">Không nhạc</option></select>
   </div>
   <div id="layers-panel" class="palette-panel" hidden><p class="panel-hint">Chọn lớp để sửa, dùng ↑ ↓ thay đổi thứ tự</p><div id="layer-list"></div></div>
  </aside>
  <main class="canvas-area" aria-label="Canvas thiết kế thiệp">
-  <div class="canvas-toolbar"><div class="face-switch" role="tablist" aria-label="Chọn mặt thiệp"><button type="button" role="tab" data-face="cover" aria-selected="true" class="active">01 · Bìa ngoài</button><button type="button" role="tab" data-face="inside" aria-selected="false">02 · Mặt trong</button></div><span class="canvas-caption">KHUNG VẼ THIỆP <span class="dot">●</span> 720 × 1080</span>
+  <div class="canvas-toolbar"><div class="face-switch" role="tablist" aria-label="Chọn trang thiệp"><button type="button" role="tab" data-face="cover" aria-selected="true" class="active">01 · Bìa ngoài</button><button type="button" role="tab" data-face="inside" aria-selected="false">02 · Mặt trong</button><span id="extra-page-tabs"></span></div><span class="canvas-caption">KHUNG VẼ THIỆP <span class="dot">●</span> 720 × 1080</span>
    <div class="canvas-controls"><button id="grid-toggle" title="Hiện / ẩn lưới">⊞ Lưới</button><button id="zoom-out" aria-label="Thu nhỏ">−</button><output id="zoom-label">60%</output><button id="zoom-in" aria-label="Phóng to">+</button><button id="fit" title="Vừa khung">Vừa khung</button></div>
   </div>
+  <div id="active-page-tools" class="active-page-tools" hidden><label for="current-page-title">Tên trang</label><input id="current-page-title" maxlength="65" aria-label="Đặt tên trang"><button id="page-up" title="Đưa trang về trước" type="button">←</button><button id="page-down" title="Đưa trang về sau" type="button">→</button><button id="page-duplicate" title="Nhân bản trang" type="button">Nhân bản</button><button id="page-remove" title="Xoá trang đang chọn" type="button">Xoá</button></div>
   <div id="drop-area" class="drop-area"><div id="stage-wrap" class="stage-wrap"><div id="stage" class="stage" aria-label="Nội dung thiệp, kéo thả để chỉnh sửa"></div></div></div>
   <div class="canvas-footer"><span>Mỗi mặt có các lớp riêng · Delete để xoá · Dùng phím mũi tên dịch chuyển</span><span id="coordinates">Chưa chọn thành phần</span></div>
  </main>
@@ -62,9 +83,9 @@
   <div id="inspector-content"></div>
  </aside>
 </div>
-<div class="statusbar"><span><span class="status-light"></span> Hỷ Studio Editor v2 · Desktop</span><span id="status" role="status" aria-live="polite">Sẵn sàng thiết kế</span></div>
+<div class="statusbar"><span><span class="status-light"></span> Hỷ Studio Editor v2.2 · Nhiều trang</span><span id="status" role="status" aria-live="polite">Sẵn sàng thiết kế</span></div>
 </div>
 <input id="upload-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
 <dialog id="publish-dialog"><form method="dialog"><h2>Xuất bản thiệp cưới</h2><p id="publish-info">Lưu thiệp lên máy chủ để tạo liên kết chia sẻ. Thiệp có hiệu lực trong 30 ngày.</p><div id="publish-link-box" hidden><input id="published-url" readonly aria-label="Liên kết thiệp"><button id="copy-published" type="button">Sao chép</button></div><div class="dialog-actions"><button value="close">Đóng</button><button id="do-publish" type="button" class="primary">Lưu và lấy liên kết</button></div></form></dialog>
-<script type="module" src="/studio.mjs?v=2.1.0"></script>
+<script type="module" src="/studio.mjs?v=2.2.0"></script>
 </body></html>

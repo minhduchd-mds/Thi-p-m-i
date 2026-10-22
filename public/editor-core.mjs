@@ -1,3 +1,4 @@
+import {safeGift,safeMapUrl,blankGift,newExtraPage} from "./card-extras.mjs";
 // Hỷ Studio visual editor document and render/export primitives, ES module, no framework.
 export const W=720,H=1080;
 export const themes={
@@ -19,7 +20,7 @@ export const songs={
  "binh-minh-hanh-phuc":"Bình Minh Hạnh Phúc",
  "none":"Không nhạc"
 };
-export const fieldsDefault={bride:"Minh Anh",groom:"Hoàng Nam",date:"2027-06-20",time:"17:30",venue:"The Garden Wedding Hall",address:"Hà Nội, Việt Nam",guest:"Bạn thân mến",message:"Trân trọng kính mời bạn đến chung vui trong ngày hạnh phúc của chúng mình."};
+export const fieldsDefault={bride:"Minh Anh",groom:"Hoàng Nam",date:"2027-06-20",time:"17:30",venue:"The Garden Wedding Hall",address:"Hà Nội, Việt Nam",mapUrl:"",guest:"Bạn thân mến",message:"Trân trọng kính mời bạn đến chung vui trong ngày hạnh phúc của chúng mình."};
 const block=(id,type,x,y,w,h,extra={})=>Object.assign({id,type,x,y,w,h,rotation:0,z:10,opacity:1,locked:false,hidden:false,userAdded:false},extra);
 const txt=(id,binding,x,y,w,h,size,extra={})=>block(id,"text",x,y,w,h,Object.assign({binding,text:"",fontSize:size,align:"center",weight:600,color:""},extra));
 // A card consists of two separately editable surfaces. The inside receives its
@@ -105,7 +106,7 @@ export function createDoc(theme="red",existing={}){
  const preserved=(existing.blocks||[]).filter(x=>x.userAdded&&!blocks.some(b=>b.id===x.id));
  const freshInside=insidePreset(theme);
  const insideCustom=(existing.insideBlocks||[]).filter(x=>x.userAdded&&!freshInside.some(b=>b.id===x.id));
- return {schemaVersion:2,theme,layoutId:theme+"-poster",width:W,height:H,fields:f,music:existing.music||"loi-hen-tram-nam",blocks:blocks.concat(preserved),insideBlocks:freshInside.concat(insideCustom)};
+ return {schemaVersion:2,theme,layoutId:theme+"-poster",width:W,height:H,fields:f,music:existing.music||"loi-hen-tram-nam",blocks:blocks.concat(preserved),insideBlocks:freshInside.concat(insideCustom),extraPages:JSON.parse(JSON.stringify(existing.extraPages||[])),gift:safeGift(existing.gift||blankGift())};
 }
 export function migrate(raw){
  let d=raw&&raw.document?raw.document:raw;
@@ -119,14 +120,14 @@ export function safeSrc(src){
  return a?src:(/^data:image\/(?:webp|jpeg|png);base64,[A-Za-z0-9+/=]{20,1100000}$/.test(src||"")?src:"");
 }
 export function sanitize(raw){
- if(!raw||!Array.isArray(raw.blocks)||raw.blocks.length>80||(raw.insideBlocks!==undefined&&(!Array.isArray(raw.insideBlocks)||raw.insideBlocks.length>80)))throw Error("Tài liệu thiệp không hợp lệ");
+ if(!raw||!Array.isArray(raw.blocks)||raw.blocks.length>80||(raw.insideBlocks!==undefined&&(!Array.isArray(raw.insideBlocks)||raw.insideBlocks.length>80))||(raw.extraPages!==undefined&&(!Array.isArray(raw.extraPages)||raw.extraPages.length>20)))throw Error("Tài liệu thiệp không hợp lệ");
  const theme=themes[raw.theme]?raw.theme:"red";
  const fields={};
  for(const k of Object.keys(fieldsDefault))fields[k]=String(raw.fields?.[k]??fieldsDefault[k]).slice(0,300);
  const normalizeBlocks = values => {
  const ids=new Set(),blocks=[];
  for(const value of values){
-  if(!value||!["text","image","ornament","frame","shape"].includes(value.type))continue;
+  if(!value||!["text","image","ornament","frame","shape","map","qr"].includes(value.type))continue;
   const id=String(value.id||"").slice(0,70);
   if(!/^[A-Za-z0-9_-]+$/.test(id)||ids.has(id))continue;
   ids.add(id);
@@ -151,12 +152,25 @@ export function sanitize(raw){
  };
  const blocks=normalizeBlocks(raw.blocks);
  const insideBlocks=raw.insideBlocks===undefined?insidePreset(theme):normalizeBlocks(raw.insideBlocks);
- return {schemaVersion:2,theme,layoutId:theme+"-poster",width:W,height:H,fields,music:Object.hasOwn(songs,raw.music)?raw.music:"none",blocks,insideBlocks};
+ const seen=new Set(["cover","inside"]);
+ const extraPages=[];
+ for(const value of Array.isArray(raw.extraPages)?raw.extraPages.slice(0,20):[]){
+  if(!value||!["map","gift","custom"].includes(value.kind))continue;
+  const id=String(value.id||"").slice(0,70);
+  if(!/^[A-Za-z0-9_-]+$/.test(id)||seen.has(id))continue;
+  seen.add(id);
+  const title=String(value.title||"Trang của tôi").slice(0,65);
+  const pageBlocks=Array.isArray(value.blocks)&&value.blocks.length<=80?normalizeBlocks(value.blocks):newExtraPage(value.kind,theme).blocks;
+  extraPages.push({id,title,kind:value.kind,blocks:pageBlocks});
+ }
+ const gift=safeGift(raw.gift);
+ fields.mapUrl=safeMapUrl(fields.mapUrl);
+ return {schemaVersion:2,theme,layoutId:theme+"-poster",width:W,height:H,fields,music:Object.hasOwn(songs,raw.music)?raw.music:"none",blocks,insideBlocks,extraPages,gift};
 }
 export const clone=x=>JSON.parse(JSON.stringify(x));
 export const dateLabel=d=>/^\d{4}-\d{2}-\d{2}$/.test(d||"")?d.slice(8)+"/"+d.slice(5,7)+"/"+d.slice(0,4):String(d||"");
 export function blockText(b,doc){const v=b.binding?doc.fields[b.binding]:b.text;return b.binding==="date"?dateLabel(v):String(v||"");}
-export function blockName(b){return b.type==="text"?(b.binding||b.text||"Văn bản").slice(0,30):b.type==="ornament"?(assets.find(a=>a.id===b.asset)?.name||"Hoạ tiết"):{"image":"Ảnh/WebP","frame":"Khung viền","shape":"Hình khối"}[b.type];}
+export function blockName(b){return b.type==="text"?(b.binding||b.text||"Văn bản").slice(0,30):b.type==="ornament"?(assets.find(a=>a.id===b.asset)?.name||"Hoạ tiết"):{"image":"Ảnh/WebP","frame":"Khung viền","shape":"Hình khối","map":"Bản đồ","qr":"Mã QR mừng cưới"}[b.type];}
 export const assetUrl=id=>assets.find(a=>a.id===id)?.url||assets[0].url;
 export function addBlock(kind,doc,x=250,y=410){
  const id="b"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -165,5 +179,6 @@ export function addBlock(kind,doc,x=250,y=410){
  if(kind==="frame")return block(id,"frame",x,y,360,430,{z,userAdded:true});
  if(kind==="shape")return block(id,"shape",x,y,220,80,{z,fill:themes[doc.theme].gold,userAdded:true});
  if(kind==="image")return block(id,"image",x,y,325,250,{z,src:assetUrl("wood"),fit:"cover",userAdded:true});
+ if(kind==="map"||kind==="qr")return block(id,kind,x,y,kind==="map"?470:290,kind==="map"?300:290,{z,userAdded:true});
  return block(id,"ornament",x,y,190,190,{z,asset:assets.some(a=>a.id===kind)?kind:"song-hy",userAdded:true});
 }

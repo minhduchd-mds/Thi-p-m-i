@@ -1,3 +1,13 @@
+## v2.2 — Trình thiết kế nhiều trang, bản đồ và VietQR
+
+- Editor làm mới theo 3 phong cách **Hồng Hỷ / Ngọc Uyển / Hoa Vân**, các khối hoạ tiết SVG và chất liệu WebP, hai mặt gập có animation.
+- Thêm **trang Địa điểm**, **trang Mừng cưới (VietQR)** hoặc **trang tuỳ chỉnh**; đổi thứ tự, đổi tên, nhân bản/xoá, kéo thả và chỉnh từng khối. Giữ bản v2.1 đã lưu.
+- Tab **Nội dung** chứa tên địa điểm, địa chỉ, link Google Maps (tuỳ chọn). Google Maps được liên kết bằng URL an toàn, không đòi API key.
+- VietQR xuất hiện khi **người dùng** nhập ngân hàng, số tài khoản và chủ tài khoản. Không có tài khoản mặc định. Dữ liệu công khai với người nhận thiệp, và được gửi tới dịch vụ VietQR để tải ảnh QR. QR không xác nhận giao dịch.
+- Trang khách chuyển lần lượt qua mặt trong, bản đồ, trang mừng cưới và các trang tự tạo, mở/đóng bằng animation; RSVP vẫn trên trang xem.
+- Tệp xuất PNG/WebP dành cho trang đang chọn. Khi xuất có QR từ nhà cung cấp ngoài, trình duyệt có thể hạn chế vẽ QR vào canvas do CORS; bản thiệp web mới là phương thức quét QR chính.
+- Preview Vercel hiện là static, **không cung cấp API lưu thiệp/RSVP công khai**, nhưng editor/preview/draft hoạt động trên frontend.
+
 ## v2.1 — Thiệp hai mặt + Preview mở thiệp (22/10/2026)
 
 - Editor có hai tab **01 · Bìa ngoài** và **02 · Mặt trong**, mỗi mặt chỉnh sửa và có layer riêng.

@@ -1,3 +1,4 @@
+import {BANKS,blankGift,safeGift,giftReady,googleMapsUrl,newExtraPage,allPages,pageById,pageSurface} from "./card-extras.mjs";
 import {W,H,themes,assets,songs,fieldsDefault,createDoc,migrate,sanitize,clone,blockText,blockName,addBlock,surfaceDoc,faces} from "/editor-core.mjs";
 import {renderStage,downloadPoster} from "/editor-render.mjs";
 const $=id=>document.getElementById(id);
@@ -7,11 +8,48 @@ let doc=createDoc(new URLSearchParams(location.search).get("theme")||"red");
 let selected="",activeFace="cover",zoom=.55,history=[],future=[],dirty=false,cardId=null,editToken=null;
 let pointer=null,focusSnapshot=null,gridOn=false,draftTimer=0;
 const stage=$("stage"),wrap=$("stage-wrap"),area=$("drop-area");
-const activeBlocks=()=>activeFace==="inside"?doc.insideBlocks:doc.blocks;
-const setActiveBlocks=blocks=>{if(activeFace==="inside")doc.insideBlocks=blocks;else doc.blocks=blocks;};
-const activeSurface=()=>surfaceDoc(doc,activeFace);
-function setFace(face){if(!Object.hasOwn(faces,face)||activeFace===face)return;activeFace=face;selected="";document.querySelectorAll("[data-face]").forEach(b=>{const active=b.dataset.face===face;b.classList.toggle("active",active);b.setAttribute("aria-selected",String(active));});renderAll();notify("Đang thiết kế "+faces[face].toLowerCase());}
-const titleMap={bride:"Tên cô dâu",groom:"Tên chú rể",date:"Ngày cưới",time:"Giờ tổ chức",venue:"Địa điểm",address:"Địa chỉ",guest:"Tên khách mời",message:"Lời mời"};
+const activePage=()=>pageById(doc,activeFace)||pageById(doc,"cover");
+const activeBlocks=()=>activePage().blocks;
+const setActiveBlocks=blocks=>{if(activeFace==="inside")doc.insideBlocks=blocks;else if(activeFace==="cover")doc.blocks=blocks;else activePage().blocks=blocks;};
+const activeSurface=()=>pageSurface(doc,activeFace);
+function setFace(face){
+ if(!pageById(doc,face)||activeFace===face)return;
+ activeFace=face;selected="";renderAll();
+ notify("Đang thiết kế "+activePage().title);
+}
+function renderPageTabs(){
+ const root=$("extra-page-tabs");root.replaceChildren();
+ for(const p of doc.extraPages||[]){
+  const button=document.createElement("button");button.type="button";button.dataset.face=p.id;button.setAttribute("role","tab");
+  button.className="extra-page-button";button.textContent=(allPages(doc).indexOf(p)+1||doc.extraPages.indexOf(p)+3)+" · "+p.title;
+  button.title=p.title;button.addEventListener("click",()=>setFace(p.id));root.append(button);
+ }
+ document.querySelectorAll("[data-face]").forEach(b=>{
+  const isCurrent=b.dataset.face===activeFace;
+  b.classList.toggle("active",isCurrent);b.setAttribute("aria-selected",String(isCurrent));
+ });
+ const custom=activeFace!=="cover"&&activeFace!=="inside";
+ $("active-page-tools").hidden=!custom;
+ if(custom)$("current-page-title").value=activePage().title;
+}
+function addPage(kind){
+ if((doc.extraPages||[]).length>=20){notify("Tối đa 20 trang bổ sung để đảm bảo thiệp tải nhanh.");return;}
+ checkpoint();const page=newExtraPage(kind,doc.theme);doc.extraPages.push(page);
+ activeFace=page.id;selected="";renderAll();scheduleSave();notify("Đã thêm trang "+page.title);
+}
+function pageCommand(command){
+ const idx=(doc.extraPages||[]).findIndex(p=>p.id===activeFace);if(idx<0)return;
+ checkpoint();
+ if(command==="delete"){doc.extraPages.splice(idx,1);activeFace="inside";}
+ else if(command==="duplicate"){
+  if(doc.extraPages.length>=20){history.pop();notify("Đã đạt 20 trang");return;}
+  const copy=clone(doc.extraPages[idx]);copy.id="p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  copy.title=(copy.title+" (bản sao)").slice(0,65);doc.extraPages.splice(idx+1,0,copy);activeFace=copy.id;
+ }else if(command==="up"&&idx>0){const page=doc.extraPages.splice(idx,1)[0];doc.extraPages.splice(idx-1,0,page);}
+ else if(command==="down"&&idx<doc.extraPages.length-1){const page=doc.extraPages.splice(idx,1)[0];doc.extraPages.splice(idx+1,0,page);}
+ selected="";renderAll();scheduleSave();
+}
+const titleMap={bride:"Tên cô dâu",groom:"Tên chú rể",date:"Ngày cưới",time:"Giờ tổ chức",venue:"Tên địa điểm",address:"Địa chỉ chi tiết",mapUrl:"Link Google Maps (không bắt buộc)",guest:"Tên khách mời",message:"Lời mời"};
 function notify(msg){$("status").textContent=msg;}
 function saveDraft(){
  try{localStorage.setItem(STORE,JSON.stringify({doc,updatedAt:Date.now()}));$("autosave-label").textContent="Đã lưu bản nháp · Thiết bị này";}
@@ -21,7 +59,7 @@ function scheduleSave(){dirty=true;$("autosave-label").textContent="Đang chỉn
 function checkpoint(before){history.push(before||clone(doc));if(history.length>60)history.shift();future=[];updateHistoryUI();}
 function updateHistoryUI(){$("undo").disabled=!history.length;$("redo").disabled=!future.length;}
 function undo(){
- if(!history.length)return;future.push(clone(doc));doc=history.pop();selected=activeBlocks().some(b=>b.id===selected)?selected:"";renderAll();scheduleSave();
+ if(!history.length)return;future.push(clone(doc));doc=history.pop();if(!pageById(doc,activeFace))activeFace="cover";selected=activeBlocks().some(b=>b.id===selected)?selected:"";renderAll();scheduleSave();
 }
 function redo(){
  if(!future.length)return;history.push(clone(doc));doc=future.pop();selected=activeBlocks().some(b=>b.id===selected)?selected:"";renderAll();scheduleSave();
@@ -62,9 +100,9 @@ function renderFields(){
  for(const [key,label] of Object.entries(titleMap)){
   const lbl=document.createElement("label");lbl.className="field-label";lbl.htmlFor="field-"+key;lbl.textContent=label;
   let el=key==="message"?document.createElement("textarea"):document.createElement("input");
-  if(el instanceof HTMLInputElement)el.type=key==="date"?"date":(key==="time"?"time":"text");
+  if(el instanceof HTMLInputElement)el.type=key==="date"?"date":(key==="time"?"time":(key==="mapUrl"?"url":"text"));
   el.name=key;el.id="field-"+key;el.value=doc.fields[key]||"";
-  el.maxLength=key==="message"?300:200;
+  el.maxLength=key==="mapUrl"?2048:(key==="message"?300:200);
   el.addEventListener("focus",()=>{focusSnapshot=clone(doc);el.dataset.focusValue=el.value;});
   el.addEventListener("input",()=>{
    doc.fields[key]=el.value;renderCanvas();scheduleSave();
@@ -73,6 +111,13 @@ function renderFields(){
   form.append(lbl,el);
  }
  $("music-choice").value=doc.music;
+ const gift=safeGift(doc.gift);doc.gift=gift;
+ const select=$("gift-bank");select.replaceChildren();
+ for(const bank of BANKS){const option=document.createElement("option");option.value=bank.code;option.textContent=bank.name;select.append(option);}
+ for(const el of document.querySelectorAll("[data-gift]"))el.value=gift[el.dataset.gift]||"";
+ const map=googleMapsUrl(doc.fields);$("map-preview-link").href=map||"#";
+ $("map-preview-link").classList.toggle("is-disabled",!map);
+ $("gift-status").textContent=giftReady(gift)?"✓ VietQR sẵn sàng — xác nhận người nhận trước khi chuyển":"Nhập ngân hàng, số tài khoản và tên người nhận để tạo mã";
 }
 function renderLayers(){
  const list=$("layer-list");list.replaceChildren();
@@ -96,7 +141,7 @@ function field(label,key,value,type="number",extra=""){
 function renderInspector(){
  const root=$("inspector-content");
  const b=findSelected();
- $("inspector-title").textContent=b?blockName(b):"Bố cục "+faces[activeFace];
+ $("inspector-title").textContent=b?blockName(b):"Bố cục "+activePage().title;
  if(!b){
   const t=themes[doc.theme];
   root.innerHTML='<section class="theme-preview"><div class="swatches"><i class="swatch" style="background:'+t.bg1+'"></i><i class="swatch" style="background:'+t.bg2+'"></i><i class="swatch" style="background:'+t.gold+'"></i></div><b>'+t.name+'</b><p>'+t.description+'</p></section><p class="inspect-intro">Chọn thành phần trên thiệp để chỉnh vị trí, kích thước, chữ, hoạ tiết và lớp. Có thể kéo hoạ tiết trực tiếp từ thư viện bên trái.</p><div class="inspect-section"><h3>Thông số tài liệu</h3><p class="inspect-intro">720 × 1080 px · Xuất 2×: 1440 × 2160 px · 3 layout riêng</p></div>';
@@ -122,10 +167,12 @@ function renderInspector(){
  }else if(b.type==="image"){
   h+='<div class="inspect-section"><h3>Ảnh WebP</h3><p class="inspect-intro">Hỗ trợ JPG, PNG và WebP. Ảnh tải lên được thu nhỏ và nén thành WebP.</p><div class="inspect-actions"><button id="change-image">Thay ảnh…</button></div><label class="field-label" for="prop-fit">Cách vừa khung</label><select id="prop-fit" data-prop="fit"><option value="cover">Fill / Crop</option><option value="contain"'+(b.fit==="contain"?" selected":"")+'>Fit / Contain</option></select></div>';
  }else if(b.type==="shape")h+='<div class="inspect-section">'+field("Màu nền","fill",b.fill||themes[doc.theme].gold,"color")+'</div>';
+ else if(b.type==="map")h+='<div class="inspect-section"><h3>Liên kết chỉ đường</h3><p class="inspect-intro">Khối hiển thị địa điểm chung. Chỉnh Tên địa điểm, Địa chỉ, Google Maps ở tab Nội dung.</p><button type="button" id="goto-content" class="inspector-shortcut">Chỉnh địa điểm →</button></div>';
+ else if(b.type==="qr")h+='<div class="inspect-section"><h3>VietQR mừng cưới</h3><p class="inspect-intro">QR được sinh khi chủ thiệp nhập tài khoản. Không tự xác nhận giao dịch.</p><button type="button" id="goto-content" class="inspector-shortcut">Chỉnh tài khoản →</button></div>';
  h+='<div class="inspect-section"><h3>Thao tác thành phần</h3><div class="inspect-actions"><button data-command="duplicate">Nhân bản</button><button data-command="up">Lên lớp</button><button data-command="down">Xuống lớp</button><button data-command="lock">'+(b.locked?"Mở khoá":"Khoá")+'</button><button data-command="hide">'+(b.hidden?"Hiện":"Ẩn")+'</button><button class="danger" data-command="delete">Xoá</button></div></div>';
  root.innerHTML=h;
 }
-function renderAll(){renderThemes();renderCanvas();renderFields();renderLayers();renderInspector();updateHistoryUI();}
+function renderAll(){renderThemes();renderPageTabs();renderCanvas();renderFields();renderLayers();renderInspector();updateHistoryUI();}
 function findSelected(){return activeBlocks().find(b=>b.id===selected);}
 function selectBlock(id){selected=id||"";renderCanvas();renderInspector();renderLayers();}
 function add(kind,x,y){
@@ -249,6 +296,19 @@ async function boot(){
  if(params.get("panel")==="music"){switchPanel("fields");$("music-choice").focus();}
 }
 document.querySelectorAll("[data-face]").forEach(b=>b.addEventListener("click",()=>setFace(b.dataset.face)));
+document.querySelectorAll("[data-new-page]").forEach(b=>b.addEventListener("click",()=>addPage(b.dataset.newPage)));
+$("page-up").addEventListener("click",()=>pageCommand("up"));
+$("page-down").addEventListener("click",()=>pageCommand("down"));
+$("page-remove").addEventListener("click",()=>{if(confirm("Xoá trang đang chọn? Có thể hoàn tác bằng Undo."))pageCommand("delete")});
+$("page-duplicate").addEventListener("click",()=>pageCommand("duplicate"));
+$("current-page-title").addEventListener("focus",()=>{focusSnapshot=clone(doc);});
+$("current-page-title").addEventListener("change",e=>{const p=activePage();if(activeFace!=="cover"&&activeFace!=="inside"){checkpoint(focusSnapshot);p.title=e.target.value.trim().slice(0,65)||"Trang mới";renderPageTabs();scheduleSave();}focusSnapshot=null;});
+document.querySelectorAll("[data-gift]").forEach(el=>{
+ el.addEventListener("focus",()=>{focusSnapshot=clone(doc);el.dataset.focusValue=el.value;});
+ el.addEventListener("input",()=>{doc.gift={...doc.gift,[el.dataset.gift]:el.value};renderCanvas();scheduleSave();});
+ el.addEventListener("change",()=>{if(focusSnapshot&&el.dataset.focusValue!==el.value)checkpoint(focusSnapshot);focusSnapshot=null;doc.gift=safeGift(doc.gift);renderCanvas();$("gift-status").textContent=giftReady(doc.gift)?"✓ QR chuyển khoản đã sẵn sàng":"Vui lòng kiểm tra ngân hàng, số tài khoản và tên người nhận";scheduleSave();});
+});
+
 $("stage").addEventListener("pointerdown",startPointer);
 window.addEventListener("pointermove",movePointer);
 window.addEventListener("pointerup",endPointer);
@@ -265,14 +325,14 @@ area.addEventListener("dragleave",e=>{if(!area.contains(e.relatedTarget))area.cl
 area.addEventListener("drop",e=>{
  e.preventDefault();area.classList.remove("drag-over");
  const kind=e.dataTransfer.getData("text/plain");
- if(!["text","frame","shape","image",...assets.map(x=>x.id)].includes(kind))return;
+ if(!["text","frame","shape","image","map","qr",...assets.map(x=>x.id)].includes(kind))return;
  const r=stage.getBoundingClientRect();add(kind,Math.max(0,Math.round((e.clientX-r.left)/zoom-80)),Math.max(0,Math.round((e.clientY-r.top)/zoom-50)));
 });
 $("inspector-content").addEventListener("focusin",e=>{if(e.target.matches("[data-prop]")){focusSnapshot=clone(doc);e.target.dataset.focusValue=e.target.value;}});
 $("inspector-content").addEventListener("input",e=>{if(e.target.matches("[data-prop]"))propUpdate(e.target,false);});
 $("inspector-content").addEventListener("change",e=>{if(e.target.matches("[data-prop]"))propUpdate(e.target,true);});
 $("inspector-content").addEventListener("click",e=>{
- if(e.target.id==="change-image"){$("upload-input").click();return;}
+ if(e.target.id==="change-image"){$("upload-input").click();return;}if(e.target.id==="goto-content"){switchPanel("fields");return;}
  const b=e.target.closest("[data-command]");if(b)command(b.dataset.command);
 });
 $("upload-input").addEventListener("change",async e=>{try{await uploadImage(e.target.files[0]);}catch(err){notify("Không xử lý được ảnh: "+err.message)}e.target.value="";});

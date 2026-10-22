@@ -164,6 +164,55 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await preview.close();
   });
 
+
+  test('Tuỳ chỉnh nhiều trang: Google Maps, VietQR và trang mới; lưu và mở trên thiệp khách', async ({page},testInfo)=>{
+    await ready(page);
+    await page.locator('[data-new-page="map"]').click();
+    await expect(page.locator('#stage [data-block-id="map-photo"]')).toBeVisible();
+    await page.locator('.palette-tab[data-panel="fields"]').click();
+    await page.locator('#field-venue').fill('Trung tâm tiệc cưới Bách Việt');
+    await page.locator('#field-address').fill('Hà Nội, Việt Nam');
+    await expect(page.locator('#stage .map-place')).toContainText('Trung tâm tiệc cưới Bách Việt');
+    await expect(page.locator('#map-preview-link')).toHaveAttribute('href',/google\.com\/maps\/search\/\?api=1/);
+    await page.locator('.palette-tab[data-panel="blocks"]').click();
+    await page.locator('[data-new-page="gift"]').click();
+    await page.locator('.palette-tab[data-panel="fields"]').click();
+    await expect(page.locator('#stage .gift-qr-placeholder')).toBeVisible();
+    await page.locator('#gift-bank').selectOption('VCB');
+    await page.locator('#gift-account').fill('0123456789');
+    await page.locator('#gift-holder').fill('Test Receiver');
+    await page.locator('#gift-note').fill('Mung cuoi');
+    await expect(page.locator('#stage .gift-qr-block img')).toHaveAttribute('src',/img\.vietqr\.io\/image\/VCB-0123456789/);
+    await capture(page,testInfo,'10-gift-qr');
+    await page.locator('.palette-tab[data-panel="blocks"]').click();
+    await page.locator('[data-new-page="custom"]').click();
+    await expect(page.locator('#stage .stage-block')).toHaveCount(5);
+    await page.locator('#current-page-title').fill('Kỷ niệm của chúng mình');
+    await page.locator('#current-page-title').press('Tab');
+    await page.locator('#page-duplicate').click();
+    await expect(page.locator('#extra-page-tabs [data-face]')).toHaveCount(4);
+    page.once('dialog',d=>d.accept());
+    await page.locator('#page-remove').click();
+    await expect(page.locator('#extra-page-tabs [data-face]')).toHaveCount(3);
+    await page.locator('#save-local').click();
+    await page.reload();
+    await expect(page.locator('#extra-page-tabs [data-face]')).toHaveCount(3);
+    const open=page.context().waitForEvent('page');
+    await page.locator('#preview').click();
+    const viewer=await open;await viewer.waitForLoadState('domcontentloaded');
+    await expect(viewer.locator('#book')).toHaveClass(/is-open/,{timeout:5000});
+    await viewer.locator('#page-next').click();
+    await expect(viewer.locator('#page-name')).toContainText('Địa điểm');
+    await expect(viewer.locator('#map-directions')).toHaveAttribute('href',/google\.com\/maps\/search/);
+    await viewer.locator('#page-next').click();
+    await expect(viewer.locator('#page-name')).toContainText('Mừng cưới');
+    await expect(viewer.locator('#gift-bank-details')).toContainText('0123456789');
+    await viewer.locator('#page-next').click();
+    await expect(viewer.locator('#page-name')).toContainText('Kỷ niệm');
+    await capture(viewer,testInfo,'11-extra-custom-page');
+    await viewer.close();
+  });
+
   test('Xem trước trên mobile 390 × 844 không tràn ngang', async ({ page }, testInfo) => {
     await ready(page);
     await page.locator('#save-local').click();

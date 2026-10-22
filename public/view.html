@@ -49,11 +49,44 @@ main{max-width:900px;margin:25px auto 50px;padding:0 12px}
  .book-viewport,.invitation-book,.book-cover,.viewer.opened .rsvp-panel{transition:none!important;animation:none!important}
 }
 
+
+/* v2.2: cinematic viewer and optional book pages */
+body{background:#d8bc9f;background-image:linear-gradient(125deg,#1e15178a,#bb947077 47%,#27191a8a),url('/hy-courtyard.svg');background-size:cover;background-attachment:fixed}
+.viewer{gap:17px}
+.book-inside{transition:opacity .24s,filter .24s}
+.book-inside.turning{animation:page-turn-in .48s cubic-bezier(.2,.7,.25,1)}
+@keyframes page-turn-in{0%{opacity:.25;filter:blur(5px);transform:rotateY(-7deg)}100%{opacity:1;filter:blur(0);transform:rotateY(0)}}
+.panel{border:1px solid #e6c9a7;background:linear-gradient(145deg,#fffaf2,#fffbf7);box-shadow:0 12px 37px #2e151521}
+.viewer-pager{width:min(800px,100%);display:flex;justify-content:center;align-items:center;gap:14px;border:1px solid #e9cbb1;border-radius:14px;padding:10px;background:#fff8efdd}
+.viewer-pager button{border:1px solid #d7b49f;border-radius:9px;background:#fffdfa;padding:10px 16px;color:#873b46;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap}
+.viewer-pager button:disabled{opacity:.35;cursor:not-allowed}
+.page-indicator{flex:1;display:flex;align-items:center;flex-direction:column;gap:2px;color:#51362f;text-align:center}
+.page-indicator strong{font:600 16px 'Noto Serif',serif}
+.page-indicator small{font-size:10px;color:#987667}
+.page-interactions{display:flex;align-items:center;justify-content:center;width:min(540px,100%);background:#fffaf1;border-radius:13px;padding:14px;box-shadow:0 5px 19px #4c24291c}
+#map-directions{display:block;padding:12px 21px;background:#93464d;color:white;border-radius:99px;text-decoration:none;font-size:12px;font-weight:700}
+#gift-details{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;color:#584137}
+#gift-details strong{font:600 18px 'Noto Serif',serif}
+#gift-details span{font-size:12px}
+#gift-details small{font-size:10px;line-height:1.8;color:#94796d;max-width:460px}
+#copy-bank-account{background:#973b47;border:0;color:#fff;border-radius:8px;font-weight:700;padding:10px 16px;cursor:pointer}
+@media(max-width:520px){.viewer-pager{gap:5px;padding:8px 5px}.viewer-pager button{padding:9px 6px;font-size:10px}.page-indicator strong{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.book-inside.turning{animation:none!important}}
+
 </style></head>
 <body><header><a href="/">囍 Hỷ Studio</a><span>THƯ MỜI TRÂN TRỌNG</span></header>
 <main><div id="loading">Đang chuẩn bị tấm thiệp dành cho bạn…</div><div id="viewer" class="viewer" hidden>
 <div id="poster-wrap" class="book-viewport" aria-label="Thiệp hai mặt tương tác"><div id="book-transform"><div id="book" class="invitation-book"><div id="inside-poster" class="book-inside" aria-label="Nội dung bên trong thiệp" aria-hidden="true"></div><div id="cover-leaf" class="book-cover"><div id="poster" class="book-front" role="button" tabindex="0" aria-label="Mở thiệp để xem mặt trong"></div><div class="book-back" aria-hidden="true"><div class="back-emblem">囍</div><span>Hỷ Studio</span><small>TRĂM NĂM HẠNH PHÚC</small></div></div></div></div></div>
 <div class="open-controls"><button id="toggle-open" aria-expanded="false" type="button">✉ Mở thiệp để xem bên trong</button><span id="book-status" role="status" aria-live="polite">Chạm để mở bức thiệp</span></div>
+<div id="viewer-pager" class="viewer-pager" hidden aria-label="Lật trang thiệp">
+ <button id="page-prev" type="button" aria-label="Trang trước">← Trang trước</button>
+ <div class="page-indicator"><strong id="page-name">Mặt trong</strong><small id="page-number">2 / 2</small></div>
+ <button id="page-next" type="button" aria-label="Trang tiếp theo">Trang sau →</button>
+</div>
+<div id="page-interactions" class="page-interactions" hidden>
+ <a id="map-directions" href="#" target="_blank" rel="noopener noreferrer" hidden>⌖ Mở Google Maps chỉ đường ↗</a>
+ <div id="gift-details" hidden><strong id="gift-beneficiary"></strong><span id="gift-bank-details"></span><button id="copy-bank-account" type="button">Sao chép số tài khoản</button><small>Kiểm tra tên người nhận trên ứng dụng ngân hàng trước khi chuyển khoản. Hỷ Studio không xác nhận tiền đã chuyển.</small></div>
+</div>
 <div class="panel"><h2 id="invitation-title">Trân trọng kính mời</h2><p id="invitation-intro"></p><div class="action-row"><button id="music">♫ Bật nhạc nền</button><button id="share" class="subtle">Chia sẻ thiệp</button></div></div>
 <div class="panel rsvp-panel"><h2>Xác nhận tham dự & lời chúc</h2><form id="rsvp" class="rsvp">
 <label for="guest-name">Tên khách mời</label><input id="guest-name" maxlength="60" required placeholder="Tên của bạn">
@@ -62,4 +95,4 @@ main{max-width:900px;margin:25px auto 50px;padding:0 12px}
 <label for="wish">Lời chúc</label><textarea id="wish" maxlength="500" placeholder="Gửi những lời yêu thương…"></textarea>
 <button type="submit">Gửi phản hồi ♡</button></form><div id="result" role="status" aria-live="polite"></div></div></div>
 <audio id="audio" preload="none" loop></audio></main>
-<script type="module" src="/view.mjs?v=2.1.0"></script></body></html>
+<script type="module" src="/view.mjs?v=2.2.0"></script></body></html>
