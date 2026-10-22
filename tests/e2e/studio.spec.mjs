@@ -6,12 +6,23 @@ const ready = async page => {
   await page.goto(STUDIO);
   await expect(page.locator('#stage .stage-block')).toHaveCount(11);
   await expect(page.locator('#asset-grid .asset-card')).toHaveCount(5);
+  await expect(page.locator('#fields-form textarea#field-message')).toHaveCount(1);
 };
 const capture = async (page, testInfo, name) => {
   const path = testInfo.outputPath(name + '.png');
   await page.screenshot({ path, fullPage: true, animations: 'disabled' });
   await testInfo.attach(name, { path, contentType: 'image/png' });
 };
+
+const javascriptErrors = new WeakMap();
+test.beforeEach(async ({ page }) => {
+  const issues = [];
+  javascriptErrors.set(page, issues);
+  page.on('pageerror', error => issues.push(error.message));
+});
+test.afterEach(async ({ page }) => {
+  expect(javascriptErrors.get(page) || [], 'Unexpected browser JavaScript exceptions').toEqual([]);
+});
 
 test.describe('Hỷ Studio v2 – browser journey', () => {
   test('Cổng 3D mở đến editor mới và giữ khả năng tắt nhạc', async ({ page }) => {
