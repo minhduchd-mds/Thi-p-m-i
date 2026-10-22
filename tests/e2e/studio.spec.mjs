@@ -209,6 +209,11 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await expect(viewer.locator('#gift-bank-details')).toContainText('0123456789');
     await viewer.locator('#page-next').click();
     await expect(viewer.locator('#page-name')).toContainText('Kỷ niệm');
+    await expect(viewer.locator('#page-interactions')).toBeHidden();
+    await expect(viewer.locator('#map-directions')).toBeHidden();
+    await expect(viewer.locator('#gift-details')).toBeHidden();
+    await expect(viewer.locator('#poster')).toBeHidden();
+    await expect(viewer.locator('.book-back')).toBeVisible();
     await capture(viewer,testInfo,'11-extra-custom-page');
     await viewer.close();
   });
