@@ -58,7 +58,7 @@ function renderFields(){
  for(const [key,label] of Object.entries(titleMap)){
   const lbl=document.createElement("label");lbl.className="field-label";lbl.htmlFor="field-"+key;lbl.textContent=label;
   let el=key==="message"?document.createElement("textarea"):document.createElement("input");
-  if(key==="date")el.type="date";else if(key==="time")el.type="time";else el.type="text";
+  if(el instanceof HTMLInputElement)el.type=key==="date"?"date":(key==="time"?"time":"text");
   el.name=key;el.id="field-"+key;el.value=doc.fields[key]||"";
   el.maxLength=key==="message"?300:200;
   el.addEventListener("focus",()=>{focusSnapshot=clone(doc);el.dataset.focusValue=el.value;});
