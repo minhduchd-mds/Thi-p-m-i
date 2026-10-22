@@ -2,7 +2,7 @@
 <title>Thiệp mời · Hỷ Studio</title><meta name="theme-color" content="#fbf4ed">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Dancing+Script:wght@500;600;700&family=Noto+Serif:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box}body{margin:0;background:#eee3d7;color:#423029;font-family:'Be Vietnam Pro',sans-serif}
+[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;background:#eee3d7;color:#423029;font-family:'Be Vietnam Pro',sans-serif}
 header{display:flex;align-items:center;justify-content:space-between;padding:15px clamp(14px,4vw,45px);background:#fff9f3;border-bottom:1px solid #e6d5c3}
 header a{text-decoration:none;color:#933943;font-weight:800}header span{font-size:11px;color:#957d6a}
 main{max-width:900px;margin:25px auto 50px;padding:0 12px}
@@ -73,6 +73,11 @@ body{background:#d8bc9f;background-image:linear-gradient(125deg,#1e15178a,#bb947
 @media(max-width:520px){.viewer-pager{gap:5px;padding:8px 5px}.viewer-pager button{padding:9px 6px;font-size:10px}.page-indicator strong{font-size:12px}}
 @media(prefers-reduced-motion:reduce){.book-inside.turning{animation:none!important}}
 
+
+/* Visual QA: only the designed reverse of the fold is visible after opening. */
+#poster.book-front{-webkit-backface-visibility:hidden!important;backface-visibility:hidden!important;transform:translateZ(1px)!important}
+.invitation-book.is-open #poster.book-front{visibility:hidden!important;pointer-events:none!important}
+.book-back{-webkit-backface-visibility:hidden!important;backface-visibility:hidden!important;transform:rotateY(180deg) translateZ(1px)}
 </style></head>
 <body><header><a href="/">囍 Hỷ Studio</a><span>THƯ MỜI TRÂN TRỌNG</span></header>
 <main><div id="loading">Đang chuẩn bị tấm thiệp dành cho bạn…</div><div id="viewer" class="viewer" hidden>
@@ -95,4 +100,4 @@ body{background:#d8bc9f;background-image:linear-gradient(125deg,#1e15178a,#bb947
 <label for="wish">Lời chúc</label><textarea id="wish" maxlength="500" placeholder="Gửi những lời yêu thương…"></textarea>
 <button type="submit">Gửi phản hồi ♡</button></form><div id="result" role="status" aria-live="polite"></div></div></div>
 <audio id="audio" preload="none" loop></audio></main>
-<script type="module" src="/view.mjs?v=2.2.0"></script></body></html>
+<script type="module" src="/view.mjs?v=2.2.1"></script></body></html>
