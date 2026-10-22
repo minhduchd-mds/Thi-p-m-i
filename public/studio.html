@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f8f5f1"><title>Hỷ Studio · Trình thiết kế thiệp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Dancing+Script:wght@500;600;700&family=Noto+Serif:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/studio.css?v=2.0.0"></head>
+<body>
+<div id="studio" class="studio">
+<header class="topbar">
+ <a href="/" class="brand" aria-label="Về sảnh Hỷ Studio"><span class="brand-icon">囍</span><span><b>Hỷ Studio</b><small>WEDDING DESIGN</small></span></a>
+ <div class="top-title"><strong>Thiết kế thiệp mời</strong><span id="autosave-label">Bản nháp tự động</span></div>
+ <div class="top-themes" role="group" aria-label="Chọn phong cách">
+   <button data-theme="red" class="theme-button active">Hồng Hỷ</button>
+   <button data-theme="jade" class="theme-button">Ngọc Uyển</button>
+   <button data-theme="pink" class="theme-button">Hoa Vân</button>
+ </div>
+ <div class="top-actions">
+   <button id="undo" title="Hoàn tác (Ctrl/⌘ Z)" aria-label="Hoàn tác">↶</button>
+   <button id="redo" title="Làm lại (Ctrl/⌘ Shift Z)" aria-label="Làm lại">↷</button>
+   <button id="preview" class="secondary">Xem trước</button>
+   <button id="save-local" class="secondary">Lưu nháp</button>
+   <button id="publish" class="primary">Xuất bản ↗</button>
+ </div>
+</header>
+<div class="editor-layout">
+ <aside class="palette">
+  <div class="palette-title">THƯ VIỆN THÀNH PHẦN</div>
+  <div class="palette-tabs" role="group" aria-label="Nhóm thành phần">
+   <button class="palette-tab active" data-panel="blocks">Thành phần</button>
+   <button class="palette-tab" data-panel="fields">Nội dung</button>
+   <button class="palette-tab" data-panel="layers">Lớp</button>
+  </div>
+  <div id="blocks-panel" class="palette-panel">
+   <p class="panel-hint">Kéo vào thiệp hoặc nhấn để thêm</p>
+   <div class="group-label">KHỐI THIẾT KẾ</div>
+   <div id="block-tools" class="tool-list">
+    <button class="tool" draggable="true" data-add="text"><span class="tool-glyph">T</span><span><b>Văn bản</b><small>Tiêu đề, lời chúc</small></span><span class="tool-add">+</span></button>
+    <button class="tool" draggable="true" data-add="image"><span class="tool-glyph">▧</span><span><b>Ảnh / WebP</b><small>Ảnh nền, ảnh cưới</small></span><span class="tool-add">+</span></button>
+    <button class="tool" draggable="true" data-add="frame"><span class="tool-glyph">▣</span><span><b>Khung viền</b><small>Khung kép trang trí</small></span><span class="tool-add">+</span></button>
+    <button class="tool" draggable="true" data-add="shape"><span class="tool-glyph">◇</span><span><b>Hình khối</b><small>Dải màu, dấu nhấn</small></span><span class="tool-add">+</span></button>
+   </div>
+   <div class="group-label">HOẠ TIẾT CỔ ĐIỂN</div>
+   <div id="asset-grid" class="asset-grid" aria-label="Thư viện hoạ tiết"></div>
+   <div class="asset-tip">SVG sắc nét · Vật liệu gỗ WebP</div>
+   <div class="group-label">XUẤT THIỆP</div>
+   <div class="export-stack"><button id="export-webp" class="export">↓ Tải WebP chất lượng cao</button><button id="export-png" class="export">↓ Tải PNG</button></div>
+  </div>
+  <div id="fields-panel" class="palette-panel" hidden>
+   <p class="panel-hint">Nội dung tự cập nhật theo bố cục</p><form id="fields-form" autocomplete="off"></form>
+   <label class="field-label" for="music-choice">Nhạc nền thiệp</label><select id="music-choice"><option value="loi-hen-tram-nam">Lời Hẹn Trăm Năm</option><option value="duyen-ngoc-phuong-dong">Duyên Ngọc Phương Đông</option><option value="ngay-vui-chung-doi">Ngày Vui Chung Đôi</option><option value="binh-minh-hanh-phuc">Bình Minh Hạnh Phúc</option><option value="none">Không nhạc</option></select>
+  </div>
+  <div id="layers-panel" class="palette-panel" hidden><p class="panel-hint">Chọn lớp để sửa, dùng ↑ ↓ thay đổi thứ tự</p><div id="layer-list"></div></div>
+ </aside>
+ <main class="canvas-area" aria-label="Canvas thiết kế thiệp">
+  <div class="canvas-toolbar"><span class="canvas-caption">KHUNG VẼ THIỆP <span class="dot">●</span> 720 × 1080</span>
+   <div class="canvas-controls"><button id="grid-toggle" title="Hiện / ẩn lưới">⊞ Lưới</button><button id="zoom-out" aria-label="Thu nhỏ">−</button><output id="zoom-label">60%</output><button id="zoom-in" aria-label="Phóng to">+</button><button id="fit" title="Vừa khung">Vừa khung</button></div>
+  </div>
+  <div id="drop-area" class="drop-area"><div id="stage-wrap" class="stage-wrap"><div id="stage" class="stage" aria-label="Nội dung thiệp, kéo thả để chỉnh sửa"></div></div></div>
+  <div class="canvas-footer"><span>Giữ Shift khi cần chọn lớp · Delete để xoá · Phím mũi tên để dịch chuyển</span><span id="coordinates">Chưa chọn thành phần</span></div>
+ </main>
+ <aside class="inspector" aria-label="Thuộc tính"><div class="inspector-heading"><div><small>BẢNG THUỘC TÍNH</small><h2 id="inspector-title">Thiết kế thiệp</h2></div><span class="inspector-symbol">⚙</span></div>
+  <div id="inspector-content"></div>
+ </aside>
+</div>
+<div class="statusbar"><span><span class="status-light"></span> Hỷ Studio Editor v2 · Desktop</span><span id="status" role="status" aria-live="polite">Sẵn sàng thiết kế</span></div>
+</div>
+<input id="upload-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+<dialog id="publish-dialog"><form method="dialog"><h2>Xuất bản thiệp cưới</h2><p id="publish-info">Lưu thiệp lên máy chủ để tạo liên kết chia sẻ. Thiệp có hiệu lực trong 30 ngày.</p><div id="publish-link-box" hidden><input id="published-url" readonly aria-label="Liên kết thiệp"><button id="copy-published" type="button">Sao chép</button></div><div class="dialog-actions"><button value="close">Đóng</button><button id="do-publish" type="button" class="primary">Lưu và lấy liên kết</button></div></form></dialog>
+<script type="module" src="/studio.mjs?v=2.0.0"></script>
+</body></html>

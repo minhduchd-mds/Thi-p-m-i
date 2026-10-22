@@ -142,18 +142,10 @@
   };
   const gotoEditor = section => {
     if (openingTimer) clearTimeout(openingTimer);
-    openingTimer = null;
-    stopWelcomeMusic();
-    setShown(false);
-    if (section === 'music') {
-      document.querySelector('[data-tab="music"]')?.click();
-      document.getElementById('panel-music')?.scrollIntoView({behavior:'auto',block:'start'});
-    } else {
-      const anchor = section === 'templates' ? 'mau-thiep' : 'chinh-sua';
-      document.getElementById(anchor)?.scrollIntoView({behavior:'auto',block:'start'});
-    }
-    document.getElementById('chinh-sua')?.setAttribute('tabindex', '-1');
-    document.getElementById('chinh-sua')?.focus({preventScroll:true});
+    stopWelcomeMusic(false);
+    // New block-based studio; legacy saved guest cards still use /?card=...
+    const params = section === 'music' ? '?panel=music' : '';
+    window.location.assign('/studio.html' + params);
   };
   const lobby = () => {
     entrance.disabled = false;
@@ -213,7 +205,7 @@
         name.textContent = [d.bride, d.groom].filter(Boolean).join(' & ') || 'Thiệp chưa đặt tên';
         status.textContent = record.expiresAt ? 'Hết hạn: ' + new Date(record.expiresAt).toLocaleDateString('vi-VN') : 'Thiệp đã lưu';
         const edit = document.createElement('a');
-        edit.href = '/?edit=' + encodeURIComponent(id);
+        edit.href = '/studio.html?edit=' + encodeURIComponent(id);
         edit.textContent = 'Chỉnh sửa ↗';
         edit.setAttribute('aria-label', 'Chỉnh sửa thiệp ' + name.textContent);
         row.appendChild(edit);
@@ -246,8 +238,8 @@
   });
   gateway.querySelectorAll('[data-hy-theme]').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelector('button.template[data-theme="' + btn.dataset.hyTheme + '"]')?.click();
-      gotoEditor('templates');
+      stopWelcomeMusic(false);
+      window.location.assign('/studio.html?theme=' + encodeURIComponent(btn.dataset.hyTheme));
     });
   });
   document.addEventListener('keydown', event => {

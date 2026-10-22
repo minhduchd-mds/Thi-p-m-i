@@ -32,8 +32,8 @@ assert.match(js, /sessionStorage\.getItem/, 'Revisits should avoid replaying int
 assert.match(js, /app\.inert = shown/, 'Prevent keyboard focus behind lobby');
 assert.match(js, /localStorage\.getItem/, 'Existing device-only card management must be explicit');
 assert.match(js, /record\.expiresAt/, 'Show card expiration');
-assert.match(js, /document\.querySelector\('button\.template\[data-theme=/, 'Gallery must target an actual editor template button');
-assert.match(js, /document\.querySelector\('\[data-tab="music"\]'\)/, 'Music path must open real music panel');
+assert.match(js, /studio\.html\?theme=/, 'Gallery must open the new block-based studio with selected theme');
+assert.match(js, /studio\.html.*panel=music/, 'Music path must open studio music settings');
 assert.match(html, /id="bg-music" preload="metadata"/, 'Do not autoplay audio in guest experience');
 assert.match(html, /Mở cửa &amp; nghe nhạc/, 'Entrance button must signal music playback');
 assert.match(js, /duyen-ngoc-phuong-dong\.mp3/, 'Welcome music uses a real bundled track');

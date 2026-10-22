@@ -1,0 +1,42 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const {pathToFileURL}=require('node:url');
+(async()=>{
+ const m=await import(pathToFileURL(require('node:path').resolve('public/editor-core.mjs')));
+ const a=m.createDoc('red'),b=m.createDoc('jade'),c=m.createDoc('pink');
+ assert.equal(a.schemaVersion,2);
+ assert.equal(a.width,720);assert.equal(a.height,1080);
+ assert.equal(Object.keys(m.themes).length,3);
+ assert.ok(a.blocks.length>=9&&b.blocks.length>=9&&c.blocks.length>=9);
+ assert.notDeepEqual(a.blocks.map(x=>[x.type,x.x,x.y]),b.blocks.map(x=>[x.type,x.x,x.y]));
+ assert.notDeepEqual(b.blocks.map(x=>[x.type,x.x,x.y]),c.blocks.map(x=>[x.type,x.x,x.y]));
+ const extra=m.addBlock('plum-branch',a);
+ assert.equal(extra.type,'ornament');assert.equal(extra.asset,'plum-branch');
+ a.blocks.push(extra);
+ const switched=m.createDoc('jade',a);
+ assert.equal(switched.blocks.at(-1).id,extra.id,'Custom blocks survive theme changes');
+ assert.equal(switched.fields.bride,'Minh Anh','Business fields survive theme changes');
+ assert.deepEqual(m.sanitize(switched).blocks.length,switched.blocks.length);
+ const migrated=m.migrate({bride:'Ngọc',groom:'Bảo',theme:'pink'});
+ assert.equal(migrated.fields.bride,'Ngọc');assert.equal(migrated.theme,'pink');
+ const hostile=m.clone(a);
+ hostile.blocks.push({...extra,id:'unsafe-img',type:'image',src:'javascript:alert(1)'});
+ const safe=m.sanitize(hostile);
+ assert.equal(safe.blocks.at(-1).src,'','Unsafe image URL removed');
+ assert.equal(m.safeSrc('/assets/ornaments/song-hy.svg'),'/assets/ornaments/song-hy.svg');
+ assert.equal(m.dateLabel('2027-06-20'),'20/06/2027');
+ for(const path of ['public/studio.html','public/studio.css','public/studio.mjs','public/view.html','public/view.mjs','public/editor-render.mjs']){
+   assert.ok(fs.statSync(path).size>500,'Missing working studio file '+path);
+ }
+ const studioHtml=fs.readFileSync('public/studio.html','utf8');
+ const studioJs=fs.readFileSync('public/studio.mjs','utf8');
+ const viewer=fs.readFileSync('public/view.mjs','utf8');
+ assert.match(studioHtml,/id="stage"/);assert.match(studioHtml,/id="inspector-content"/);
+ assert.match(studioHtml,/id="asset-grid"/);assert.match(studioHtml,/id="publish"/);
+ assert.match(studioJs,/pointermove/);assert.match(studioJs,/dragstart/);assert.match(studioJs,/downloadPoster/);assert.match(studioJs,/localStorage/);
+ assert.match(viewer,/\/rsvp/);
+ const gateway=fs.readFileSync('public/hy-gateway.js','utf8');
+ assert.match(gateway,/studio.html/);
+ console.log('PASS: editor v2 layouts, document migration, sanitization, assets, canvas interactions, export and viewer links.');
+})().catch(e=>{console.error(e);process.exitCode=1;});

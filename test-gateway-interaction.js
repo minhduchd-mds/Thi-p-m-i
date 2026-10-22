@@ -68,7 +68,7 @@ const document = {
 const timers = [];
 let nextTimer = 0;
 const win = {
-  location: {search:'',hash:''},
+  location: {search:'',hash:'',href:'',assign(path){this.href=path;}},
   matchMedia() {return {matches:false};},
   setTimeout(fn) {const id=++nextTimer; timers.push({id,fn,kind:'timeout'}); return id;},
   clearInterval() {},
@@ -102,13 +102,11 @@ assert.equal(audio.paused,true,'Music button mutes');
 assert.equal(sound.attributes['aria-pressed'],'false');
 
 actions.find(x=>x.dataset.hyAction==='design').click();
-assert.equal(gateway.hidden,true,'Editing hides the lobby');
-assert.equal(elements.get('app').inert,false,'Editor restored to interactive state');
+assert.equal(win.location.href,'/studio.html','Design opens the new studio page');
 actions.find(x=>x.dataset.hyAction==='templates').click();
 assert.equal(elements.get('hy-page-library').hidden,false,'Gallery screen becomes visible');
 themes.find(x=>x.dataset.hyTheme==='jade').click();
-assert.equal(selectedEditorTheme,'jade','Gallery must select the existing editable Jade template');
-assert.equal(gateway.hidden,true,'Choosing a gallery template opens the real editor');
+assert.equal(win.location.href,'/studio.html?theme=jade','Gallery opens studio with Jade layout');
 
 const home = document.querySelector('.topbar .top-spacer'); // home button inserted after the spacer
 assert.ok(home);

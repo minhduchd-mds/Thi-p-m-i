@@ -1,3 +1,13 @@
+## v2.0 — Block Editor (22/10/2026)
+
+- Trình thiết kế mới tại `/studio.html`, khách xem thiệp v2 tại `/view.html?card=<id>`; thiệp v1 vẫn xem tại `/?card=<id>`.
+- 3 layout riêng Hồng Hỷ / Ngọc Uyển / Hoa Vân; palette text, ảnh WebP, khung, shape, SVG ornaments; kéo-thả/resize, Inspector, Layers, khoá/ẩn/nhân bản, undo/redo.
+- Canvas 720×1080, xuất PNG hoặc WebP 2× (1440×2160). File ảnh tải lên được thu nhỏ/nén thành WebP data URL trong bản nháp, **chưa phải object storage**.
+- Tự lưu nháp cục bộ; server Node hỗ trợ `data.document.schemaVersion=2` đồng thời duy trì v1, RSVP, token, MP3 và TTL 30 ngày.
+- **Quan trọng:** Vercel `hy-studio-preview.vercel.app` là preview tĩnh. Kéo thả, preview nháp, export hoạt động trên frontend; nút Xuất bản và RSVP trên link chia sẻ **chỉ hoạt động khi triển khai `server.js` với persistent storage**. Không coi preview tĩnh là production.
+- Kiểm tra: `npm run check`, `node server.js` rồi `npm run test:api`. Trình duyệt phải kiểm tra thêm Chrome/Safari và xuất ảnh với font tải qua mạng.
+- Luồng cổng chuyển editor sang `/studio.html`; link chia sẻ v1 / edit token trên thiết bị vẫn tương thích qua trang v1 và luồng chuyển đổi v2. Trước khi đưa production cần regression test browser, server production persistence, hạn mức upload, CSP và chính sách quyền riêng tư.
+
 # Hỷ Studio · Thiệp cưới web tương tác
 
 ## Cổng chào 3D và sảnh chức năng — v1.3 (20/10/2026)

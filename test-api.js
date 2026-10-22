@@ -25,6 +25,31 @@ async function test(){
     const rsvp=await send(`/api/cards/${id}/rsvp`,'POST',{name:'Khách thử nghiệm',attendance:'yes',guests:2,wish:'Trăm năm hạnh phúc!'});assert.equal(rsvp.status,201);
     assert.equal((await send(`/api/cards/${id}/rsvps`)).status,403);
     const list=await send(`/api/cards/${id}/rsvps`,'GET',null,editToken);assert.equal(list.status,200);assert.equal(list.body.count,1);assert.equal(list.body.rsvps[0].guests,2);
+    // Editor v2 round-trip and content safety, with legacy fields still intact.
+    const visual={schemaVersion:2,theme:'jade',layoutId:'jade-poster',width:720,height:1080,
+      fields:{...data,bride:'Mỹ Duyên'},music:'loi-hen-tram-nam',
+      blocks:[{id:'test-title',type:'text',x:45,y:90,w:550,h:120,rotation:0,z:3,
+        binding:'bride',fontSize:55,align:'center',weight:600,text:'',color:'#ffffff'}]};
+    const v2=await send('/api/cards','POST',{data:{...data,theme:'jade',document:visual}});
+    assert.equal(v2.status,201);
+    const round=await send('/api/cards/'+v2.body.id);
+    assert.equal(round.status,200);
+    assert.equal(round.body.data.document.schemaVersion,2);
+    assert.equal(round.body.data.document.blocks[0].binding,'bride');
+    assert.equal(round.body.data.bride,'Mỹ Duyên');
+    const v2update=await send('/api/cards/'+v2.body.id,'PUT',{data:{...data,theme:'jade',document:{...visual,blocks:[...visual.blocks,{id:'added-frame',type:'frame',x:18,y:28,w:650,h:900,z:1}]}}},v2.body.editToken);
+    assert.equal(v2update.status,200);
+    const after=await send('/api/cards/'+v2.body.id);assert.equal(after.body.data.document.blocks.length,2);
+    const exploit=await send('/api/cards','POST',{data:{...data,document:{...visual,blocks:[{id:'unsafe',type:'image',x:10,y:10,w:100,h:100,src:'javascript:alert(1)'}]}}});
+    assert.equal(exploit.status,201);
+    const exploited=await send('/api/cards/'+exploit.body.id);assert.equal(exploited.body.data.document.blocks[0].src,'');
+    await fs.unlink(path.join(DATA_DIR,v2.body.id+'.json'));
+    await fs.unlink(path.join(DATA_DIR,exploit.body.id+'.json'));
+    const assetResponse=await fetch(BASE+'/assets/textures/wood-mahogany.webp');
+    assert.equal(assetResponse.status,200);
+    assert.equal(assetResponse.headers.get('content-type'),'image/webp');
+    const jsResponse=await fetch(BASE+'/studio.mjs');assert.equal(jsResponse.status,200);
+    assert.match(jsResponse.headers.get('content-type'),/javascript/);
     const bad=await send('/api/cards','POST',{data:{...data,music:'non-existent'}});assert.equal(bad.status,201);await fs.unlink(path.join(DATA_DIR,`${bad.body.id}.json`));
     const expiredId=crypto.randomUUID();await fs.writeFile(path.join(DATA_DIR,`${expiredId}.json`),JSON.stringify({id:expiredId,createdAt:'2020-01-01T00:00:00Z',expiresAt:'2020-01-31T00:00:00Z',editToken:'x',data,rsvps:[]}));
     await fs.mkdir(path.join(DATA_DIR,'music'),{recursive:true});await fs.writeFile(path.join(DATA_DIR,'music',`${expiredId}.mp3`),mp3);

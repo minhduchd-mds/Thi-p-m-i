@@ -49,6 +49,49 @@ function sanitizeData(raw){
   if(data.time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(data.time))throw Object.assign(new Error('Giờ cưới không hợp lệ'),{status:400});
   if(typeof raw.photo==='string'&&raw.photo.length<=1_200_000&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(raw.photo))data.photo=raw.photo;
   else data.photo='';
+  // v2 visual editor document is stored alongside legacy v1 fields.
+  if(raw.document!==undefined){
+    const d=raw.document;
+    if(!d||d.schemaVersion!==2||!['red','jade','pink'].includes(d.theme)||!Array.isArray(d.blocks)||d.blocks.length>80){
+      throw Object.assign(new Error('Tài liệu thiết kế không hợp lệ'),{status:400});
+    }
+    const f={};
+    const names={bride:30,groom:30,date:10,time:5,venue:100,address:180,guest:50,message:300};
+    for(const [key,max] of Object.entries(names))f[key]=cleanString(d.fields?.[key],max);
+    const officialAssets=new Set(['/assets/ornaments/song-hy.svg','/assets/ornaments/carved-door.svg','/assets/ornaments/gold-corner.svg','/assets/ornaments/plum-branch.svg','/assets/textures/wood-mahogany.webp']);
+    const blocks=[],ids=new Set();
+    const finite=(v,min,max,def)=>Number.isFinite(Number(v))?Math.min(max,Math.max(min,Number(v))):def;
+    for(const input of d.blocks){
+      if(!input||!['text','image','ornament','frame','shape'].includes(input.type))continue;
+      const id=cleanString(input.id,70);
+      if(!/^[a-zA-Z0-9_-]+$/.test(id)||ids.has(id))throw Object.assign(new Error('Mã khối thiết kế không hợp lệ'),{status:400});
+      ids.add(id);
+      const b={id,type:input.type,x:finite(input.x,-500,1150,0),y:finite(input.y,-500,1600,0),
+        w:finite(input.w,20,900,100),h:finite(input.h,20,1200,100),rotation:finite(input.rotation,-360,360,0),
+        z:finite(input.z,0,900,10),opacity:finite(input.opacity,0,1,1),
+        locked:!!input.locked,hidden:!!input.hidden,userAdded:!!input.userAdded};
+      if(b.type==='text'){
+        b.binding=Object.hasOwn(names,input.binding)?input.binding:'';
+        b.text=cleanString(input.text,400);b.fontSize=finite(input.fontSize,10,150,24);
+        b.align=['left','center','right'].includes(input.align)?input.align:'center';
+        b.fontFamily=cleanString(input.fontFamily,100);b.weight=finite(input.weight,300,900,500);
+        b.color=/^#[0-9a-fA-F]{6}$/.test(input.color||'')?input.color:'';
+        b.letterSpacing=finite(input.letterSpacing,0,15,0);
+      }
+      if(b.type==='ornament')b.asset=['song-hy','carved-door','gold-corner','plum-branch','wood'].includes(input.asset)?input.asset:'song-hy';
+      if(b.type==='image'){
+        const src=typeof input.src==='string'?input.src:'';
+        b.src=officialAssets.has(src)||/^data:image\/(?:webp|jpeg|png);base64,[A-Za-z0-9+/=]{20,1100000}$/.test(src)?src:'';
+        b.fit=input.fit==='contain'?'contain':'cover';
+      }
+      if(b.type==='shape')b.fill=/^#[0-9a-fA-F]{6}$/.test(input.fill||'')?input.fill:'#b7855b';
+      blocks.push(b);
+    }
+    const document={schemaVersion:2,theme:d.theme,layoutId:cleanString(d.layoutId,60),width:720,height:1080,
+      fields:f,music:data.music,blocks};
+    if(JSON.stringify(document).length>1_300_000)throw Object.assign(new Error('Thiệp có quá nhiều dữ liệu ảnh'),{status:413});
+    data.document=document;
+  }
   return data;
 }
 function sanitizeRSVP(raw){
@@ -153,7 +196,7 @@ async function serveStatic(req,res,p){
   const rel=(p==='/'?'/index.html':p).replace(/^\/+/,''),file=path.resolve(PUBLIC_DIR,rel);
   if(!file.startsWith(PUBLIC_DIR+path.sep))return response(res,403,{error:'Đường dẫn không hợp lệ'});
   const type=path.extname(file).toLowerCase();
-  const allowed={'.html':'text/html; charset=utf-8','.wav':'audio/wav','.mp3':'audio/mpeg','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml'};
+  const allowed={'.html':'text/html; charset=utf-8','.wav':'audio/wav','.mp3':'audio/mpeg','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.mjs':'text/javascript; charset=utf-8'};
   if(!allowed[type])return response(res,404,{error:'Tài nguyên không tồn tại'});
   try{const b=await fs.readFile(file);res.writeHead(200,{'Content-Type':allowed[type],'Content-Length':b.length,'Cache-Control':type==='.html'?'no-cache':'public,max-age=604800','X-Content-Type-Options':'nosniff'});res.end(b)}catch(e){response(res,404,{error:'Tài nguyên không tồn tại'})}
 }
