@@ -44,7 +44,7 @@
 .drop-area.drag-over{outline:3px dashed #9a3440;outline-offset:-12px;background-color:#eddfdb}
 .stage-wrap{position:relative;flex:none;transform-origin:top left}
 .stage{position:relative;width:720px;height:1080px;box-shadow:0 26px 58px #3c262438,0 2px 6px #4d3a2a29;overflow:hidden;user-select:none;touch-action:none;transform-origin:top left}
-.stage.show-grid{background-image:linear-gradient(#ffffff18 1px,transparent 1px),linear-gradient(90deg,#ffffff18 1px,transparent 1px)!important;background-size:60px 60px!important}
+.stage.show-grid::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:950;background-image:linear-gradient(#ffffff26 1px,transparent 1px),linear-gradient(90deg,#ffffff26 1px,transparent 1px);background-size:60px 60px}
 .stage-block{position:absolute;display:flex;align-items:center;justify-content:center;white-space:pre-wrap;line-height:1.32;overflow:visible;cursor:grab;touch-action:none;outline:1px solid transparent}
 .stage-block img{height:100%;width:100%;pointer-events:none;display:block}.stage-block.is-selected{outline:2px solid #2c9ddb;outline-offset:2px}.stage-block:focus-visible{outline:2px solid #2c9ddb}
 .stage-block.is-selected:before{content:"";position:absolute;inset:-5px;outline:1px dashed #fff;pointer-events:none}

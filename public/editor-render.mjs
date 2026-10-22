@@ -48,6 +48,12 @@ export function renderStage(el,doc,selected=""){
    if(url){
     const qr=document.createElement("img");qr.alt="QR mừng cưới — kiểm tra người nhận trước khi chuyển";qr.src=url;qr.loading="lazy";qr.referrerPolicy="no-referrer";qr.style.objectFit="contain";
     const account=document.createElement("span");account.className="gift-qr-caption";account.textContent=doc.gift.holder+" · "+doc.gift.account;
+    qr.addEventListener("error",()=>{
+     qr.remove();
+     const notice=document.createElement("span");notice.className="gift-qr-placeholder";
+     notice.textContent="Không tải được mã VietQR. Kiểm tra kết nối mạng và thử lại trước khi gửi thiệp.";
+     item.prepend(notice);
+    },{once:true});
     item.append(qr,account);
    }else{
     const empty=document.createElement("span");empty.className="gift-qr-placeholder";empty.textContent="▦\nThiết lập ngân hàng, số tài khoản và người nhận trong tab Nội dung";item.append(empty);
@@ -69,7 +75,8 @@ const imageCache=new Map();
 async function getImg(url){
  if(!url)return null;
  if(imageCache.has(url))return imageCache.get(url);
- const p=new Promise(resolve=>{const img=new Image();img.crossOrigin="anonymous";img.onload=()=>resolve(img);img.onerror=()=>resolve(null);img.src=url;});
+ const p=new Promise(resolve=>{const img=new Image();img.crossOrigin="anonymous";img.onload=()=>resolve(img);img.onerror=()=>resolve(null);img.src=url;})
+  .then(img=>{if(!img)imageCache.delete(url);return img;});
  imageCache.set(url,p);return p;
 }
 function getLines(ctx,text,maxWidth){
@@ -102,6 +109,7 @@ export async function drawPoster(doc,scale=2){
   const x=-block.w/2,y=-block.h/2,w=block.w,h=block.h;
   if(block.type==="ornament"||block.type==="image"){
    const img=await getImg(block.type==="ornament"?assetUrl(block.asset):block.src);
+   if(!img)throw new Error("Không tải được ảnh hoặc hoa văn. Hãy kiểm tra tài nguyên và xuất lại.");
    if(img){
     const ratio=block.type==="ornament"||block.fit==="contain"?Math.min(w/img.width,h/img.height):Math.max(w/img.width,h/img.height);
     let iw=img.width*ratio,ih=img.height*ratio;
@@ -120,8 +128,8 @@ export async function drawPoster(doc,scale=2){
    const url=vietQRUrl(doc.gift);
    if(url){
     const qr=await getImg(url);
-    if(qr){const side=Math.min(w,h-32);ctx.drawImage(qr,x+(w-side)/2,y,side,side);}
-    else {ctx.textAlign="center";ctx.fillStyle="#6b5042";ctx.font="19px sans-serif";ctx.fillText("Mở thiệp web để quét VietQR",0,0,w-12);}
+    if(!qr)throw new Error("Không tải được mã VietQR để đưa vào ảnh xuất (có thể bị chặn CORS). Vui lòng thử lại hoặc dùng thiệp web để hiển thị QR.");
+    const side=Math.min(w,h-32);ctx.drawImage(qr,x+(w-side)/2,y,side,side);
     ctx.fillStyle="#564334";ctx.font="18px sans-serif";ctx.textAlign="center";ctx.fillText((doc.gift.holder+" · "+doc.gift.account).slice(0,38),0,y+h-15,w-12);
    }else{
     ctx.textAlign="center";ctx.fillStyle="#a06a6a";ctx.font="22px sans-serif";ctx.fillText("Chưa thiết lập tài khoản",0,0,w-20);

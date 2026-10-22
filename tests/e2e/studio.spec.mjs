@@ -223,6 +223,58 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await viewer.close();
   });
 
+  test('Lưới không thay nền của Hồng Hỷ, Ngọc Uyển và Hoa Vân', async ({page}, testInfo)=>{
+    await ready(page);
+    for(const theme of ['red','jade','pink']){
+      page.on('dialog',d=>d.accept());
+      await page.locator('[data-theme="'+theme+'"]').click();
+      const before=await page.locator('#stage').evaluate(el=>getComputedStyle(el).backgroundImage);
+      await page.locator('#grid-toggle').click();
+      await expect(page.locator('#stage')).toHaveClass(/show-grid/);
+      const after=await page.locator('#stage').evaluate(el=>getComputedStyle(el).backgroundImage);
+      expect(after, 'Grid overlay must never replace invitation paper background').toBe(before);
+      const overlay=await page.locator('#stage').evaluate(el=>getComputedStyle(el,'::after').backgroundImage);
+      expect(overlay).toContain('linear-gradient');
+      if(theme==='red')await capture(page,testInfo,'12-grid-preserves-paper');
+      await page.locator('#grid-toggle').click();
+    }
+  });
+
+  test('Không xuất QR thiếu ảnh khi VietQR bị ngắt kết nối', async ({page})=>{
+    await page.route('https://img.vietqr.io/**',route=>route.abort('failed'));
+    await ready(page);
+    await page.locator('[data-new-page="gift"]').click();
+    await page.locator('.palette-tab[data-panel="fields"]').click();
+    await page.locator('#gift-account').fill('0123456789');
+    await page.locator('#gift-holder').fill('Test Receiver');
+    await expect(page.locator('#stage .gift-qr-placeholder')).toContainText('Không tải được mã VietQR');
+    await page.locator('.palette-tab[data-panel="blocks"]').click();
+    await page.locator('#export-png').click();
+    await expect(page.locator('#status')).toContainText('Xuất PNG thất bại');
+    await expect(page.locator('#status')).toContainText('VietQR');
+  });
+
+  test('Mobile mở thiệp nhiều trang, xem bản đồ và QR không tràn ngang', async ({page},testInfo)=>{
+    await ready(page);
+    await page.locator('[data-new-page="map"]').click();
+    await page.locator('[data-new-page="gift"]').click();
+    await page.locator('#save-local').click();
+    await page.setViewportSize({width:390,height:844});
+    await page.goto('/view.html?preview=1');
+    await expect(page.locator('#viewer')).toBeVisible();
+    await page.locator('#toggle-open').click();
+    await expect(page.locator('#book')).toHaveClass(/is-open/);
+    await page.locator('#page-next').click();
+    await expect(page.locator('#page-name')).toContainText('Địa điểm');
+    await expect(page.locator('#map-directions')).toBeVisible();
+    await page.locator('#page-next').click();
+    await expect(page.locator('#page-name')).toContainText('Mừng cưới');
+    await expect(page.locator('#gift-details')).toBeHidden();
+    const widths=await page.evaluate(()=>({screen:innerWidth,body:document.documentElement.scrollWidth}));
+    expect(widths.body).toBeLessThanOrEqual(widths.screen+2);
+    await capture(page,testInfo,'13-mobile-open-multipage');
+  });
+
   test('Xem trước trên mobile 390 × 844 không tràn ngang', async ({ page }, testInfo) => {
     await ready(page);
     await page.locator('#save-local').click();
