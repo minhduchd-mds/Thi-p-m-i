@@ -1,9 +1,10 @@
 'use strict';
-const assert=require('node:assert/strict');
-const fs=require('node:fs');
-const {pathToFileURL}=require('node:url');
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {pathToFileURL} from 'node:url';
+import {resolve} from 'node:path';
 (async()=>{
- const m=await import(pathToFileURL(require('node:path').resolve('public/editor-core.mjs')));
+ const m=await import(pathToFileURL(resolve('public/editor-core.mjs')));
  const a=m.createDoc('red'),b=m.createDoc('jade'),c=m.createDoc('pink');
  assert.equal(a.schemaVersion,2);
  assert.equal(a.width,720);assert.equal(a.height,1080);
