@@ -78,10 +78,18 @@ body{background:#d8bc9f;background-image:linear-gradient(125deg,#1e15178a,#bb947
 #poster.book-front{-webkit-backface-visibility:hidden!important;backface-visibility:hidden!important;transform:translateZ(1px)!important}
 .invitation-book.is-open #poster.book-front{visibility:hidden!important;pointer-events:none!important}
 .book-back{-webkit-backface-visibility:hidden!important;backface-visibility:hidden!important;transform:rotateY(180deg) translateZ(1px)}
+
+/* Reverse of the opening cover is a designed interior page, not mirrored front lettering. */
+.book-back{background-image:url('/assets/ornaments/plum-branch.svg'),url('/assets/ornaments/gold-corner.svg'),linear-gradient(155deg,#fff7ea,#efdbc0 70%,#f9f0e0);background-position:right 7% top 7%,left 1% bottom 2%,center;background-size:300px,230px,cover;background-repeat:no-repeat;border:21px double #c79c6c;gap:24px}
+.book-back .back-emblem{width:244px;height:244px;font-size:111px;border:8px solid #c49867;box-shadow:0 10px 28px #864f2324;background:#fff8ebcc}
+.book-back .back-eyebrow{letter-spacing:7px;font-size:17px;color:#915548}
+.book-back #back-couple{font-size:47px;max-width:590px;text-align:center;line-height:1.45;color:#8c3544}
+.book-back #back-date{font-size:22px;letter-spacing:2px;color:#93654e}
+.book-back .back-separator{font-size:24px;font-style:normal;color:#bf9369}
 </style></head>
 <body><header><a href="/">囍 Hỷ Studio</a><span>THƯ MỜI TRÂN TRỌNG</span></header>
 <main><div id="loading">Đang chuẩn bị tấm thiệp dành cho bạn…</div><div id="viewer" class="viewer" hidden>
-<div id="poster-wrap" class="book-viewport" aria-label="Thiệp hai mặt tương tác"><div id="book-transform"><div id="book" class="invitation-book"><div id="inside-poster" class="book-inside" aria-label="Nội dung bên trong thiệp" aria-hidden="true"></div><div id="cover-leaf" class="book-cover"><div id="poster" class="book-front" role="button" tabindex="0" aria-label="Mở thiệp để xem mặt trong"></div><div class="book-back" aria-hidden="true"><div class="back-emblem">囍</div><span>Hỷ Studio</span><small>TRĂM NĂM HẠNH PHÚC</small></div></div></div></div></div>
+<div id="poster-wrap" class="book-viewport" aria-label="Thiệp hai mặt tương tác"><div id="book-transform"><div id="book" class="invitation-book"><div id="inside-poster" class="book-inside" aria-label="Nội dung bên trong thiệp" aria-hidden="true"></div><div id="cover-leaf" class="book-cover"><div id="poster" class="book-front" role="button" tabindex="0" aria-label="Mở thiệp để xem mặt trong"></div><div class="book-back" aria-hidden="true"><div class="back-emblem">囍</div><small class="back-eyebrow">TRÂN TRỌNG KÍNH MỜI</small><span id="back-couple">Lễ thành hôn</span><small id="back-date">Ngày hạnh phúc</small><i class="back-separator">✦  ❦  ✦</i></div></div></div></div></div>
 <div class="open-controls"><button id="toggle-open" aria-expanded="false" type="button">✉ Mở thiệp để xem bên trong</button><span id="book-status" role="status" aria-live="polite">Chạm để mở bức thiệp</span></div>
 <div id="viewer-pager" class="viewer-pager" hidden aria-label="Lật trang thiệp">
  <button id="page-prev" type="button" aria-label="Trang trước">← Trang trước</button>
