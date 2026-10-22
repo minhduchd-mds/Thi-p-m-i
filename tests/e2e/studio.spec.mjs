@@ -83,8 +83,8 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await expect(page.locator('[data-block-id="bride"]')).toContainText('Mai Phương');
     await page.locator('.palette-tab[data-panel="blocks"]').click();
     await page.locator('.tool[data-add="image"]').click();
-    const base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9rM7xYoAAAAASUVORK5CYII=';
-    await page.locator('#upload-input').setInputFiles({name:'tiny.png',mimeType:'image/png',buffer:Buffer.from(base64,'base64')});
+    const fixture=await fs.readFile('public/assets/textures/wood-mahogany.webp');
+    await page.locator('#upload-input').setInputFiles({name:'wood.webp',mimeType:'image/webp',buffer:fixture});
     await expect(page.locator('#stage img[src^="data:image/webp;base64,"]')).toHaveCount(1);
     const webpEvent=page.waitForEvent('download');
     await page.locator('#export-webp').click();
