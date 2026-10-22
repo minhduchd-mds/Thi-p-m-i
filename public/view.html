@@ -86,10 +86,22 @@ body{background:#d8bc9f;background-image:linear-gradient(125deg,#1e15178a,#bb947
 .book-back #back-couple{font-size:47px;max-width:590px;text-align:center;line-height:1.45;color:#8c3544}
 .book-back #back-date{font-size:22px;letter-spacing:2px;color:#93654e}
 .book-back .back-separator{font-size:24px;font-style:normal;color:#bf9369}
+
+/* A separate real left-hand page resolves nested-3D backface inconsistencies in Chromium/Safari. */
+.book-left-inside{position:absolute;top:0;left:-720px;width:720px;height:1080px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:25px;border:22px double #c59d69;background:linear-gradient(143deg,#fff7e9,#eed9bc 75%,#f6e8d7);box-shadow:0 16px 34px #3b1b1b3b;z-index:5;opacity:0;visibility:hidden;pointer-events:none;transform:rotateY(-12deg);transform-origin:right center;transition:opacity .55s ease,transform .55s ease}
+.invitation-book.is-open .book-left-inside{visibility:visible;opacity:1;transform:rotateY(0deg);pointer-events:auto}
+.book-left-inside .left-flower{position:absolute;right:-6px;top:0;width:260px;height:320px;object-fit:contain;pointer-events:none}
+.book-left-inside .back-emblem{width:245px;height:245px;display:grid;place-items:center;font:700 115px 'Noto Serif',serif;color:#a83f49;border:9px double #c59e6c;border-radius:50%;background:#fff8e7cc;box-shadow:0 8px 23px #844d2630}
+.book-left-inside small{font:500 21px 'Noto Serif',serif;letter-spacing:5px;color:#9d624c;text-align:center}
+.book-left-inside #left-couple{font:600 49px 'Noto Serif',serif;color:#8b3342;text-align:center;max-width:610px;line-height:1.5}
+.book-left-inside i{font:400 27px serif;color:#c39d67}
+@media(max-width:720px){.invitation-book.is-open .book-left-inside{display:none}}
+@media(prefers-reduced-motion:reduce){.book-left-inside{transition:none!important}}
+
 </style></head>
 <body><header><a href="/">囍 Hỷ Studio</a><span>THƯ MỜI TRÂN TRỌNG</span></header>
 <main><div id="loading">Đang chuẩn bị tấm thiệp dành cho bạn…</div><div id="viewer" class="viewer" hidden>
-<div id="poster-wrap" class="book-viewport" aria-label="Thiệp hai mặt tương tác"><div id="book-transform"><div id="book" class="invitation-book"><div id="inside-poster" class="book-inside" aria-label="Nội dung bên trong thiệp" aria-hidden="true"></div><div id="cover-leaf" class="book-cover"><div id="poster" class="book-front" role="button" tabindex="0" aria-label="Mở thiệp để xem mặt trong"></div><div class="book-back" aria-hidden="true"><div class="back-emblem">囍</div><small class="back-eyebrow">TRÂN TRỌNG KÍNH MỜI</small><span id="back-couple">Lễ thành hôn</span><small id="back-date">Ngày hạnh phúc</small><i class="back-separator">✦  ❦  ✦</i></div></div></div></div></div>
+<div id="poster-wrap" class="book-viewport" aria-label="Thiệp hai mặt tương tác"><div id="book-transform"><div id="book" class="invitation-book"><div id="inside-poster" class="book-inside" aria-label="Nội dung bên trong thiệp" aria-hidden="true"></div><div id="book-left-inside" class="book-left-inside" aria-hidden="true"><img src="/assets/ornaments/plum-branch.svg" alt="" class="left-flower"><div class="back-emblem">囍</div><small>TRÂN TRỌNG KÍNH MỜI</small><span id="left-couple">Lễ thành hôn</span><small id="left-date">Ngày hạnh phúc</small><i>✦  ❦  ✦</i></div><div id="cover-leaf" class="book-cover"><div id="poster" class="book-front" role="button" tabindex="0" aria-label="Mở thiệp để xem mặt trong"></div><div class="book-back" aria-hidden="true"><div class="back-emblem">囍</div><small class="back-eyebrow">TRÂN TRỌNG KÍNH MỜI</small><span id="back-couple">Lễ thành hôn</span><small id="back-date">Ngày hạnh phúc</small><i class="back-separator">✦  ❦  ✦</i></div></div></div></div></div>
 <div class="open-controls"><button id="toggle-open" aria-expanded="false" type="button">✉ Mở thiệp để xem bên trong</button><span id="book-status" role="status" aria-live="polite">Chạm để mở bức thiệp</span></div>
 <div id="viewer-pager" class="viewer-pager" hidden aria-label="Lật trang thiệp">
  <button id="page-prev" type="button" aria-label="Trang trước">← Trang trước</button>
