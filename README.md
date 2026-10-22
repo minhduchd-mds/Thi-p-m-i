@@ -137,3 +137,5 @@ curl http://localhost:4177/api/health
 ```
 
 Tập trung vào demo chức năng, không coi đây là sản phẩm thương mại đã kiểm toán bảo mật.
+
+**Vercel production:** Besides versioning vercel.json, project `hy-studio-preview` has two Live Project Routes for `/api/:path*` (destination ends in `/api/:path`, no trailing star) and `/i/:code`. In this static deployment the Vercel project routes are necessary; rerun GitHub workflow `Hỷ Studio Live Backend Smoke` after any routing changes.

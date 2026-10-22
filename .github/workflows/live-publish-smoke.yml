@@ -54,3 +54,52 @@ jobs:
           assert status==200 and 'id="viewer"' in html and 'view.mjs' in html, "Short-code page rewrite missing"
           print("PASS: /i/HY-... routed to wedding viewer")
           PY
+
+      - name: Verify production short-code lifecycle through Vercel and Supabase
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import urllib.request, urllib.error, json, re
+          root="https://hy-studio-preview.vercel.app"
+          def call(path,method="GET",payload=None,token=None):
+              data=json.dumps(payload).encode() if payload is not None else (b'' if method=="POST" else None)
+              headers={"Content-Type":"application/json"} if data is not None else {}
+              if token:headers["Authorization"]="Bearer "+token
+              request=urllib.request.Request(root+path,data=data,headers=headers,method=method)
+              try:
+                  with urllib.request.urlopen(request,timeout=25) as response:
+                      return response.status,json.loads(response.read())
+              except urllib.error.HTTPError as e:
+                  return e.code,json.loads(e.read())
+          document={
+              "schemaVersion":2,"theme":"red","layoutId":"test-publication",
+              "fields":{"bride":"Hy Studio QA","groom":"Test Invitation","date":"2027-02-14",
+                        "time":"18:00","venue":"E2E Lab","address":"Ha Noi","message":"Automated test"},
+              "music":"none","blocks":[],"insideBlocks":[],"extraPages":[],"gift":{}
+          }
+          status,created=call("/api/cards","POST",{"data":{"document":document}})
+          assert status==201,(status,str(created)[:330])
+          card_id,code,token=created["id"],created["code"],created["editToken"]
+          assert re.fullmatch(r"HY-[A-HJ-NP-Z2-9]{12}",code)
+          try:
+              status,card=call("/api/cards/"+code)
+              assert status==200 and card["code"]==code and card["id"]==card_id,(status,card)
+              status,info=call("/api/cards/"+card_id+"/manage",token=token)
+              assert status==200 and info["code"]==code
+              status,renew=call("/api/cards/"+card_id+"/extend","POST",{},token)
+              assert status==200 and renew.get("expiresAt")
+              status,revoked=call("/api/cards/"+card_id+"/revoke","POST",{},token)
+              assert status==200 and revoked["revoked"] is True
+              status,blocked=call("/api/cards/"+code)
+              assert status==410,(status,blocked)
+              status,restored=call("/api/cards/"+card_id+"/restore","POST",{},token)
+              assert status==200 and restored["revoked"] is False
+              status,card=call("/api/cards/"+code)
+              assert status==200
+              print("PASS: live publish, unique HY code, owner manage, extend, revoke, restore, read")
+          finally:
+              status,_=call("/api/cards/"+card_id+"/revoke","POST",{},token)
+              assert status==200,"Failed to revoke QA invitation after smoke test"
+              print("QA invitation has been revoked. It will expire under normal retention.")
+          PY
