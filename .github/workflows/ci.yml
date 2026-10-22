@@ -34,3 +34,24 @@ jobs:
             sleep .5
           done
           npm run test:api
+
+      - name: Smoke test editor in headless browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$BROWSER" ]; then
+            echo "Chrome/Chromium not installed on runner; browser smoke not executed"
+            exit 0
+          fi
+          node server.js > /tmp/hy-studio-browser-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for _ in {1..20}; do
+            if curl -fsS http://127.0.0.1:4177/studio.html >/dev/null; then break; fi
+            sleep .5
+          done
+          "$BROWSER" --headless --no-sandbox --disable-dev-shm-usage --disable-gpu --virtual-time-budget=10000 --window-size=1366,900 --dump-dom http://127.0.0.1:4177/studio.html > /tmp/hy-studio-browser-dom.html 2>/tmp/hy-studio-browser-log.txt
+          grep -q 'class="stage-block' /tmp/hy-studio-browser-dom.html
+          grep -q 'class="asset-card' /tmp/hy-studio-browser-dom.html
+          echo "PASS: 1366px editor renders dynamic canvas layers and asset catalog in Chrome"
