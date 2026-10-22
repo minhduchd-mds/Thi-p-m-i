@@ -4,7 +4,7 @@
   "private": true,
   "description": "Thiệp cưới web tương tác lấy cảm hứng Tân Trung Hoa, lưu 30 ngày",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.23.4 <27"
   },
   "scripts": {
     "start": "node server.js",
