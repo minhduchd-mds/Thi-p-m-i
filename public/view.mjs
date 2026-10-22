@@ -36,6 +36,7 @@ function setOpen(open,fromUser=false){
  $("book").classList.toggle("is-open",isOpen);
  $("viewer").classList.toggle("opened",isOpen);
  $("inside-poster").setAttribute("aria-hidden",String(!isOpen));
+ $("book-left-inside").setAttribute("aria-hidden",String(!isOpen));
  $("poster").setAttribute("aria-hidden",String(isOpen));
  $("toggle-open").setAttribute("aria-expanded",String(isOpen));
  $("toggle-open").textContent=isOpen?"↶ Đóng thiệp xem bìa":"✉ Mở thiệp để xem bên trong";
@@ -77,6 +78,8 @@ async function boot(){
   $("invitation-title").textContent=doc.fields.bride+" & "+doc.fields.groom;
   $("back-couple").textContent=doc.fields.bride+" & "+doc.fields.groom;
   $("back-date").textContent=doc.fields.date?doc.fields.date.split("-").reverse().join(" · "):"Ngày hạnh phúc";
+  $("left-couple").textContent=doc.fields.bride+" & "+doc.fields.groom;
+  $("left-date").textContent=doc.fields.date?doc.fields.date.split("-").reverse().join(" · "):"Ngày hạnh phúc";
   $("invitation-intro").textContent="Trân trọng kính mời "+(doc.fields.guest||"bạn")+" đến chung vui vào "+doc.fields.date+" lúc "+doc.fields.time+" tại "+doc.fields.venue+" — "+doc.fields.address+".";
   $("attendance").addEventListener("change",()=>{$("guests").disabled=$("attendance").value!=="yes";});
   const musicPaths={
