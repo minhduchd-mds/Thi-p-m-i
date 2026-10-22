@@ -39,7 +39,7 @@ assert.match(html, /Mở cửa &amp; nghe nhạc/, 'Entrance button must signal 
 assert.match(js, /duyen-ngoc-phuong-dong\.mp3/, 'Welcome music uses a real bundled track');
 assert.match(js, /welcomeAudio\.play\(\)/, 'Use actual HTML audio playback');
 assert.match(js, /const openDoors[\s\S]*?startWelcomeMusic\(\)/, 'Play as part of the opening gesture');
-assert.match(js, /stopWelcomeMusic\(\)/, 'Stop ambient lobby music on editor entry');
+assert.match(js, /stopWelcomeMusic\(false\)/, 'Stop ambient lobby music on editor entry');
 assert.match(css, /\.hy-sound\[aria-pressed="true"\]/, 'Sound button provides visible active state');
 const ornaments = ['carved-door.svg','song-hy.svg','gold-corner.svg','plum-branch.svg'];
 for (const file of ornaments) {
