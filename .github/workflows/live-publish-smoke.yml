@@ -19,8 +19,23 @@ jobs:
           python3 - <<'PY'
           import json,time,urllib.request,urllib.error
           root="https://hy-studio-preview.vercel.app"
+          urls=[
+              "https://ogzwyibvvsvuufoghudl.supabase.co/functions/v1/studio-api/api/health",
+              root+"/api/health",
+              root+"/i/HY-ABCDEFGHJKL",
+              root+"/studio.html"
+          ]
+          for target in urls:
+              try:
+                  with urllib.request.urlopen(target,timeout=15) as r:
+                      sample=r.read(400).decode("utf-8","replace")
+                      print("DIAG",r.status,target,repr(sample),flush=True)
+              except urllib.error.HTTPError as e:
+                  print("DIAG",e.code,target,repr(e.read(400).decode("utf-8","replace")),flush=True)
+              except Exception as e:
+                  print("DIAG ERROR",target,str(e)[:160],flush=True)
           data=None
-          for attempt in range(15):
+          for attempt in range(4):
               try:
                   with urllib.request.urlopen(root+"/api/health", timeout=18) as r:
                       payload=json.loads(r.read())
