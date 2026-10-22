@@ -22,6 +22,47 @@ export const songs={
 export const fieldsDefault={bride:"Minh Anh",groom:"Hoàng Nam",date:"2027-06-20",time:"17:30",venue:"The Garden Wedding Hall",address:"Hà Nội, Việt Nam",guest:"Bạn thân mến",message:"Trân trọng kính mời bạn đến chung vui trong ngày hạnh phúc của chúng mình."};
 const block=(id,type,x,y,w,h,extra={})=>Object.assign({id,type,x,y,w,h,rotation:0,z:10,opacity:1,locked:false,hidden:false,userAdded:false},extra);
 const txt=(id,binding,x,y,w,h,size,extra={})=>block(id,"text",x,y,w,h,Object.assign({binding,text:"",fontSize:size,align:"center",weight:600,color:""},extra));
+// A card consists of two separately editable surfaces. The inside receives its
+// own default layout when migrating old one-sided cards; the cover is untouched.
+export const faces={cover:"Bìa ngoài",inside:"Bên trong"};
+export const insidePalette={
+ red:{bg1:"#fff6e7",bg2:"#edd9bc",ink:"#743043",gold:"#ba8b52"},
+ jade:{bg1:"#f6faf1",bg2:"#dcebe0",ink:"#315449",gold:"#a18457"},
+ pink:{bg1:"#fff9f4",bg2:"#f5dfe0",ink:"#8a5263",gold:"#c39880"}
+};
+export function insidePreset(theme="red"){
+ const color=insidePalette[theme]||insidePalette.red;
+ const serif=(themes[theme]||themes.red).font;
+ const base=[
+  block("inside-frame","frame",38,35,644,1010,{z:1,opacity:.8}),
+  txt("inside-title","",78,164,564,67,32,{text:"TRÂN TRỌNG KÍNH MỜI",letterSpacing:3,weight:600,color:color.ink,z:4}),
+  txt("inside-guest","guest",88,268,544,85,43,{fontFamily:serif,color:color.ink,z:5}),
+  txt("inside-message","message",100,387,520,142,23,{weight:400,color:color.ink,z:5}),
+  txt("inside-date","date",110,586,500,57,29,{fontFamily:serif,color:color.ink,z:5}),
+  txt("inside-time","time",125,662,470,53,24,{color:color.ink,z:5}),
+  txt("inside-venue","venue",90,754,540,75,28,{color:color.ink,z:5}),
+  txt("inside-address","address",100,842,520,72,19,{color:color.ink,weight:400,z:5}),
+  txt("inside-footer","",90,958,540,40,18,{text:"Rất hân hạnh được đón tiếp",weight:400,color:color.ink,z:5})
+ ];
+ if(theme==="red"){
+  base.splice(1,0,block("inside-seal","ornament",292,62,136,136,{asset:"song-hy",z:3}));
+  base.push(block("inside-flower","ornament",-17,829,165,165,{asset:"gold-corner",rotation:-90,z:2}));
+ }else if(theme==="jade"){
+  base[1].x=98;base[1].y=191;base[1].align="left";
+  base[2].align="left";base[2].x=98;
+  base.push(block("inside-flower","ornament",502,58,207,207,{asset:"plum-branch",opacity:.7,z:2}));
+ }else{
+  base[1].fontFamily="'Dancing Script',cursive";
+  base[1].fontSize=48;base[1].letterSpacing=0;
+  base.push(block("inside-flower","ornament",473,744,236,236,{asset:"plum-branch",rotation:190,opacity:.65,z:2}));
+  base.push(block("inside-corner","ornament",-32,35,202,202,{asset:"gold-corner",opacity:.53,z:2}));
+ }
+ return base;
+}
+export function surfaceDoc(doc,face="cover"){
+ return {...doc,face,blocks:face==="inside"?doc.insideBlocks:doc.blocks};
+}
+
 export function createDoc(theme="red",existing={}){
  if(!themes[theme])theme="red";
  const f=Object.assign({},fieldsDefault,existing.fields||{});
@@ -62,7 +103,9 @@ export function createDoc(theme="red",existing={}){
   txt("message","message",125,873,470,112,18,{weight:400,z:5})
  ];
  const preserved=(existing.blocks||[]).filter(x=>x.userAdded&&!blocks.some(b=>b.id===x.id));
- return {schemaVersion:2,theme,layoutId:theme+"-poster",width:W,height:H,fields:f,music:existing.music||"loi-hen-tram-nam",blocks:blocks.concat(preserved)};
+ const freshInside=insidePreset(theme);
+ const insideCustom=(existing.insideBlocks||[]).filter(x=>x.userAdded&&!freshInside.some(b=>b.id===x.id));
+ return {schemaVersion:2,theme,layoutId:theme+"-poster",width:W,height:H,fields:f,music:existing.music||"loi-hen-tram-nam",blocks:blocks.concat(preserved),insideBlocks:freshInside.concat(insideCustom)};
 }
 export function migrate(raw){
  let d=raw&&raw.document?raw.document:raw;
@@ -76,12 +119,13 @@ export function safeSrc(src){
  return a?src:(/^data:image\/(?:webp|jpeg|png);base64,[A-Za-z0-9+/=]{20,1100000}$/.test(src||"")?src:"");
 }
 export function sanitize(raw){
- if(!raw||!Array.isArray(raw.blocks)||raw.blocks.length>80)throw Error("Tài liệu thiệp không hợp lệ");
+ if(!raw||!Array.isArray(raw.blocks)||raw.blocks.length>80||(raw.insideBlocks!==undefined&&(!Array.isArray(raw.insideBlocks)||raw.insideBlocks.length>80)))throw Error("Tài liệu thiệp không hợp lệ");
  const theme=themes[raw.theme]?raw.theme:"red";
  const fields={};
  for(const k of Object.keys(fieldsDefault))fields[k]=String(raw.fields?.[k]??fieldsDefault[k]).slice(0,300);
+ const normalizeBlocks = values => {
  const ids=new Set(),blocks=[];
- for(const value of raw.blocks){
+ for(const value of values){
   if(!value||!["text","image","ornament","frame","shape"].includes(value.type))continue;
   const id=String(value.id||"").slice(0,70);
   if(!/^[A-Za-z0-9_-]+$/.test(id)||ids.has(id))continue;
@@ -103,7 +147,11 @@ export function sanitize(raw){
   if(b.type==="shape")b.fill=/^#[0-9a-fA-F]{6}$/.test(value.fill||"")?value.fill:themes[theme].gold;
   blocks.push(b);
  }
- return {schemaVersion:2,theme,layoutId:theme+"-poster",width:W,height:H,fields,music:Object.hasOwn(songs,raw.music)?raw.music:"none",blocks};
+ return blocks;
+ };
+ const blocks=normalizeBlocks(raw.blocks);
+ const insideBlocks=raw.insideBlocks===undefined?insidePreset(theme):normalizeBlocks(raw.insideBlocks);
+ return {schemaVersion:2,theme,layoutId:theme+"-poster",width:W,height:H,fields,music:Object.hasOwn(songs,raw.music)?raw.music:"none",blocks,insideBlocks};
 }
 export const clone=x=>JSON.parse(JSON.stringify(x));
 export const dateLabel=d=>/^\d{4}-\d{2}-\d{2}$/.test(d||"")?d.slice(8)+"/"+d.slice(5,7)+"/"+d.slice(0,4):String(d||"");

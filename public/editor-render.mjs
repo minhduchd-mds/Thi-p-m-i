@@ -1,9 +1,11 @@
-import {W,H,themes,assetUrl,blockText} from "/editor-core.mjs";
+import {W,H,themes,insidePalette,assetUrl,blockText} from "/editor-core.mjs";
+export const palette=doc=>doc.face==="inside"?insidePalette[doc.theme]:themes[doc.theme];
 export const paintBackground=(el,doc)=>{
- el.style.background="linear-gradient(150deg,"+themes[doc.theme].bg1+","+themes[doc.theme].bg2+")";
- el.style.setProperty("--paper-ink",themes[doc.theme].ink);
- el.style.setProperty("--paper-gold",themes[doc.theme].gold);
- el.style.setProperty("--paper-sub",themes[doc.theme].sub);
+ const colors=palette(doc);
+ el.style.background="linear-gradient(155deg,"+colors.bg1+","+colors.bg2+")";
+ el.style.setProperty("--paper-ink",colors.ink);
+ el.style.setProperty("--paper-gold",colors.gold);
+ el.style.setProperty("--paper-sub",colors.sub||colors.ink);
 };
 export function renderStage(el,doc,selected=""){
  paintBackground(el,doc);
@@ -19,7 +21,7 @@ export function renderStage(el,doc,selected=""){
   if(block.type==="text"){
    item.textContent=blockText(block,doc);
    item.style.fontSize=(block.fontSize||24)+"px";
-   item.style.color=block.color||themes[doc.theme].ink;
+   item.style.color=block.color||palette(doc).ink;
    item.style.fontFamily=block.fontFamily||"'Noto Serif',serif";
    item.style.textAlign=block.align||"center";
    item.style.fontWeight=String(block.weight||500);
@@ -33,10 +35,10 @@ export function renderStage(el,doc,selected=""){
    img.style.objectFit=block.type==="ornament"?"contain":(block.fit||"cover");
    item.appendChild(img);
   }else if(block.type==="frame"){
-   item.style.border="5px double "+themes[doc.theme].gold;
-   item.style.boxShadow="inset 0 0 0 8px "+themes[doc.theme].bg1;
+   item.style.border="5px double "+palette(doc).gold;
+   item.style.boxShadow="inset 0 0 0 8px "+palette(doc).bg1;
   }else{
-   item.style.background=block.fill||themes[doc.theme].gold;
+   item.style.background=block.fill||palette(doc).gold;
   }
   if(selected===block.id){
    const handle=document.createElement("span");handle.className="block-resize";handle.dataset.handle="resize";
@@ -71,7 +73,7 @@ export async function drawPoster(doc,scale=2){
  canvas.width=W*scale;canvas.height=H*scale;
  const ctx=canvas.getContext("2d",{alpha:false});
  ctx.scale(scale,scale);
- const theme=themes[doc.theme];
+ const theme=palette(doc);
  const grad=ctx.createLinearGradient(0,0,W,H);grad.addColorStop(0,theme.bg1);grad.addColorStop(1,theme.bg2);
  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
  for(const block of [...doc.blocks].sort((a,b)=>a.z-b.z)){
@@ -115,6 +117,6 @@ export async function downloadPoster(doc,type="image/webp"){
  if(!blob)throw Error("Không thể tạo ảnh. Kiểm tra asset và trình duyệt.");
  const link=document.createElement("a");
  const url=URL.createObjectURL(blob);
- link.href=url;link.download="hy-studio-"+doc.theme+"."+(type==="image/png"?"png":"webp");
+ link.href=url;link.download="hy-studio-"+doc.theme+"-"+(doc.face==="inside"?"mat-trong":"bia-ngoai")+"."+(type==="image/png"?"png":"webp");
  document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
 }

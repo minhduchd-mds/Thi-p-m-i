@@ -52,16 +52,17 @@ function sanitizeData(raw){
   // v2 visual editor document is stored alongside legacy v1 fields.
   if(raw.document!==undefined){
     const d=raw.document;
-    if(!d||d.schemaVersion!==2||!['red','jade','pink'].includes(d.theme)||!Array.isArray(d.blocks)||d.blocks.length>80){
+    if(!d||d.schemaVersion!==2||!['red','jade','pink'].includes(d.theme)||!Array.isArray(d.blocks)||d.blocks.length>80||(d.insideBlocks!==undefined&&(!Array.isArray(d.insideBlocks)||d.insideBlocks.length>80))){
       throw Object.assign(new Error('Tài liệu thiết kế không hợp lệ'),{status:400});
     }
     const f={};
     const names={bride:30,groom:30,date:10,time:5,venue:100,address:180,guest:50,message:300};
     for(const [key,max] of Object.entries(names))f[key]=cleanString(d.fields?.[key],max);
     const officialAssets=new Set(['/assets/ornaments/song-hy.svg','/assets/ornaments/carved-door.svg','/assets/ornaments/gold-corner.svg','/assets/ornaments/plum-branch.svg','/assets/textures/wood-mahogany.webp']);
-    const blocks=[],ids=new Set();
     const finite=(v,min,max,def)=>Number.isFinite(Number(v))?Math.min(max,Math.max(min,Number(v))):def;
-    for(const input of d.blocks){
+    const normalizeBlocks = source => {
+    const blocks=[],ids=new Set();
+    for(const input of source){
       if(!input||!['text','image','ornament','frame','shape'].includes(input.type))continue;
       const id=cleanString(input.id,70);
       if(!/^[a-zA-Z0-9_-]+$/.test(id)||ids.has(id))throw Object.assign(new Error('Mã khối thiết kế không hợp lệ'),{status:400});
@@ -87,8 +88,12 @@ function sanitizeData(raw){
       if(b.type==='shape')b.fill=/^#[0-9a-fA-F]{6}$/.test(input.fill||'')?input.fill:'#b7855b';
       blocks.push(b);
     }
+    return blocks;
+    };
+    const blocks=normalizeBlocks(d.blocks);
+    const insideBlocks=d.insideBlocks===undefined?[]:normalizeBlocks(d.insideBlocks);
     const document={schemaVersion:2,theme:d.theme,layoutId:cleanString(d.layoutId,60),width:720,height:1080,
-      fields:f,music:data.music,blocks};
+      fields:f,music:data.music,blocks,insideBlocks};
     if(JSON.stringify(document).length>1_300_000)throw Object.assign(new Error('Thiệp có quá nhiều dữ liệu ảnh'),{status:413});
     data.document=document;
   }

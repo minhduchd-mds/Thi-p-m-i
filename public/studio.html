@@ -3,7 +3,7 @@
 <meta name="theme-color" content="#f8f5f1"><title>Hỷ Studio · Trình thiết kế thiệp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Dancing+Script:wght@500;600;700&family=Noto+Serif:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/studio.css?v=2.0.0"></head>
+<link rel="stylesheet" href="/studio.css?v=2.1.0"></head>
 <body>
 <div id="studio" class="studio">
 <header class="topbar">
@@ -31,7 +31,7 @@
    <button class="palette-tab" data-panel="layers">Lớp</button>
   </div>
   <div id="blocks-panel" class="palette-panel">
-   <p class="panel-hint">Kéo vào thiệp hoặc nhấn để thêm</p>
+   <p class="panel-hint">Chọn Bìa ngoài / Mặt trong trên canvas. Kéo khối vào mặt đang thiết kế.</p>
    <div class="group-label">KHỐI THIẾT KẾ</div>
    <div id="block-tools" class="tool-list">
     <button class="tool" draggable="true" data-add="text"><span class="tool-glyph">T</span><span><b>Văn bản</b><small>Tiêu đề, lời chúc</small></span><span class="tool-add">+</span></button>
@@ -43,7 +43,7 @@
    <div id="asset-grid" class="asset-grid" aria-label="Thư viện hoạ tiết"></div>
    <div class="asset-tip">SVG sắc nét · Vật liệu gỗ WebP</div>
    <div class="group-label">XUẤT THIỆP</div>
-   <div class="export-stack"><button id="export-webp" class="export">↓ Tải WebP chất lượng cao</button><button id="export-png" class="export">↓ Tải PNG</button></div>
+   <div class="export-stack"><button id="export-webp" class="export">↓ Tải WebP mặt đang chọn</button><button id="export-png" class="export">↓ Tải PNG mặt đang chọn</button></div>
   </div>
   <div id="fields-panel" class="palette-panel" hidden>
    <p class="panel-hint">Nội dung tự cập nhật theo bố cục</p><form id="fields-form" autocomplete="off"></form>
@@ -52,11 +52,11 @@
   <div id="layers-panel" class="palette-panel" hidden><p class="panel-hint">Chọn lớp để sửa, dùng ↑ ↓ thay đổi thứ tự</p><div id="layer-list"></div></div>
  </aside>
  <main class="canvas-area" aria-label="Canvas thiết kế thiệp">
-  <div class="canvas-toolbar"><span class="canvas-caption">KHUNG VẼ THIỆP <span class="dot">●</span> 720 × 1080</span>
+  <div class="canvas-toolbar"><div class="face-switch" role="tablist" aria-label="Chọn mặt thiệp"><button type="button" role="tab" data-face="cover" aria-selected="true" class="active">01 · Bìa ngoài</button><button type="button" role="tab" data-face="inside" aria-selected="false">02 · Mặt trong</button></div><span class="canvas-caption">KHUNG VẼ THIỆP <span class="dot">●</span> 720 × 1080</span>
    <div class="canvas-controls"><button id="grid-toggle" title="Hiện / ẩn lưới">⊞ Lưới</button><button id="zoom-out" aria-label="Thu nhỏ">−</button><output id="zoom-label">60%</output><button id="zoom-in" aria-label="Phóng to">+</button><button id="fit" title="Vừa khung">Vừa khung</button></div>
   </div>
   <div id="drop-area" class="drop-area"><div id="stage-wrap" class="stage-wrap"><div id="stage" class="stage" aria-label="Nội dung thiệp, kéo thả để chỉnh sửa"></div></div></div>
-  <div class="canvas-footer"><span>Giữ Shift khi cần chọn lớp · Delete để xoá · Phím mũi tên để dịch chuyển</span><span id="coordinates">Chưa chọn thành phần</span></div>
+  <div class="canvas-footer"><span>Mỗi mặt có các lớp riêng · Delete để xoá · Dùng phím mũi tên dịch chuyển</span><span id="coordinates">Chưa chọn thành phần</span></div>
  </main>
  <aside class="inspector" aria-label="Thuộc tính"><div class="inspector-heading"><div><small>BẢNG THUỘC TÍNH</small><h2 id="inspector-title">Thiết kế thiệp</h2></div><span class="inspector-symbol">⚙</span></div>
   <div id="inspector-content"></div>
@@ -66,5 +66,5 @@
 </div>
 <input id="upload-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
 <dialog id="publish-dialog"><form method="dialog"><h2>Xuất bản thiệp cưới</h2><p id="publish-info">Lưu thiệp lên máy chủ để tạo liên kết chia sẻ. Thiệp có hiệu lực trong 30 ngày.</p><div id="publish-link-box" hidden><input id="published-url" readonly aria-label="Liên kết thiệp"><button id="copy-published" type="button">Sao chép</button></div><div class="dialog-actions"><button value="close">Đóng</button><button id="do-publish" type="button" class="primary">Lưu và lấy liên kết</button></div></form></dialog>
-<script type="module" src="/studio.mjs?v=2.0.0"></script>
+<script type="module" src="/studio.mjs?v=2.1.0"></script>
 </body></html>

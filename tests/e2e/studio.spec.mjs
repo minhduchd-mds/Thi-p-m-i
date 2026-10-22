@@ -122,12 +122,46 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await visitor.goto(url);
     await expect(visitor.locator('#viewer')).toBeVisible();
     await expect(visitor.locator('#poster .stage-block')).toHaveCount(11);
+    await visitor.locator('#toggle-open').click();
+    await expect(visitor.locator('#book')).toHaveClass(/is-open/);
+    await expect(visitor.locator('#inside-poster .stage-block').first()).toBeVisible();
     await visitor.locator('#guest-name').fill('Khách kiểm thử');
     await visitor.locator('#wish').fill('Chúc cô dâu và chú rể trăm năm hạnh phúc');
     await visitor.locator('#rsvp button[type="submit"]').click();
     await expect(visitor.locator('#result')).toContainText('đã được ghi nhận', { timeout: 15000 });
     await capture(visitor,testInfo,'06-published-rsvp');
     await visitor.close();
+  });
+
+  test('Chỉnh mặt trong, lưu riêng và Preview mở thiệp có animation', async ({ page }, testInfo) => {
+    await ready(page);
+    await expect(page.locator('[data-face="cover"]')).toHaveAttribute('aria-selected','true');
+    await page.locator('[data-face="inside"]').click();
+    await expect(page.locator('[data-face="inside"]')).toHaveAttribute('aria-selected','true');
+    await expect(page.locator('#stage [data-block-id="inside-message"]')).toBeVisible();
+    const initial=await page.locator('#stage .stage-block').count();
+    await page.locator('.tool[data-add="text"]').click();
+    await expect(page.locator('#stage .stage-block')).toHaveCount(initial+1);
+    await page.locator('#save-local').click();
+    await page.reload();
+    await page.locator('[data-face="inside"]').click();
+    await expect(page.locator('#stage .stage-block')).toHaveCount(initial+1);
+    await capture(page,testInfo,'08-inside-editing');
+    const previewPromise=page.context().waitForEvent('page');
+    await page.locator('#preview').click();
+    const preview=await previewPromise;
+    await preview.waitForLoadState('domcontentloaded');
+    await expect(preview.locator('#viewer')).toBeVisible();
+    await expect(preview.locator('#poster .stage-block')).toHaveCount(11);
+    await expect(preview.locator('#inside-poster [data-block-id="inside-message"]')).toBeVisible();
+    await expect(preview.locator('#book')).toHaveClass(/is-open/, {timeout:4500});
+    await expect(preview.locator('#toggle-open')).toHaveAttribute('aria-expanded','true');
+    await capture(preview,testInfo,'09-opening-animation-inner');
+    await preview.locator('#toggle-open').click();
+    await expect(preview.locator('#book')).not.toHaveClass(/is-open/);
+    await preview.locator('#toggle-open').click();
+    await expect(preview.locator('#book')).toHaveClass(/is-open/);
+    await preview.close();
   });
 
   test('Xem trước trên mobile 390 × 844 không tràn ngang', async ({ page }, testInfo) => {

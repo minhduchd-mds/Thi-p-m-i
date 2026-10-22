@@ -29,17 +29,21 @@ async function test(){
     const visual={schemaVersion:2,theme:'jade',layoutId:'jade-poster',width:720,height:1080,
       fields:{...data,bride:'Mỹ Duyên'},music:'loi-hen-tram-nam',
       blocks:[{id:'test-title',type:'text',x:45,y:90,w:550,h:120,rotation:0,z:3,
-        binding:'bride',fontSize:55,align:'center',weight:600,text:'',color:'#ffffff'}]};
+        binding:'bride',fontSize:55,align:'center',weight:600,text:'',color:'#ffffff'}],
+      insideBlocks:[{id:'inside-message',type:'text',x:65,y:240,w:580,h:130,rotation:0,z:4,
+        binding:'message',fontSize:29,align:'center',weight:500,text:'Lời mời bên trong',color:'#6b4436'}]};
     const v2=await send('/api/cards','POST',{data:{...data,theme:'jade',document:visual}});
     assert.equal(v2.status,201);
     const round=await send('/api/cards/'+v2.body.id);
     assert.equal(round.status,200);
     assert.equal(round.body.data.document.schemaVersion,2);
     assert.equal(round.body.data.document.blocks[0].binding,'bride');
+    assert.equal(round.body.data.document.insideBlocks[0].binding,'message','Server must preserve inside card blocks');
     assert.equal(round.body.data.bride,'Mỹ Duyên');
     const v2update=await send('/api/cards/'+v2.body.id,'PUT',{data:{...data,theme:'jade',document:{...visual,blocks:[...visual.blocks,{id:'added-frame',type:'frame',x:18,y:28,w:650,h:900,z:1}]}}},v2.body.editToken);
     assert.equal(v2update.status,200);
     const after=await send('/api/cards/'+v2.body.id);assert.equal(after.body.data.document.blocks.length,2);
+    assert.equal(after.body.data.document.insideBlocks.length,1);
     const exploit=await send('/api/cards','POST',{data:{...data,document:{...visual,blocks:[{id:'unsafe',type:'image',x:10,y:10,w:100,h:100,src:'javascript:alert(1)'}]}}});
     assert.equal(exploit.status,201);
     const exploited=await send('/api/cards/'+exploit.body.id);assert.equal(exploited.body.data.document.blocks[0].src,'');

@@ -56,3 +56,18 @@ dialog{border:1px solid #e5d5cc;border-radius:18px;box-shadow:0 40px 90px #230b0
 @media(max-width:1290px){.editor-layout{grid-template-columns:211px minmax(380px,1fr) 258px}.topbar{gap:12px;padding:0 12px}.brand{min-width:147px}.top-title{min-width:120px}.theme-button{padding:8px}.top-actions button{padding:0 8px}}
 @media(max-width:1040px){.top-title{display:none}.editor-layout{grid-template-columns:190px minmax(380px,1fr) 240px}.top-themes{margin-left:0}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Hỷ Studio 2.1 — separate editable faces within one invitation */
+.face-switch{display:flex;gap:4px;padding:3px;background:#e8e2dd;border:1px solid #ddd3ca;border-radius:9px;flex-shrink:0}
+.face-switch button{white-space:nowrap;border:0;border-radius:6px;background:transparent;padding:9px 12px;font-size:11px;font-weight:700;color:#74675d;cursor:pointer}
+.face-switch button.active{background:#fffaf4;color:#8f3545;box-shadow:0 2px 7px #50322617}
+.face-switch button:focus-visible{outline:2px solid #993844;outline-offset:2px}
+@media(max-width:1290px){
+ .canvas-caption{display:none}
+ .face-switch button{padding:8px}
+}
+@media(max-width:1040px){
+ .canvas-toolbar{gap:7px;padding:0 11px}
+ .face-switch button{font-size:10px;padding:7px}
+ .canvas-controls{gap:3px}
+}

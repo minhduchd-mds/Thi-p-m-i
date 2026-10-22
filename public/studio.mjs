@@ -1,12 +1,16 @@
-import {W,H,themes,assets,songs,fieldsDefault,createDoc,migrate,sanitize,clone,blockText,blockName,addBlock} from "/editor-core.mjs";
+import {W,H,themes,assets,songs,fieldsDefault,createDoc,migrate,sanitize,clone,blockText,blockName,addBlock,surfaceDoc,faces} from "/editor-core.mjs";
 import {renderStage,downloadPoster} from "/editor-render.mjs";
 const $=id=>document.getElementById(id);
 const STORE="hy-studio-editor-v2";
 const OWNER="hy-studio-owner-";
 let doc=createDoc(new URLSearchParams(location.search).get("theme")||"red");
-let selected="",zoom=.55,history=[],future=[],dirty=false,cardId=null,editToken=null;
+let selected="",activeFace="cover",zoom=.55,history=[],future=[],dirty=false,cardId=null,editToken=null;
 let pointer=null,focusSnapshot=null,gridOn=false,draftTimer=0;
 const stage=$("stage"),wrap=$("stage-wrap"),area=$("drop-area");
+const activeBlocks=()=>activeFace==="inside"?doc.insideBlocks:doc.blocks;
+const setActiveBlocks=blocks=>{if(activeFace==="inside")doc.insideBlocks=blocks;else doc.blocks=blocks;};
+const activeSurface=()=>surfaceDoc(doc,activeFace);
+function setFace(face){if(!Object.hasOwn(faces,face)||activeFace===face)return;activeFace=face;selected="";document.querySelectorAll("[data-face]").forEach(b=>{const active=b.dataset.face===face;b.classList.toggle("active",active);b.setAttribute("aria-selected",String(active));});renderAll();notify("Đang thiết kế "+faces[face].toLowerCase());}
 const titleMap={bride:"Tên cô dâu",groom:"Tên chú rể",date:"Ngày cưới",time:"Giờ tổ chức",venue:"Địa điểm",address:"Địa chỉ",guest:"Tên khách mời",message:"Lời mời"};
 function notify(msg){$("status").textContent=msg;}
 function saveDraft(){
@@ -17,10 +21,10 @@ function scheduleSave(){dirty=true;$("autosave-label").textContent="Đang chỉn
 function checkpoint(before){history.push(before||clone(doc));if(history.length>60)history.shift();future=[];updateHistoryUI();}
 function updateHistoryUI(){$("undo").disabled=!history.length;$("redo").disabled=!future.length;}
 function undo(){
- if(!history.length)return;future.push(clone(doc));doc=history.pop();selected=doc.blocks.some(b=>b.id===selected)?selected:"";renderAll();scheduleSave();
+ if(!history.length)return;future.push(clone(doc));doc=history.pop();selected=activeBlocks().some(b=>b.id===selected)?selected:"";renderAll();scheduleSave();
 }
 function redo(){
- if(!future.length)return;history.push(clone(doc));doc=future.pop();selected=doc.blocks.some(b=>b.id===selected)?selected:"";renderAll();scheduleSave();
+ if(!future.length)return;history.push(clone(doc));doc=future.pop();selected=activeBlocks().some(b=>b.id===selected)?selected:"";renderAll();scheduleSave();
 }
 function fit(){
  const availableW=area.clientWidth-85,availableH=area.clientHeight-65;
@@ -33,7 +37,7 @@ function applyZoom(){
  $("zoom-label").textContent=Math.round(zoom*100)+"%";
 }
 function renderCanvas(){
- renderStage(stage,doc,selected);
+ renderStage(stage,activeSurface(),selected);
  stage.classList.toggle("show-grid",gridOn);
  $("coordinates").textContent=selected?(function(){const b=findSelected();return b?("X: "+Math.round(b.x)+" · Y: "+Math.round(b.y)+" · "+Math.round(b.w)+" × "+Math.round(b.h)):"";})():"Chưa chọn thành phần";
 }
@@ -72,7 +76,7 @@ function renderFields(){
 }
 function renderLayers(){
  const list=$("layer-list");list.replaceChildren();
- for(const b of [...doc.blocks].sort((a,b)=>b.z-a.z)){
+ for(const b of [...activeBlocks()].sort((a,b)=>b.z-a.z)){
   const line=document.createElement("div");line.className="layer-row"+(selected===b.id?" active":"");
   const button=document.createElement("button");button.className="layer-name";button.textContent=(b.hidden?"◌ ":"◉ ")+blockName(b);
   button.title=blockName(b);button.addEventListener("click",()=>selectBlock(b.id));
@@ -82,7 +86,7 @@ function renderLayers(){
  }
 }
 function moveLayer(id,by){
- const b=doc.blocks.find(x=>x.id===id);if(!b)return;
+ const b=activeBlocks().find(x=>x.id===id);if(!b)return;
  checkpoint();b.z=Math.max(0,Math.min(890,b.z+by));renderAll();scheduleSave();
 }
 const escape=x=>String(x??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
@@ -92,7 +96,7 @@ function field(label,key,value,type="number",extra=""){
 function renderInspector(){
  const root=$("inspector-content");
  const b=findSelected();
- $("inspector-title").textContent=b?blockName(b):"Bố cục & phong cách";
+ $("inspector-title").textContent=b?blockName(b):"Bố cục "+faces[activeFace];
  if(!b){
   const t=themes[doc.theme];
   root.innerHTML='<section class="theme-preview"><div class="swatches"><i class="swatch" style="background:'+t.bg1+'"></i><i class="swatch" style="background:'+t.bg2+'"></i><i class="swatch" style="background:'+t.gold+'"></i></div><b>'+t.name+'</b><p>'+t.description+'</p></section><p class="inspect-intro">Chọn thành phần trên thiệp để chỉnh vị trí, kích thước, chữ, hoạ tiết và lớp. Có thể kéo hoạ tiết trực tiếp từ thư viện bên trái.</p><div class="inspect-section"><h3>Thông số tài liệu</h3><p class="inspect-intro">720 × 1080 px · Xuất 2×: 1440 × 2160 px · 3 layout riêng</p></div>';
@@ -122,19 +126,19 @@ function renderInspector(){
  root.innerHTML=h;
 }
 function renderAll(){renderThemes();renderCanvas();renderFields();renderLayers();renderInspector();updateHistoryUI();}
-function findSelected(){return doc.blocks.find(b=>b.id===selected);}
+function findSelected(){return activeBlocks().find(b=>b.id===selected);}
 function selectBlock(id){selected=id||"";renderCanvas();renderInspector();renderLayers();}
 function add(kind,x,y){
- checkpoint();const b=addBlock(kind,doc,x??260,y??370);doc.blocks.push(b);
+ checkpoint();const b=addBlock(kind,activeSurface(),x??260,y??370);activeBlocks().push(b);
  selectBlock(b.id);scheduleSave();notify("Đã thêm "+blockName(b));
 }
 function del(){
- const b=findSelected();if(!b||b.locked)return;checkpoint();doc.blocks=doc.blocks.filter(x=>x.id!==b.id);selected="";renderAll();scheduleSave();
+ const b=findSelected();if(!b||b.locked)return;checkpoint();setActiveBlocks(activeBlocks().filter(x=>x.id!==b.id));selected="";renderAll();scheduleSave();
 }
 function duplicate(){
  const b=findSelected();if(!b)return;checkpoint();const cp=clone(b);
  cp.id="b"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
- cp.x+=20;cp.y+=20;cp.locked=false;cp.userAdded=true;cp.z=Math.max(0,...doc.blocks.map(x=>x.z))+1;doc.blocks.push(cp);selected=cp.id;renderAll();scheduleSave();
+ cp.x+=20;cp.y+=20;cp.locked=false;cp.userAdded=true;cp.z=Math.max(0,...activeBlocks().map(x=>x.z))+1;activeBlocks().push(cp);selected=cp.id;renderAll();scheduleSave();
 }
 function command(cmd){
  const b=findSelected();
@@ -167,14 +171,14 @@ function propUpdate(el,commit=false){
 }
 function startPointer(e){
  const item=e.target.closest(".stage-block");if(!item){selectBlock("");return;}
- const b=doc.blocks.find(x=>x.id===item.dataset.blockId);if(!b)return;
+ const b=activeBlocks().find(x=>x.id===item.dataset.blockId);if(!b)return;
  if(selected!==b.id)selectBlock(b.id);
  if(b.locked)return;
  e.preventDefault();
  pointer={id:b.id,kind:e.target.dataset.handle==="resize"?"resize":"move",x:e.clientX,y:e.clientY,fromX:b.x,fromY:b.y,fromW:b.w,fromH:b.h,before:clone(doc),changed:false};
 }
 function movePointer(e){
- if(!pointer)return;const b=doc.blocks.find(x=>x.id===pointer.id);if(!b)return;
+ if(!pointer)return;const b=activeBlocks().find(x=>x.id===pointer.id);if(!b)return;
  const dx=(e.clientX-pointer.x)/zoom,dy=(e.clientY-pointer.y)/zoom;
  if(pointer.kind==="resize"){b.w=Math.max(24,Math.round((pointer.fromW+dx)/5)*5);b.h=Math.max(24,Math.round((pointer.fromH+dy)/5)*5);}
  else {b.x=Math.round((pointer.fromX+dx)/5)*5;b.y=Math.round((pointer.fromY+dy)/5)*5;}
@@ -200,7 +204,7 @@ async function uploadImage(file){
  checkpoint();b.src=url;renderCanvas();scheduleSave();notify("Đã nén và thêm ảnh WebP");
 }
 function preview(){
- saveDraft();window.open("/view.html?preview=1","_blank","noopener");
+ saveDraft();window.open("/view.html?preview=1&animate=1","_blank","noopener");
 }
 async function publish(){
  $("publish-dialog").showModal();$("publish-info").textContent="Tạo link thiệp có hiệu lực 30 ngày. Bản xem trước tĩnh của Vercel không chạy API lưu thiệp; nếu chưa cấu hình backend, hãy dùng Lưu nháp / Xuất WebP.";
@@ -244,6 +248,7 @@ async function boot(){
  renderAssets();renderAll();fit();saveDraft();
  if(params.get("panel")==="music"){switchPanel("fields");$("music-choice").focus();}
 }
+document.querySelectorAll("[data-face]").forEach(b=>b.addEventListener("click",()=>setFace(b.dataset.face)));
 $("stage").addEventListener("pointerdown",startPointer);
 window.addEventListener("pointermove",movePointer);
 window.addEventListener("pointerup",endPointer);
@@ -279,8 +284,8 @@ $("fit").addEventListener("click",fit);window.addEventListener("resize",fit);
 $("grid-toggle").addEventListener("click",()=>{gridOn=!gridOn;renderCanvas();});
 $("save-local").addEventListener("click",()=>{saveDraft();notify("Đã lưu nháp trên thiết bị");});
 $("preview").addEventListener("click",preview);
-$("export-webp").addEventListener("click",async()=>{try{notify("Đang tạo WebP 1440 × 2160…");await downloadPoster(doc,"image/webp");notify("Đã tải WebP 2×");}catch(e){notify("Xuất WebP thất bại: "+e.message);}});
-$("export-png").addEventListener("click",async()=>{try{notify("Đang tạo PNG…");await downloadPoster(doc,"image/png");notify("Đã tải PNG 2×");}catch(e){notify("Xuất PNG thất bại: "+e.message);}});
+$("export-webp").addEventListener("click",async()=>{try{notify("Đang tạo WebP 1440 × 2160…");await downloadPoster(activeSurface(),"image/webp");notify("Đã tải WebP 2×");}catch(e){notify("Xuất WebP thất bại: "+e.message);}});
+$("export-png").addEventListener("click",async()=>{try{notify("Đang tạo PNG…");await downloadPoster(activeSurface(),"image/png");notify("Đã tải PNG 2×");}catch(e){notify("Xuất PNG thất bại: "+e.message);}});
 $("publish").addEventListener("click",publish);
 $("do-publish").addEventListener("click",sendPublish);
 $("copy-published").addEventListener("click",()=>navigator.clipboard.writeText($("published-url").value).then(()=>notify("Đã sao chép link thiệp")));

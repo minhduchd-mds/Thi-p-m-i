@@ -1,8 +1,24 @@
-import {migrate,songs,fieldsDefault} from "/editor-core.mjs";
+import {migrate,songs,fieldsDefault,surfaceDoc} from "/editor-core.mjs";
 import {renderStage} from "/editor-render.mjs";
 const $=id=>document.getElementById(id);
 const params=new URLSearchParams(location.search);
-let doc=null,cardId=params.get("card");
+let doc=null,cardId=params.get("card"),isOpen=false;
+function setOpen(open,fromUser=false){
+ isOpen=!!open;
+ $("book").classList.toggle("is-open",isOpen);
+ $("viewer").classList.toggle("opened",isOpen);
+ $("inside-poster").setAttribute("aria-hidden",String(!isOpen));
+ $("poster").setAttribute("aria-hidden",String(isOpen));
+ $("toggle-open").setAttribute("aria-expanded",String(isOpen));
+ $("toggle-open").textContent=isOpen?"↶ Đóng thiệp xem bìa":"✉ Mở thiệp để xem bên trong";
+ $("book-status").textContent=isOpen?"Mặt trong · Lời mời & thông tin lễ cưới":"Mặt ngoài · Chạm để mở thiệp";
+ resize();
+ if(isOpen&&fromUser&&$("audio").src&&$("audio").paused){$("audio").play().then(()=>$("music").textContent="♫ Tắt nhạc").catch(()=>{});}
+}
+function toggleOpen(open,fromUser=false){setOpen(open,fromUser);}
+$("toggle-open").addEventListener("click",()=>toggleOpen(!isOpen,true));
+$("poster").addEventListener("click",()=>{if(!isOpen)toggleOpen(true,true)});
+$("poster").addEventListener("keydown",e=>{if(!isOpen&&(e.key==="Enter"||e.key===" ")){e.preventDefault();toggleOpen(true,true)}});
 async function boot(){
  try{
   if(params.has("preview")){
@@ -39,14 +55,22 @@ async function boot(){
   });
   $("loading").hidden=true;$("viewer").hidden=false;
   resize();window.addEventListener("resize",resize);
+  if(params.has("animate"))window.setTimeout(()=>{if(!isOpen)toggleOpen(true,false)},850);
  }catch(e){$("loading").textContent="Không thể mở thiệp: "+e.message;}
 }
 function resize(){
- const size=Math.min(.83,(window.innerWidth-28)/720,540/1080);
- $("poster-wrap").style.width=(720*size)+"px";
+ const mobile=window.innerWidth<=720;
+ const spread=isOpen&&!mobile;
+ const maxWidth=Math.min(900,window.innerWidth-28);
+ const size=Math.min(.6,maxWidth/(spread?1440:720),(window.innerHeight<760?500:650)/1080);
+ $("poster-wrap").style.width=((spread?1440:720)*size)+"px";
  $("poster-wrap").style.height=(1080*size)+"px";
- $("poster").style.transform="scale("+size+")";
- if(doc)renderStage($("poster"),doc);
+ $("book-transform").style.transform="scale("+size+")";
+ $("book").style.left=spread?"720px":"0px";
+ if(doc){
+  renderStage($("poster"),surfaceDoc(doc,"cover"));
+  renderStage($("inside-poster"),surfaceDoc(doc,"inside"));
+ }
 }
 $("rsvp").addEventListener("submit",async event=>{
  event.preventDefault();

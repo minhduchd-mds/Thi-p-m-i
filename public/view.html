@@ -21,16 +21,45 @@ main{max-width:900px;margin:25px auto 50px;padding:0 12px}
 .rsvp input,.rsvp select,.rsvp textarea{width:100%;border:1px solid #e1d3c8;border-radius:7px;padding:10px;background:white;font:12px 'Be Vietnam Pro',sans-serif}
 .rsvp textarea{min-height:85px;resize:vertical}#result{font-size:11px;color:#876f63;padding:8px 0}
 @media(max-width:500px){header{padding:13px 15px}main{margin:10px auto 25px}.panel{padding:18px}}
+
+/* Hỷ Studio 2.1: actual two-face folded invitation, not a static poster. */
+.book-viewport{position:relative;perspective:2200px;overflow:visible;flex:none;transition:width .7s ease,height .7s ease}
+#book-transform{position:absolute;top:0;left:0;width:720px;height:1080px;transform-origin:top left}
+.invitation-book{position:absolute;top:0;left:0;width:720px;height:1080px;perspective:2400px;transform-style:preserve-3d;transition:left .85s cubic-bezier(.2,.8,.2,1)}
+.book-inside{position:absolute;inset:0;width:720px;height:1080px;overflow:hidden;box-shadow:0 18px 38px #50312733;user-select:none;backface-visibility:hidden}
+.book-cover{position:absolute;inset:0;width:720px;height:1080px;transform-origin:0 50%;transform-style:preserve-3d;transform:rotateY(0deg);transition:transform 1.25s cubic-bezier(.22,.7,.15,1);z-index:3;filter:drop-shadow(8px 7px 9px #24111255)}
+#poster.book-front{position:absolute;inset:0;width:720px;height:1080px;overflow:hidden;transform:none!important;backface-visibility:hidden;cursor:pointer;box-shadow:none;background:#982e41;user-select:none}
+.book-back{position:absolute;inset:0;width:720px;height:1080px;transform:rotateY(180deg);backface-visibility:hidden;background:linear-gradient(145deg,#fbf2df,#efddc1);border:24px double #b68b58;color:#7e3b4a;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:30px;font-family:'Noto Serif',serif}
+.back-emblem{font-size:136px;color:#a84050;border:9px solid #c29b68;border-radius:50%;width:290px;height:290px;display:grid;place-items:center}
+.book-back span{font-size:42px}.book-back small{font-size:18px;letter-spacing:6px}
+.invitation-book.is-open .book-cover{transform:rotateY(-165deg)}
+.open-controls{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;width:min(650px,100%);margin:3px 0 11px}
+.open-controls button{background:linear-gradient(115deg,#8e2839,#b04450);color:#fff;border:1px solid #d3a783;border-radius:999px;min-height:44px;padding:10px 23px;font:600 12px 'Be Vietnam Pro',sans-serif;box-shadow:0 5px 18px #6e202a30;cursor:pointer}
+.open-controls span{font-size:11px;color:#846e62}
+.viewer:not(.opened) .rsvp-panel{display:none}
+.viewer.opened .rsvp-panel{animation:rise-in .5s ease both}
+@keyframes rise-in{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:720px){
+ .invitation-book{transition:none}
+ .book-cover{filter:none;transition:transform .95s ease,opacity .65s ease}
+ .invitation-book.is-open .book-cover{transform:rotateY(-100deg);opacity:0;pointer-events:none}
+ .open-controls{flex-direction:column;gap:6px}
+}
+@media(prefers-reduced-motion:reduce){
+ .book-viewport,.invitation-book,.book-cover,.viewer.opened .rsvp-panel{transition:none!important;animation:none!important}
+}
+
 </style></head>
 <body><header><a href="/">囍 Hỷ Studio</a><span>THƯ MỜI TRÂN TRỌNG</span></header>
 <main><div id="loading">Đang chuẩn bị tấm thiệp dành cho bạn…</div><div id="viewer" class="viewer" hidden>
-<div id="poster-wrap"><div id="poster" aria-label="Thiệp mời"></div></div>
+<div id="poster-wrap" class="book-viewport" aria-label="Thiệp hai mặt tương tác"><div id="book-transform"><div id="book" class="invitation-book"><div id="inside-poster" class="book-inside" aria-label="Nội dung bên trong thiệp" aria-hidden="true"></div><div id="cover-leaf" class="book-cover"><div id="poster" class="book-front" role="button" tabindex="0" aria-label="Mở thiệp để xem mặt trong"></div><div class="book-back" aria-hidden="true"><div class="back-emblem">囍</div><span>Hỷ Studio</span><small>TRĂM NĂM HẠNH PHÚC</small></div></div></div></div></div>
+<div class="open-controls"><button id="toggle-open" aria-expanded="false" type="button">✉ Mở thiệp để xem bên trong</button><span id="book-status" role="status" aria-live="polite">Chạm để mở bức thiệp</span></div>
 <div class="panel"><h2 id="invitation-title">Trân trọng kính mời</h2><p id="invitation-intro"></p><div class="action-row"><button id="music">♫ Bật nhạc nền</button><button id="share" class="subtle">Chia sẻ thiệp</button></div></div>
-<div class="panel"><h2>Xác nhận tham dự & lời chúc</h2><form id="rsvp" class="rsvp">
+<div class="panel rsvp-panel"><h2>Xác nhận tham dự & lời chúc</h2><form id="rsvp" class="rsvp">
 <label for="guest-name">Tên khách mời</label><input id="guest-name" maxlength="60" required placeholder="Tên của bạn">
 <label for="attendance">Bạn có tham dự không?</label><select id="attendance"><option value="yes">Tôi sẽ tham dự</option><option value="no">Rất tiếc tôi không thể đến</option><option value="wish">Chỉ gửi lời chúc</option></select>
 <label for="guests">Số khách tham dự</label><select id="guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
 <label for="wish">Lời chúc</label><textarea id="wish" maxlength="500" placeholder="Gửi những lời yêu thương…"></textarea>
 <button type="submit">Gửi phản hồi ♡</button></form><div id="result" role="status" aria-live="polite"></div></div></div>
 <audio id="audio" preload="none" loop></audio></main>
-<script type="module" src="/view.mjs?v=2.0.0"></script></body></html>
+<script type="module" src="/view.mjs?v=2.1.0"></script></body></html>

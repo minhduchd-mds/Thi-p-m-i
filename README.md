@@ -1,3 +1,13 @@
+## v2.1 — Thiệp hai mặt + Preview mở thiệp (22/10/2026)
+
+- Editor có hai tab **01 · Bìa ngoài** và **02 · Mặt trong**, mỗi mặt chỉnh sửa và có layer riêng.
+- Mặt trong có sẵn nội dung lời mời, khách mời, ngày giờ, địa điểm, địa chỉ và hoạ tiết theo 3 phong cách.
+- Xem trước `/view.html?preview=1&animate=1` tự mở bìa bằng chuyển động gập 3D; người nhận thiệp click **Mở thiệp** để xem mặt trong, đóng lại hoặc bật/tắt nhạc.
+- Thiệp cũ v1/v2 tự sinh mặt trong khi mở, không ghi đè block cũ. Khi lưu v2.1, server lưu thêm `insideBlocks[]` song song `blocks[]`, RSVP không thay đổi.
+- Export PNG/WebP áp dụng cho mặt đang chọn; file có hậu tố `bia-ngoai` hoặc `mat-trong`.
+- Unit + Node API + Playwright E2E kiểm chứng editor 2 mặt, preview mở/đóng và lưu trữ, bên cạnh test cổng, kéo thả và 3 theme.
+- Preview Vercel vẫn là web tĩnh, không có Node API để tạo link thiệp công khai.
+
 ## v2.0 — Block Editor (22/10/2026)
 
 - Trình thiết kế mới tại `/studio.html`, khách xem thiệp v2 tại `/view.html?card=<id>`; thiệp v1 vẫn xem tại `/?card=<id>`.
