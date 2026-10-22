@@ -225,8 +225,8 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
 
   test('Lưới không thay nền của Hồng Hỷ, Ngọc Uyển và Hoa Vân', async ({page}, testInfo)=>{
     await ready(page);
+    page.on('dialog',d=>d.accept());
     for(const theme of ['red','jade','pink']){
-      page.on('dialog',d=>d.accept());
       await page.locator('[data-theme="'+theme+'"]').click();
       const before=await page.locator('#stage').evaluate(el=>getComputedStyle(el).backgroundImage);
       await page.locator('#grid-toggle').click();
