@@ -75,6 +75,8 @@ async function boot(){
   }else throw Error("Thiếu liên kết thiệp.");
   document.title="Thiệp cưới "+doc.fields.bride+" & "+doc.fields.groom+" – Hỷ Studio";
   $("invitation-title").textContent=doc.fields.bride+" & "+doc.fields.groom;
+  $("back-couple").textContent=doc.fields.bride+" & "+doc.fields.groom;
+  $("back-date").textContent=doc.fields.date?doc.fields.date.split("-").reverse().join(" · "):"Ngày hạnh phúc";
   $("invitation-intro").textContent="Trân trọng kính mời "+(doc.fields.guest||"bạn")+" đến chung vui vào "+doc.fields.date+" lúc "+doc.fields.time+" tại "+doc.fields.venue+" — "+doc.fields.address+".";
   $("attendance").addEventListener("change",()=>{$("guests").disabled=$("attendance").value!=="yes";});
   const musicPaths={
