@@ -382,7 +382,7 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
   });
 
   test('Preview cục bộ trên mobile khác báo cách lấy link đúng thay vì loading vô hạn',async({browser})=>{
-    const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+    const context=await browser.newContext({baseURL:'http://127.0.0.1:4177',viewport:{width:390,height:844},isMobile:true,hasTouch:true});
     const phone=await context.newPage();
     await phone.goto('/view.html?preview=1&animate=1');
     await expect(phone.locator('#loading')).toHaveClass(/is-error/);
