@@ -212,8 +212,8 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await expect(viewer.locator('#page-interactions')).toBeHidden();
     await expect(viewer.locator('#map-directions')).toBeHidden();
     await expect(viewer.locator('#gift-details')).toBeHidden();
-    await expect(viewer.locator('#poster')).toBeHidden();
-    await expect(viewer.locator('.book-back')).toBeVisible();
+    await expect(viewer.locator('#poster')).toHaveCSS('pointer-events','none');
+    await expect(viewer.locator('#cover-leaf')).toHaveCSS('pointer-events','none');
     await expect(viewer.locator('#back-couple')).toContainText('Minh Anh & Hoàng Nam');
     await expect(viewer.locator('#book-left-inside')).toBeVisible();
     await expect(viewer.locator('#left-couple')).toContainText('Minh Anh & Hoàng Nam');
@@ -328,6 +328,81 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await expect(view.locator('#viewer')).toBeVisible();
     await capture(page,testInfo,'15-owner-publication-dashboard');
     await view.close();
+  });
+
+
+  test('Bìa không xuyên chữ mặt trong; animation lật có trạng thái chuyển động thật',async({page},testInfo)=>{
+    await ready(page);
+    await page.locator('#save-local').click();
+    await page.goto('/view.html?preview=1');
+    await expect(page.locator('#viewer')).toBeVisible();
+    const cover=page.locator('#cover-leaf'),inside=page.locator('#inside-poster');
+    await expect(inside).toHaveCSS('visibility','hidden');
+    await expect(inside).toHaveCSS('opacity','0');
+    await expect(cover).toHaveCSS('backface-visibility','hidden');
+    await expect(page.locator('body')).toHaveCSS('background-image','none');
+    await capture(page,testInfo,'16-cover-no-text-bleed');
+    const before=await cover.evaluate(el=>getComputedStyle(el).transform);
+    await page.locator('#toggle-open').click();
+    await page.waitForTimeout(180);
+    const middle=await cover.evaluate(el=>getComputedStyle(el).transform);
+    expect(middle).not.toBe(before);
+    await page.waitForTimeout(1450);
+    const finish=await cover.evaluate(el=>getComputedStyle(el).transform);
+    expect(finish).not.toBe(middle);
+    await expect(inside).toHaveCSS('visibility','visible');
+    await expect(page.locator('#book-left-inside')).toBeVisible();
+    await capture(page,testInfo,'17-open-after-real-animation');
+    await page.locator('#toggle-open').click();
+    await page.waitForTimeout(1400);
+    await expect(inside).toHaveCSS('visibility','hidden');
+    await expect(inside).toHaveCSS('opacity','0');
+  });
+
+  test('Link công khai mở trên điện thoại mới, không phụ thuộc localStorage',async({page,browser},testInfo)=>{
+    await ready(page);
+    await page.locator('#publish').click();
+    await page.locator('#do-publish').click();
+    await expect(page.locator('#publish-link-box')).toBeVisible({timeout:15000});
+    const link=await page.locator('#published-url').inputValue();
+    const context=await browser.newContext({viewport:{width:375,height:812},deviceScaleFactor:2,isMobile:true,hasTouch:true});
+    const phone=await context.newPage();
+    await phone.goto(link);
+    await expect(phone.locator('#viewer')).toBeVisible({timeout:20000});
+    await expect(phone.locator('#loading')).toBeHidden();
+    await expect(phone.locator('#inside-poster')).toHaveCSS('visibility','hidden');
+    await phone.locator('#toggle-open').click();
+    await phone.waitForTimeout(1100);
+    await expect(phone.locator('#inside-poster')).toHaveCSS('visibility','visible');
+    await expect(phone.locator('#toggle-open')).toHaveAttribute('aria-expanded','true');
+    const layout=await phone.evaluate(()=>({screen:innerWidth,page:document.documentElement.scrollWidth}));
+    expect(layout.page).toBeLessThanOrEqual(layout.screen+2);
+    await capture(phone,testInfo,'18-fresh-iphone-public-link');
+    await context.close();
+  });
+
+  test('Preview cục bộ trên mobile khác báo cách lấy link đúng thay vì loading vô hạn',async({browser})=>{
+    const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+    const phone=await context.newPage();
+    await phone.goto('/view.html?preview=1&animate=1');
+    await expect(phone.locator('#loading')).toHaveClass(/is-error/);
+    await expect(phone.locator('#loading')).toContainText('Xuất bản');
+    await expect(phone.locator('#loading a').first()).toBeVisible();
+    await context.close();
+  });
+
+  test('Header editor bám phía trên; nền canvas sạch trên màn mobile',async({page},testInfo)=>{
+    await page.setViewportSize({width:390,height:844});
+    await ready(page);
+    const header=page.locator('.topbar');
+    await expect(header).toHaveCSS('position','sticky');
+    await expect(header).toHaveCSS('top','0px');
+    await expect(page.locator('.canvas-area')).toHaveCSS('background-image','none');
+    await page.evaluate(()=>window.scrollTo(0,420));
+    await expect(header).toBeInViewport();
+    const layout=await page.evaluate(()=>({screen:innerWidth,page:document.documentElement.scrollWidth}));
+    expect(layout.page).toBeLessThanOrEqual(layout.screen+2);
+    await capture(page,testInfo,'19-clean-mobile-editor');
   });
 
   test('Xem trước trên mobile 390 × 844 không tràn ngang', async ({ page }, testInfo) => {

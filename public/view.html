@@ -98,6 +98,42 @@ body{background:#d8bc9f;background-image:linear-gradient(125deg,#1e15178a,#bb947
 @media(max-width:720px){.invitation-book.is-open .book-left-inside{display:none}}
 @media(prefers-reduced-motion:reduce){.book-left-inside{transition:none!important}}
 
+
+/* v2.4 — visual QA: clean presentation, deterministic layers, visible hinge animation. */
+html{background:#f6f1eb}
+body{min-height:100dvh;background:#f6f1eb!important;background-image:none!important;color:#513c35}
+header{position:sticky;top:0;z-index:1000;min-height:58px;background:rgba(255,252,248,.97)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid #e5d7cc}
+main{max-width:1050px}
+.book-viewport{isolation:isolate;overflow:visible}
+.invitation-book{isolation:isolate;perspective:2400px;transform-style:flat}
+.book-inside{z-index:1;visibility:hidden;opacity:0;backface-visibility:visible;transition:opacity .42s ease,visibility 0s linear .42s}
+.invitation-book.is-open .book-inside{visibility:visible;opacity:1;transition:opacity .42s ease .2s,visibility 0s}
+.book-left-inside{z-index:2;transition:opacity .48s ease .42s,visibility 0s linear .42s,transform .65s ease .3s}
+.invitation-book.is-open .book-left-inside{transition:opacity .48s ease .32s,visibility 0s,transform .65s ease .25s}
+.book-cover{z-index:9;transform-style:flat!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important;background:#8e2637;filter:none;transition:transform 1.3s cubic-bezier(.15,.75,.2,1),opacity .45s ease;will-change:transform}
+#poster.book-front{position:absolute;inset:0;z-index:2;opacity:1;visibility:visible!important;pointer-events:auto;transform:none!important;backface-visibility:visible!important;-webkit-backface-visibility:visible!important;background-color:#8e2637;isolation:isolate}
+.book-back{display:none!important}
+.invitation-book.is-open .book-cover{transform:rotateY(-168deg);pointer-events:none}
+.invitation-book.is-open #poster.book-front{visibility:visible!important;opacity:1;pointer-events:none}
+.open-controls{position:relative;z-index:11}
+.open-controls button{min-width:215px}
+@media(max-width:720px){
+ body{background:#f8f3ee!important}
+ main{margin:16px auto 30px}
+ .book-viewport{max-width:calc(100vw - 24px)}
+ .book-left-inside{display:none!important}
+ .book-cover{transform-origin:0 50%;filter:none;transition:transform .95s cubic-bezier(.2,.75,.2,1),opacity .35s ease .55s}
+ .invitation-book.is-open .book-cover{transform:perspective(1800px) rotateY(-105deg);opacity:0;pointer-events:none}
+ .invitation-book.is-open .book-inside{transition:opacity .43s ease .38s,visibility 0s}
+ .open-controls{padding:0 9px}
+}
+@media(prefers-reduced-motion:reduce){
+ .book-cover,.book-inside,.book-left-inside{transition:none!important}
+}
+/* Clear error recovery on a different device or when the API is unavailable. */
+#loading.is-error{width:min(500px,100%);margin:38px auto;background:white;padding:26px;border:1px solid #eeddd1;border-radius:16px;box-shadow:0 12px 30px #45302412;line-height:1.9}
+#loading.is-error a{display:inline-flex;padding:9px 14px;margin-top:10px;border-radius:9px;background:#913847;color:white;text-decoration:none;font-weight:700}
+
 </style></head>
 <body><header><a href="/">囍 Hỷ Studio</a><span>THƯ MỜI TRÂN TRỌNG</span></header>
 <main><div id="loading">Đang chuẩn bị tấm thiệp dành cho bạn…</div><div id="viewer" class="viewer" hidden>
@@ -120,4 +156,5 @@ body{background:#d8bc9f;background-image:linear-gradient(125deg,#1e15178a,#bb947
 <label for="wish">Lời chúc</label><textarea id="wish" maxlength="500" placeholder="Gửi những lời yêu thương…"></textarea>
 <button type="submit">Gửi phản hồi ♡</button></form><div id="result" role="status" aria-live="polite"></div></div></div>
 <audio id="audio" preload="none" loop></audio></main>
-<script type="module" src="/view.mjs?v=2.2.1"></script></body></html>
+<script type="module" src="/view.mjs?v=2.4.0"></script>
+<script>window.addEventListener("error",function(){const el=document.getElementById("loading");if(el&&!el.hidden){el.classList.add("is-error");el.textContent="Không thể tải trình xem thiệp. Vui lòng tải lại trang hoặc dùng liên kết thiệp đã xuất bản.";const a=document.createElement("a");a.href="/";a.textContent="Về Hỷ Studio";el.append(a);}})</script></body></html>

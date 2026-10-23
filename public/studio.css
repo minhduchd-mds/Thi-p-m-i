@@ -145,3 +145,31 @@ dialog{border:1px solid #e5d5cc;border-radius:18px;box-shadow:0 40px 90px #230b0
 .rsvp-entry{border:1px solid #ebd9c8;background:white;border-radius:9px;padding:10px;display:grid;gap:3px}
 .rsvp-entry b{font-size:12px}.rsvp-entry span{font-size:10px;color:#975747}.rsvp-entry p{font-size:11px;margin:4px 0;color:#725b4f;white-space:pre-wrap}
 @media(max-width:550px){.published-result{flex-direction:column;align-items:flex-start}.published-result img{height:110px;width:110px}}
+
+/* v2.4 — remove ornamental app wallpaper; keep decoration INSIDE the card only */
+html,body{background:#f5f3f0}
+.studio{background:#f5f3f0}
+.topbar{position:sticky;top:0;z-index:1100;background:rgba(255,252,248,.98);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 2px 16px #32261d12}
+.canvas-area{background:#e9e5e0!important;background-image:none!important}
+.drop-area{background:#ece9e5!important;background-image:radial-gradient(#c9beb4 1px,transparent 1px)!important;background-size:22px 22px!important}
+@media(max-width:768px){
+ html,body{width:100%;overflow-x:hidden}
+ .studio{min-width:0!important;width:100%;min-height:100dvh}
+ .topbar{height:auto;min-height:58px;display:flex;flex-wrap:wrap;align-items:center;padding:8px 12px;gap:8px}
+ .brand{min-width:auto;margin-right:auto}
+ .top-themes{order:3;display:flex;width:100%;margin:0;overflow-x:auto;scrollbar-width:thin}
+ .top-actions{order:4;flex:1 0 100%;display:flex;justify-content:flex-end;flex-wrap:wrap;gap:5px}
+ .top-actions button{min-height:32px}
+ .editor-layout{display:flex;flex-direction:column;height:auto;min-height:0}
+ .canvas-area{order:1;min-height:510px;height:calc(100svh - 182px);max-height:760px;overflow:hidden}
+ .palette{order:2;border-right:0;border-top:1px solid #e2d8cd;padding:15px}
+ .inspector{order:3;border-left:0;border-top:1px solid #e2d8cd;padding:15px}
+ .canvas-toolbar{flex-wrap:nowrap;overflow-x:auto;min-height:54px;gap:5px}
+ .face-switch{min-width:0;max-width:none;flex:1 0 auto}
+ .canvas-controls{flex-shrink:0}
+ .drop-area{padding:24px 12px;overflow:auto}
+ .canvas-footer{flex-wrap:wrap;padding:8px 10px}
+ .asset-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .page-template-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .statusbar{position:relative}
+}

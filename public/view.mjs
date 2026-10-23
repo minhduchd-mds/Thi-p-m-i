@@ -63,14 +63,22 @@ $("poster").addEventListener("keydown",e=>{if(!isOpen&&(e.key==="Enter"||e.key==
 async function boot(){
  try{
   if(params.has("preview")){
-   const d=JSON.parse(localStorage.getItem("hy-studio-editor-v2")||"null");
-   if(!d?.doc)throw Error("Chưa có bản nháp trong trình duyệt này.");
-   doc=migrate(d.doc);
-   $("rsvp").querySelector('button[type="submit"]').disabled=true;
-   $("result").textContent="Bản xem trước: phản hồi RSVP chỉ hoạt động với thiệp đã xuất bản.";
-  }else if(cardId){
+   let draft=null;
+   try{draft=JSON.parse(localStorage.getItem("hy-studio-editor-v2")||"null");}catch(e){/* iOS private mode and other-device previews */ }
+   if(draft?.doc){
+     doc=migrate(draft.doc);
+     $("rsvp").querySelector('button[type="submit"]').disabled=true;
+     $("result").textContent="Bản xem trước: phản hồi RSVP chỉ hoạt động với thiệp đã xuất bản.";
+   }else if(!cardId){
+     throw new Error("Bản xem trước chỉ có trên thiết bị đã thiết kế thiệp. Để xem trên điện thoại khác, hãy Xuất bản và gửi link /i/HY-... thay vì chia sẻ link ?preview=1.");
+   }
+  }
+  if(!doc&&cardId){
    const response=await fetch("/api/cards/"+encodeURIComponent(cardId));
-   if(!response.ok)throw Error("Không thể tải thiệp từ máy chủ ("+response.status+").");
+   if(!response.ok){
+     let detail="";try{detail=(await response.json()).error||""}catch(e){}
+     throw Error(response.status===410?"Thiệp đã hết hạn hoặc liên kết đã thu hồi.":response.status===404?"Không tìm thấy mã thiệp. Hãy kiểm tra lại liên kết.":("Không thể tải thiệp từ máy chủ ("+response.status+"). "+detail));
+   }
    const result=await response.json();
    doc=migrate(result.data?.document||result.data);
   }else throw Error("Thiếu liên kết thiệp.");
@@ -99,9 +107,18 @@ async function boot(){
    catch(e){try{await navigator.clipboard.writeText(location.href);$("result").textContent="Đã sao chép liên kết thiệp.";}catch(x){$("result").textContent=location.href;}}
   });
   $("loading").hidden=true;$("viewer").hidden=false;
+  renderStage($("poster"),surfaceDoc(doc,"cover"));
   resize();if(doc)setPage(1,false);window.addEventListener("resize",resize);
   if(params.has("animate"))window.setTimeout(()=>{if(!isOpen)toggleOpen(true,false)},850);
- }catch(e){$("loading").textContent="Không thể mở thiệp: "+e.message;}
+ }catch(e){
+   const loading=$("loading");loading.classList.add("is-error");loading.replaceChildren();
+   const title=document.createElement("strong");title.textContent="Chưa thể mở thiệp";
+   const detail=document.createElement("p");detail.textContent=e?.message||"Vui lòng thử lại sau.";
+   const retry=document.createElement("a");retry.href=location.href;retry.textContent="↻ Tải lại";
+   const home=document.createElement("a");home.href="/";home.textContent="Về Hỷ Studio";
+   loading.append(title,detail,retry,document.createTextNode(" "),home);
+   console.error("Hỷ Studio viewer:",e);
+ }
 }
 function resize(){
  const mobile=window.innerWidth<=720;
@@ -112,10 +129,7 @@ function resize(){
  $("poster-wrap").style.height=(1080*size)+"px";
  $("book-transform").style.transform="scale("+size+")";
  $("book").style.left=spread?"720px":"0px";
- if(doc){
-  renderStage($("poster"),surfaceDoc(doc,"cover"));
-  renderStage($("inside-poster"),pageSurface(doc,allPages(doc)[pageIndex]?.id||"inside"));
- }
+ // Surfaces are rendered on boot / page change, not on every resize or opening frame.
 }
 $("rsvp").addEventListener("submit",async event=>{
  event.preventDefault();
