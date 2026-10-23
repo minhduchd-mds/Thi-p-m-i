@@ -324,7 +324,7 @@ html,body{overflow-x:clip;overflow-y:visible;background:#f6f3ef!important;color:
 @media (min-width:861px){
  html,body{height:100%;max-height:100%;overflow:hidden!important;overscroll-behavior:none}
  .studio{height:100vh;height:100dvh;max-height:100dvh;min-height:0;overflow:hidden;display:flex;flex-direction:column}
- .topbar{position:relative!important;top:auto!important;flex:0 0 68px;height:68px;min-height:68px;max-height:68px}
+ .topbar{position:sticky!important;top:0!important;flex:0 0 68px;height:68px;min-height:68px;max-height:68px}
  .editor-layout{flex:1 1 0;height:auto!important;min-height:0;max-height:none;overflow:hidden;grid-template-rows:minmax(0,1fr)}
  .tool-rail,.palette,.inspector{
   height:100%;min-height:0;max-height:100%;
@@ -346,7 +346,8 @@ html,body{overflow-x:clip;overflow-y:visible;background:#f6f3ef!important;color:
 .palette::-webkit-scrollbar-track,.inspector::-webkit-scrollbar-track,.tool-rail::-webkit-scrollbar-track{background:#f8f3ef}
 .palette::-webkit-scrollbar-thumb,.inspector::-webkit-scrollbar-thumb,.tool-rail::-webkit-scrollbar-thumb{background:#cfbcb1;border-radius:9px}
 @media (max-width:860px){
- html,body{height:auto;max-height:none;overflow-x:clip!important;overflow-y:auto!important}
+ html{height:auto;max-height:none;overflow-x:clip!important;overflow-y:auto!important}
+ body{height:auto;max-height:none;overflow-x:clip!important;overflow-y:visible!important}
  .studio{height:auto;max-height:none;min-height:100dvh;overflow:visible}
  .editor-layout{height:auto!important;overflow:visible}
  .palette,.inspector{height:auto;min-height:0;max-height:min(62dvh,510px);overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior-y:contain;scrollbar-gutter:stable}
