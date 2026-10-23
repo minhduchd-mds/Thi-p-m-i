@@ -168,15 +168,23 @@ if(created){
       }));
       check(facts.root<=facts.screen+3,"Desktop document scrolls "+JSON.stringify(facts));
       check(facts.palette>facts.paletteViewport+10,"Left sidebar not independently scrollable");
-      await page.locator('.palette').hover();await page.mouse.wheel(0,320);
+      await page.locator('.palette .tool-list').first().hover();
+      await page.mouse.wheel(0,320);
+      try{await page.waitForFunction(()=>document.querySelector('.palette').scrollTop>5,null,{timeout:5000});}
+      catch(e){
+       const box=await page.locator('.palette').evaluate(el=>({top:el.scrollTop,height:el.clientHeight,full:el.scrollHeight,overflow:getComputedStyle(el).overflowY}));
+       throw Error("Left sidebar wheel scroll failed: "+JSON.stringify(box));
+      }
       const scroll=await page.locator('.palette').evaluate(el=>el.scrollTop);
-      check(scroll>5,"Left sidebar scroll failed");
       await page.locator('#stage [data-block-id="bride"]').click({force:true});
       const inspector=await page.locator('.inspector').evaluate(el=>({height:el.clientHeight,scroll:el.scrollHeight}));
       check(inspector.scroll>inspector.height+10,"Inspector content must overflow inside its own pane");
       await page.locator('.inspector-heading').hover();await page.mouse.wheel(0,380);
-      const rightScroll=await page.locator('.inspector').evaluate(el=>el.scrollTop);
-      check(rightScroll>5,"Right inspector independent scroll failed");
+      try{await page.waitForFunction(()=>document.querySelector('.inspector').scrollTop>5,null,{timeout:5000});}
+      catch(e){
+       const box=await page.locator('.inspector').evaluate(el=>({top:el.scrollTop,height:el.clientHeight,full:el.scrollHeight,overflow:getComputedStyle(el).overflowY}));
+       throw Error("Right inspector wheel scroll failed: "+JSON.stringify(box));
+      }
       const afterLayout=await page.evaluate(()=>({document:document.documentElement.scrollHeight,viewport:innerHeight,
        header:document.querySelector('.topbar').getBoundingClientRect().top,
        canvas:document.querySelector('.canvas-area').getBoundingClientRect().top}));
