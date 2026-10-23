@@ -13,7 +13,7 @@ function storePublished(record){const entries=publishedIndex().filter(x=>x.id!==
 
 let doc=createDoc(new URLSearchParams(location.search).get("theme")||"red");
 let selected="",activeFace="cover",zoom=.55,history=[],future=[],dirty=false,cardId=null,editToken=null;
-let pointer=null,focusSnapshot=null,gridOn=false,draftTimer=0;
+let pointer=null,focusSnapshot=null,gridOn=false,draftTimer=0,workspaceMode="design";
 const stage=$("stage"),wrap=$("stage-wrap"),area=$("drop-area");
 const activePage=()=>pageById(doc,activeFace)||pageById(doc,"cover");
 const activeBlocks=()=>activePage().blocks;
@@ -56,10 +56,51 @@ function pageCommand(command){
  else if(command==="down"&&idx<doc.extraPages.length-1){const page=doc.extraPages.splice(idx,1)[0];doc.extraPages.splice(idx+1,0,page);}
  selected="";renderAll();scheduleSave();
 }
+
+function refreshProjectIdentity(){
+ const bride=String(doc.fields?.bride||"").trim();
+ $("project-title").textContent=bride?"Thiệp cưới của "+bride:"Thiệp cưới";
+ document.querySelectorAll(".theme-poster").forEach(card=>{
+  const names=card.querySelectorAll("strong");
+  if(names[0])names[0].textContent=bride||"Cô dâu";
+  if(names[1])names[1].textContent=doc.fields?.groom||"Chú rể";
+ });
+}
+function setWorkspaceMode(mode){
+ if(!["design","preview"].includes(mode))return;
+ workspaceMode=mode;const preview=mode==="preview",frame=$("preview-frame");
+ for(const [id,on] of [["mode-design",!preview],["mode-preview",preview]]){
+  $(id).classList.toggle("active",on);$(id).setAttribute("aria-pressed",String(on));
+ }
+ wrap.hidden=preview;$("live-preview").hidden=!preview;
+ $("canvas-hint").textContent=preview?"Mở thiệp · Chạm để đóng hoặc mở lại":"Kéo thả để chỉnh sửa · Nhấn Delete để xoá";
+ $("coordinates").hidden=preview;
+ for(const id of ["zoom-in","zoom-out","fit","grid-toggle"])$(id).disabled=preview;
+ if(preview){saveDraft();frame.src="/view.html?preview=1&embed=1&animate=1&v=2.5";notify("Đang hiển thị thiệp thật với animation");}
+ else{frame.removeAttribute("src");fit();notify("Chế độ thiết kế");}
+}
+function activateRail(name){
+ document.querySelectorAll("[data-rail]").forEach(button=>{
+  const yes=button.dataset.rail===name;button.classList.toggle("active",yes);button.setAttribute("aria-pressed",String(yes));
+ });
+}
+function useToolRail(name){
+ if(["templates","blocks","layers"].includes(name)){switchPanel(name);activateRail(name);return;}
+ if(name==="image"){switchPanel("blocks");activateRail(name);$("upload-input").click();return;}
+ if(name==="text"){setWorkspaceMode("design");switchPanel("blocks");activateRail(name);add("text");return;}
+ if(name==="pages"){switchPanel("blocks");activateRail(name);document.querySelector(".page-template-grid")?.scrollIntoView({behavior:"smooth",block:"nearest"});return;}
+ if(["location","gift","music"].includes(name)){
+  switchPanel("fields");activateRail(name);
+  const id=name==="location"?"field-venue":name==="gift"?"gift-bank":"music-choice";
+  $(id)?.focus({preventScroll:true});
+  if(window.innerWidth<900)$(id)?.scrollIntoView({behavior:"smooth",block:"center"});
+ }
+}
+
 const titleMap={bride:"Tên cô dâu",groom:"Tên chú rể",date:"Ngày cưới",time:"Giờ tổ chức",venue:"Tên địa điểm",address:"Địa chỉ chi tiết",mapUrl:"Link Google Maps (không bắt buộc)",guest:"Tên khách mời",message:"Lời mời"};
 function notify(msg){$("status").textContent=msg;}
 function saveDraft(){
- try{localStorage.setItem(STORE,JSON.stringify({doc,updatedAt:Date.now()}));$("autosave-label").textContent="Đã lưu bản nháp · Thiết bị này";}
+ try{localStorage.setItem(STORE,JSON.stringify({doc,updatedAt:Date.now()}));$("autosave-label").textContent="✓ Đã lưu";}
  catch(e){$("autosave-label").textContent="Không thể lưu: bộ nhớ đã đầy";notify("Hãy xuất ảnh hoặc giảm dung lượng ảnh đính kèm.");}
 }
 function scheduleSave(){dirty=true;$("autosave-label").textContent="Đang chỉnh sửa…";clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,250);}
@@ -112,7 +153,7 @@ function renderFields(){
   el.maxLength=key==="mapUrl"?2048:(key==="message"?300:200);
   el.addEventListener("focus",()=>{focusSnapshot=clone(doc);el.dataset.focusValue=el.value;});
   el.addEventListener("input",()=>{
-   doc.fields[key]=el.value;renderCanvas();scheduleSave();
+   doc.fields[key]=el.value;renderCanvas();refreshProjectIdentity();scheduleSave();
   });
   el.addEventListener("change",()=>{if(focusSnapshot&&el.dataset.focusValue!==el.value)checkpoint(focusSnapshot);focusSnapshot=null;});
   form.append(lbl,el);
@@ -179,7 +220,7 @@ function renderInspector(){
  h+='<div class="inspect-section"><h3>Thao tác thành phần</h3><div class="inspect-actions"><button data-command="duplicate">Nhân bản</button><button data-command="up">Lên lớp</button><button data-command="down">Xuống lớp</button><button data-command="lock">'+(b.locked?"Mở khoá":"Khoá")+'</button><button data-command="hide">'+(b.hidden?"Hiện":"Ẩn")+'</button><button class="danger" data-command="delete">Xoá</button></div></div>';
  root.innerHTML=h;
 }
-function renderAll(){renderThemes();renderPageTabs();renderCanvas();renderFields();renderLayers();renderInspector();updateHistoryUI();}
+function renderAll(){renderThemes();renderPageTabs();renderCanvas();renderFields();renderLayers();renderInspector();refreshProjectIdentity();updateHistoryUI();}
 function findSelected(){return activeBlocks().find(b=>b.id===selected);}
 function selectBlock(id){selected=id||"";renderCanvas();renderInspector();renderLayers();}
 function add(kind,x,y){
@@ -240,8 +281,10 @@ function movePointer(e){
 }
 function endPointer(){if(!pointer)return;if(pointer.changed){checkpoint(pointer.before);scheduleSave();}pointer=null;renderLayers();renderInspector();}
 function switchPanel(name){
- document.querySelectorAll(".palette-tab").forEach(x=>x.classList.toggle("active",x.dataset.panel===name));
- for(const p of ["blocks","fields","layers"])$(p+"-panel").hidden=p!==name;
+ document.querySelectorAll(".palette-tab").forEach(x=>{const active=x.dataset.panel===name;x.classList.toggle("active",active);x.setAttribute("aria-selected",String(active));});
+ for(const p of ["templates","blocks","fields","layers"])$(p+"-panel").hidden=p!==name;
+ activateRail(name==="fields"?"location":name);
+ $("library-title").textContent=({templates:"Mẫu thiệp",blocks:"Thành phần",fields:"Nội dung thiệp",layers:"Các lớp thiết kế"})[name]||"Thư viện";
 }
 async function uploadImage(file){
  if(!file||!/^image\/(?:png|webp|jpeg)$/.test(file.type)){notify("Hãy chọn JPG, PNG hoặc WebP");return;}
@@ -371,7 +414,7 @@ async function boot(){
    notify(editToken?"Đã tải thiệp từ máy chủ":"Chỉ xem được: chưa có quyền chỉnh sửa trên thiết bị này");
   }catch(e){notify("Không tải được thiệp từ máy chủ: "+e.message);}
  }
- renderAssets();renderAll();fit();saveDraft();
+ renderAssets();renderAll();switchPanel("templates");fit();saveDraft();
  if(params.get("panel")==="music"){switchPanel("fields");$("music-choice").focus();}
 }
 document.querySelectorAll("[data-face]").forEach(b=>b.addEventListener("click",()=>setFace(b.dataset.face)));
