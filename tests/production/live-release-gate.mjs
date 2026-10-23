@@ -106,9 +106,9 @@ if(created){
   });
   await must("owner-updates-with-stable-code",async()=>{
    const update=structuredClone(data);update.document.fields.venue="QA Updated Hall";
-   const forbidden=await request("/api/cards/"+created.id,{method:"PUT",body:update,token:"0".repeat(48)});
+   const forbidden=await request("/api/cards/"+created.id,{method:"PUT",body:{data:update},token:"0".repeat(48)});
    assert.equal(forbidden.status,403);
-   const valid=await request("/api/cards/"+created.id,{method:"PUT",body:update,token});
+   const valid=await request("/api/cards/"+created.id,{method:"PUT",body:{data:update},token});
    assert.equal(valid.status,200,JSON.stringify(valid.data));
    check(valid.data.code===created.code,"Code changed upon edit");
    const read=await request("/api/cards/"+created.code);
@@ -156,6 +156,8 @@ if(created){
      } else {
       await page.goto(ROOT+"/studio.html",{waitUntil:"domcontentloaded",timeout:25000});
       await page.locator(".palette").waitFor({state:"visible"});
+      await page.locator('.palette-tab[data-panel="blocks"]').click();
+      await page.locator('.tool-list').first().waitFor({state:"visible"});
       const facts=await page.evaluate(()=>({
        root:document.documentElement.scrollHeight,screen:innerHeight,
        palette:document.querySelector(".palette").scrollHeight,
@@ -169,6 +171,17 @@ if(created){
       await page.locator('.palette').hover();await page.mouse.wheel(0,320);
       const scroll=await page.locator('.palette').evaluate(el=>el.scrollTop);
       check(scroll>5,"Left sidebar scroll failed");
+      await page.locator('#stage [data-block-id="bride"]').click({force:true});
+      const inspector=await page.locator('.inspector').evaluate(el=>({height:el.clientHeight,scroll:el.scrollHeight}));
+      check(inspector.scroll>inspector.height+10,"Inspector content must overflow inside its own pane");
+      await page.locator('.inspector-heading').hover();await page.mouse.wheel(0,380);
+      const rightScroll=await page.locator('.inspector').evaluate(el=>el.scrollTop);
+      check(rightScroll>5,"Right inspector independent scroll failed");
+      const afterLayout=await page.evaluate(()=>({document:document.documentElement.scrollHeight,viewport:innerHeight,
+       header:document.querySelector('.topbar').getBoundingClientRect().top,
+       canvas:document.querySelector('.canvas-area').getBoundingClientRect().top}));
+      check(afterLayout.document<=afterLayout.viewport+3&&Math.abs(afterLayout.header)<2&&afterLayout.canvas>0,
+       "Main editor moved while scrolling sidebars "+JSON.stringify(afterLayout));
      }
      check(errors.length===0,"Javascript exceptions: "+JSON.stringify(errors));
      check(firstParty.length===0,"First-party HTTP failures: "+JSON.stringify(firstParty));
