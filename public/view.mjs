@@ -81,7 +81,7 @@ async function boot(){
    }
    const result=await response.json();
    doc=migrate(result.data?.document||result.data);
-  }else throw Error("Thiếu liên kết thiệp.");
+  }else if(!doc)throw Error("Thiếu liên kết thiệp.");
   document.title="Thiệp cưới "+doc.fields.bride+" & "+doc.fields.groom+" – Hỷ Studio";
   $("invitation-title").textContent=doc.fields.bride+" & "+doc.fields.groom;
   $("back-couple").textContent=doc.fields.bride+" & "+doc.fields.groom;

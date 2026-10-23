@@ -173,3 +173,11 @@ html,body{background:#f5f3f0}
  .page-template-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
  .statusbar{position:relative}
 }
+
+/* iOS/Chrome mobile: clip overflow without creating a separate scroll container,
+   so position:sticky remains anchored to the viewport. */
+@media(max-width:768px){
+ html,body{overflow-x:clip!important;overflow-y:visible!important}
+ .studio{overflow:visible!important}
+ .topbar{position:sticky!important;top:0!important;z-index:1300!important}
+}
