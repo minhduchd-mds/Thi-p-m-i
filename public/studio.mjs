@@ -191,9 +191,15 @@ function renderInspector(){
  const b=findSelected();
  $("inspector-title").textContent=b?blockName(b):"Bố cục "+activePage().title;
  if(!b){
-  const t=themes[doc.theme];
-  root.innerHTML='<section class="theme-preview"><div class="swatches"><i class="swatch" style="background:'+t.bg1+'"></i><i class="swatch" style="background:'+t.bg2+'"></i><i class="swatch" style="background:'+t.gold+'"></i></div><b>'+t.name+'</b><p>'+t.description+'</p></section><p class="inspect-intro">Chọn thành phần trên thiệp để chỉnh vị trí, kích thước, chữ, hoạ tiết và lớp. Có thể kéo hoạ tiết trực tiếp từ thư viện bên trái.</p><div class="inspect-section"><h3>Thông số tài liệu</h3><p class="inspect-intro">720 × 1080 px · Xuất 2×: 1440 × 2160 px · 3 layout riêng</p></div>';
-  return;
+  const colors=[["red","#a42c3d","Hồng Hỷ"],["jade","#53796e","Ngọc Uyển"],["pink","#d891a4","Hoa Vân"]];
+  let html='<div class="inspector-mini-tabs"><strong>Thiết kế</strong><span>'+escape(activePage().title)+'</span></div><section class="quick-fields"><h3>Nội dung</h3>';
+  for(const [key,label] of [["bride","Tên cô dâu"],["groom","Tên chú rể"],["date","Ngày"],["time","Giờ"],["venue","Địa điểm"]]){
+   html+='<label class="field-label" for="quick-'+key+'">'+label+'</label><input id="quick-'+key+'" data-quick-field="'+key+'" type="'+(key==="date"?"date":key==="time"?"time":"text")+'" value="'+escape(doc.fields[key]||"")+'" autocomplete="off">';
+  }
+  html+='</section><section class="quick-palette"><h3>Màu sắc</h3><div class="quick-swatches">';
+  for(const [key,hex,label] of colors)html+='<button type="button" data-quick-theme="'+key+'" title="'+label+'" aria-label="'+label+'" aria-pressed="'+String(doc.theme===key)+'" class="'+(doc.theme===key?"active":"")+'" style="--swatch:'+hex+'"></button>';
+  html+='</div></section><div class="inspector-bottom"><span>720 × 1080 px</span><button type="button" id="open-settings">Chỉnh chi tiết →</button></div>';
+  root.innerHTML=html;return;
  }
  let h='<div class="inspect-section"><h3>Vị trí & kích thước</h3><div class="inspect-grid">';
  for(const p of [["X","x"],["Y","y"],["Rộng","w"],["Cao","h"]])h+='<div>'+field(p[0],p[1],Math.round(b[p[1]]))+'</div>';
@@ -417,7 +423,17 @@ async function boot(){
  renderAssets();renderAll();switchPanel("templates");fit();saveDraft();
  if(params.get("panel")==="music"){switchPanel("fields");$("music-choice").focus();}
 }
-document.querySelectorAll("[data-face]").forEach(b=>b.addEventListener("click",()=>setFace(b.dataset.face)));
+document.querySelectorAll("[data-face]").forEach(b=>b.addEventListener("click",()=>{setFace(b.dataset.face);if(workspaceMode==="preview")setWorkspaceMode("design");}));
+$("add-page-shortcut").addEventListener("click",()=>{setWorkspaceMode("design");addPage("custom")});
+document.querySelectorAll("[data-rail]").forEach(b=>b.addEventListener("click",()=>useToolRail(b.dataset.rail)));
+$("mode-design").addEventListener("click",()=>setWorkspaceMode("design"));
+$("mode-preview").addEventListener("click",()=>setWorkspaceMode("preview"));
+$("quick-export-pdf").addEventListener("click",()=>$("export-pdf-all").click());
+document.querySelectorAll("[data-template-filter]").forEach(b=>b.addEventListener("click",()=>{
+ const group=b.dataset.templateFilter;
+ document.querySelectorAll("[data-template-filter]").forEach(x=>x.classList.toggle("active",x===b));
+ document.querySelectorAll(".top-themes .theme-button").forEach(x=>{x.hidden=group!=="all"&&!(group==="traditional"?x.dataset.theme==="red":x.dataset.theme!=="red")});
+}));
 document.querySelectorAll("[data-new-page]").forEach(b=>b.addEventListener("click",()=>addPage(b.dataset.newPage)));
 $("page-up").addEventListener("click",()=>pageCommand("up"));
 $("page-down").addEventListener("click",()=>pageCommand("down"));
@@ -450,10 +466,24 @@ area.addEventListener("drop",e=>{
  if(!["text","frame","shape","image","map","qr",...assets.map(x=>x.id)].includes(kind))return;
  const r=stage.getBoundingClientRect();add(kind,Math.max(0,Math.round((e.clientX-r.left)/zoom-80)),Math.max(0,Math.round((e.clientY-r.top)/zoom-50)));
 });
-$("inspector-content").addEventListener("focusin",e=>{if(e.target.matches("[data-prop]")){focusSnapshot=clone(doc);e.target.dataset.focusValue=e.target.value;}});
-$("inspector-content").addEventListener("input",e=>{if(e.target.matches("[data-prop]"))propUpdate(e.target,false);});
-$("inspector-content").addEventListener("change",e=>{if(e.target.matches("[data-prop]"))propUpdate(e.target,true);});
+$("inspector-content").addEventListener("focusin",e=>{
+ if(e.target.matches("[data-prop],[data-quick-field]")){focusSnapshot=clone(doc);e.target.dataset.focusValue=e.target.value;}
+});
+$("inspector-content").addEventListener("input",e=>{
+ if(e.target.matches("[data-prop]"))propUpdate(e.target,false);
+ if(e.target.matches("[data-quick-field]")){doc.fields[e.target.dataset.quickField]=e.target.value;renderCanvas();refreshProjectIdentity();scheduleSave();}
+});
+$("inspector-content").addEventListener("change",e=>{
+ if(e.target.matches("[data-prop]"))propUpdate(e.target,true);
+ if(e.target.matches("[data-quick-field]")){
+  if(focusSnapshot&&e.target.dataset.focusValue!==e.target.value)checkpoint(focusSnapshot);
+  focusSnapshot=null;renderFields();scheduleSave();
+ }
+});
 $("inspector-content").addEventListener("click",e=>{
+ const theme=e.target.closest("[data-quick-theme]");
+ if(theme){setTheme(theme.dataset.quickTheme);return;}
+ if(e.target.closest("#open-settings")){switchPanel("fields");return;}
  if(e.target.id==="change-image"){$("upload-input").click();return;}if(e.target.id==="goto-content"){switchPanel("fields");return;}
  const b=e.target.closest("[data-command]");if(b)command(b.dataset.command);
 });
