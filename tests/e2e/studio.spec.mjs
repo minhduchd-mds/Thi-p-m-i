@@ -323,7 +323,7 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await page.locator('#manage-toggle').click();
     await expect(page.locator('#manage-summary')).toContainText('Đã thu hồi');
     await view.reload();
-    await expect(view.locator('#loading')).toContainText('Không thể mở thiệp');
+    await expect(view.locator('#loading')).toContainText('Thiệp đã hết hạn hoặc liên kết đã thu hồi');
     await page.locator('#manage-toggle').click();
     await expect(page.locator('#manage-summary')).toContainText('Đang hoạt động');
     await view.reload();
