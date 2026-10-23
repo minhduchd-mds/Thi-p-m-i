@@ -1,3 +1,13 @@
+## v2.5 — Premium Wedding Editor (23/10/2026)
+
+- Header sticky có chọn trang, trạng thái lưu, undo/redo, xem trước, xuất PDF và xuất bản; bỏ các subtitle không cần thiết.
+- Thanh công cụ dọc **Mẫu / Khối / Ảnh / Chữ / Trang / Map / QR / Nhạc / Lớp** có thao tác thật, điều hướng panel hoặc thêm khối.
+- Thư viện mẫu có thumbnail trực quan cho **Hồng Hỷ, Ngọc Uyển, Hoa Vân**, bộ lọc truyền thống/hiện đại, chuyển theme giữ các khối người dùng tự thêm.
+- Canvas giữ chế độ kéo thả và thêm **Mở thiệp 3D** trực tiếp qua viewer thật cùng origin; không thay bằng mockup tĩnh.
+- Inspector có thể chỉnh nhanh tên cô dâu/chú rể, ngày, giờ, địa điểm và màu/theme; chọn một khối sẽ hiện các thuộc tính sâu.
+- Giao diện nền kem sáng, trang trí chỉ bên trong thiệp, không phủ background UI; breakpoint desktop và mobile, hỗ trợ giảm chuyển động.
+- GitHub CI chạy cả Node API, smoke Chrome và 20 kịch bản Playwright; artifact gồm ảnh chụp editor thực tế, trạng thái mở 3D, desktop và mobile.
+
 ## v2.3 — PDF, link định danh, QR thiệp và quản lý xuất bản (22/10/2026)
 
 - PDF: xuất tất cả trang hoặc trang đang chọn, kích thước in 120 × 180 mm, ảnh 1440 × 2160 ~305 dpi. PDF không chứa nhạc/animation.

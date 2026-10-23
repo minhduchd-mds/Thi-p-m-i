@@ -189,7 +189,7 @@ function field(label,key,value,type="number",extra=""){
 function renderInspector(){
  const root=$("inspector-content");
  const b=findSelected();
- $("inspector-title").textContent=b?blockName(b):"Bố cục "+activePage().title;
+ $("inspector-title").textContent=b?blockName(b):"Thuộc tính";
  if(!b){
   const colors=[["red","#a42c3d","Hồng Hỷ"],["jade","#53796e","Ngọc Uyển"],["pink","#d891a4","Hoa Vân"]];
   let html='<div class="inspector-mini-tabs"><strong>Thiết kế</strong><span>'+escape(activePage().title)+'</span></div><section class="quick-fields"><h3>Nội dung</h3>';
