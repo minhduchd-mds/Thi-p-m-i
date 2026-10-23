@@ -307,7 +307,9 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     const view=await page.context().newPage();
     await view.goto(link);
     await expect(view.locator('#viewer')).toBeVisible();
-    await expect(view.locator('#inside-poster')).toBeVisible();
+    await expect(view.locator('#inside-poster')).toHaveCSS('visibility','hidden');
+    await view.locator('#toggle-open').click();
+    await expect(view.locator('#inside-poster')).toHaveCSS('visibility','visible');
     await page.locator('#publish-dialog button[value="close"]').click();
     await page.locator('#manage').click();
     await expect(page.locator('#manage-information')).toBeVisible();
