@@ -523,6 +523,43 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await expect(page.locator('.topbar')).toHaveCSS('position','sticky');
   });
 
+  test('Xoá trực tiếp trang phụ trên header: huỷ, xác nhận, hoàn tác, lưu lại',async({page},testInfo)=>{
+    await ready(page);
+    await page.locator('#add-page-shortcut').click();
+    await page.locator('#add-page-shortcut').click();
+    await page.locator('#add-page-shortcut').click();
+    const tabs=page.locator('#extra-page-tabs [data-face]');
+    const remove=page.locator('#extra-page-tabs [data-remove-page]');
+    await expect(tabs).toHaveCount(3);
+    await expect(remove).toHaveCount(3);
+    await expect(page.locator('[data-face="cover"]')).not.toHaveAttribute('data-remove-page');
+    await expect(page.locator('[data-face="inside"]')).not.toHaveAttribute('data-remove-page');
+    const firstId=await tabs.first().getAttribute('data-face');
+    const secondId=await tabs.nth(1).getAttribute('data-face');
+    const thirdId=await tabs.last().getAttribute('data-face');
+    await tabs.first().click();
+    await expect(tabs.first()).toHaveAttribute('aria-selected','true');
+    page.once('dialog',dialog=>dialog.dismiss());
+    await page.locator('#extra-page-tabs [data-remove-page="'+secondId+'"]').click();
+    await expect(tabs).toHaveCount(3);
+    page.once('dialog',dialog=>dialog.accept());
+    await page.locator('#extra-page-tabs [data-remove-page="'+thirdId+'"]').click();
+    await expect(tabs).toHaveCount(2);
+    await expect(page.locator('#extra-page-tabs [data-face="'+firstId+'"]')).toHaveAttribute('aria-selected','true');
+    await page.locator('#undo').click();
+    await expect(tabs).toHaveCount(3);
+    await expect(page.locator('#extra-page-tabs [data-face="'+thirdId+'"]')).toBeVisible();
+    await tabs.last().click();
+    page.once('dialog',dialog=>dialog.accept());
+    await page.locator('#extra-page-tabs [data-remove-page="'+thirdId+'"]').click();
+    await expect(tabs).toHaveCount(2);
+    await expect(page.locator('#extra-page-tabs [data-face="'+secondId+'"]')).toHaveAttribute('aria-selected','true');
+    await page.locator('#save-local').click();
+    await page.reload();
+    await expect(page.locator('#extra-page-tabs [data-face]')).toHaveCount(2);
+    await capture(page,testInfo,'23-remove-extra-pages-from-header');
+  });
+
   test('Xem trước trên mobile 390 × 844 không tràn ngang', async ({ page }, testInfo) => {
     await ready(page);
     await page.locator('#save-local').click();

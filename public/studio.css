@@ -354,3 +354,27 @@ html,body{overflow-x:clip;overflow-y:visible;background:#f6f3ef!important;color:
  .palette-title{top:-15px}
  .inspector-heading{top:-17px}
 }
+
+/* v2.5.2 — removable page tabs in the sticky header */
+#extra-page-tabs .extra-page-item{display:inline-flex;align-items:center;flex:0 0 auto;max-width:174px;min-height:34px;gap:0;border-radius:8px;background:transparent}
+#extra-page-tabs .extra-page-item.is-active{background:var(--hy-wine,#a52437)}
+.header-pages .face-switch #extra-page-tabs .extra-page-button{
+ display:block;min-width:0;max-width:122px!important;overflow:hidden;text-overflow:ellipsis;
+ padding:0 4px 0 11px!important;border-radius:7px 0 0 7px;
+ background:transparent;box-shadow:none;white-space:nowrap;
+}
+.header-pages .face-switch #extra-page-tabs .extra-page-item.is-active .extra-page-button{color:white}
+.header-pages .face-switch #extra-page-tabs .extra-page-remove{
+ display:grid;place-items:center;flex:none;width:24px;min-width:24px;min-height:28px;height:28px;
+ padding:0!important;margin:0 3px 0 1px;border:0;border-radius:6px;
+ background:transparent;color:#8a7974;line-height:1;font:600 18px/1 Arial,sans-serif;cursor:pointer;
+}
+.header-pages .face-switch #extra-page-tabs .extra-page-remove:hover{background:#efd7d7;color:#98243b}
+.header-pages .face-switch #extra-page-tabs .extra-page-item.is-active .extra-page-remove{color:#fff6f6}
+.header-pages .face-switch #extra-page-tabs .extra-page-item.is-active .extra-page-remove:hover{background:#ffffff30;color:white}
+.header-pages .face-switch #extra-page-tabs .extra-page-remove:focus-visible{outline:2px solid #d4a756;outline-offset:-2px}
+@media(max-width:860px){
+ #extra-page-tabs .extra-page-item{max-width:145px}
+ .header-pages .face-switch #extra-page-tabs .extra-page-button{max-width:94px!important}
+ .header-pages .face-switch #extra-page-tabs .extra-page-remove{width:28px;min-width:28px;height:30px}
+}

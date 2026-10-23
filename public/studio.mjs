@@ -26,10 +26,19 @@ function setFace(face){
 }
 function renderPageTabs(){
  const root=$("extra-page-tabs");root.replaceChildren();
- for(const p of doc.extraPages||[]){
-  const button=document.createElement("button");button.type="button";button.dataset.face=p.id;button.setAttribute("role","tab");
-  button.className="extra-page-button";button.textContent=(allPages(doc).indexOf(p)+1||doc.extraPages.indexOf(p)+3)+" · "+p.title;
-  button.title=p.title;button.addEventListener("click",()=>setFace(p.id));root.append(button);
+ for(const [index,p] of (doc.extraPages||[]).entries()){
+  const item=document.createElement("span");item.className="extra-page-item";
+  if(p.id===activeFace)item.classList.add("is-active");
+  const tab=document.createElement("button");tab.type="button";tab.dataset.face=p.id;
+  tab.setAttribute("role","tab");tab.className="extra-page-button";
+  tab.textContent=(index+3)+" · "+p.title;tab.title=p.title;
+  tab.addEventListener("click",()=>setFace(p.id));
+  const remove=document.createElement("button");remove.type="button";
+  remove.className="extra-page-remove";remove.dataset.removePage=p.id;
+  remove.textContent="×";remove.title="Xoá trang "+p.title;
+  remove.setAttribute("aria-label","Xoá trang "+p.title);
+  remove.addEventListener("click",()=>removeExtraPage(p.id));
+  item.append(tab,remove);root.append(item);
  }
  document.querySelectorAll("[data-face]").forEach(b=>{
   const isCurrent=b.dataset.face===activeFace;
@@ -44,11 +53,25 @@ function addPage(kind){
  checkpoint();const page=newExtraPage(kind,doc.theme);doc.extraPages.push(page);
  activeFace=page.id;selected="";renderAll();scheduleSave();notify("Đã thêm trang "+page.title);
 }
+function removeExtraPage(pageId){
+ const pages=doc.extraPages||[];
+ const idx=pages.findIndex(p=>p.id===pageId);
+ if(idx<0)return;
+ const title=pages[idx].title;
+ if(!confirm('Xoá trang "'+title+'"? Các nội dung trong trang này sẽ bị xoá. Có thể Hoàn tác.'))return;
+ checkpoint();
+ pages.splice(idx,1);
+ if(activeFace===pageId){
+  activeFace=pages[idx]?.id||pages[idx-1]?.id||"inside";
+  selected="";
+ }
+ renderAll();scheduleSave();notify('Đã xoá "'+title+'". Có thể dùng Hoàn tác để khôi phục.');
+}
 function pageCommand(command){
  const idx=(doc.extraPages||[]).findIndex(p=>p.id===activeFace);if(idx<0)return;
+ if(command==="delete"){removeExtraPage(activeFace);return;}
  checkpoint();
- if(command==="delete"){doc.extraPages.splice(idx,1);activeFace="inside";}
- else if(command==="duplicate"){
+ if(command==="duplicate"){
   if(doc.extraPages.length>=20){history.pop();notify("Đã đạt 20 trang");return;}
   const copy=clone(doc.extraPages[idx]);copy.id="p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   copy.title=(copy.title+" (bản sao)").slice(0,65);doc.extraPages.splice(idx+1,0,copy);activeFace=copy.id;
@@ -437,7 +460,7 @@ document.querySelectorAll("[data-template-filter]").forEach(b=>b.addEventListene
 document.querySelectorAll("[data-new-page]").forEach(b=>b.addEventListener("click",()=>addPage(b.dataset.newPage)));
 $("page-up").addEventListener("click",()=>pageCommand("up"));
 $("page-down").addEventListener("click",()=>pageCommand("down"));
-$("page-remove").addEventListener("click",()=>{if(confirm("Xoá trang đang chọn? Có thể hoàn tác bằng Undo."))pageCommand("delete")});
+$("page-remove").addEventListener("click",()=>removeExtraPage(activeFace));
 $("page-duplicate").addEventListener("click",()=>pageCommand("duplicate"));
 $("current-page-title").addEventListener("focus",()=>{focusSnapshot=clone(doc);});
 $("current-page-title").addEventListener("change",e=>{const p=activePage();if(activeFace!=="cover"&&activeFace!=="inside"){checkpoint(focusSnapshot);p.title=e.target.value.trim().slice(0,65)||"Trang mới";renderPageTabs();scheduleSave();}focusSnapshot=null;});
