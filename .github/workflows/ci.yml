@@ -56,8 +56,17 @@ jobs:
             sleep .5
           done
           "$BROWSER" --headless --no-sandbox --disable-dev-shm-usage --disable-gpu --virtual-time-budget=10000 --window-size=1366,900 --dump-dom http://127.0.0.1:4177/studio.html > /tmp/hy-studio-browser-dom.html 2>/tmp/hy-studio-browser-log.txt
-          grep -q 'class="stage-block' /tmp/hy-studio-browser-dom.html
-          grep -q 'class="asset-card' /tmp/hy-studio-browser-dom.html
+          if ! grep -q 'class="stage-block' /tmp/hy-studio-browser-dom.html; then
+            echo "ERROR: canvas layers missing"
+            grep -o -E 'id="status"[^<]*|id="autosave-label"[^<]*|id="stage"[^>]*|Uncaught[^<]*' /tmp/hy-studio-browser-dom.html | head -20 || true
+            tail -n 45 /tmp/hy-studio-browser-log.txt || true
+            exit 1
+          fi
+          if ! grep -q 'class="asset-card' /tmp/hy-studio-browser-dom.html; then
+            echo "ERROR: asset catalog missing"
+            tail -n 45 /tmp/hy-studio-browser-log.txt || true
+            exit 1
+          fi
           echo "PASS: 1366px editor renders dynamic canvas layers and asset catalog in Chrome"
 
   browser-e2e:
