@@ -1,0 +1,42 @@
+name: Production Release Gate
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/production-gate.yml"
+      - "tests/production/**"
+permissions:
+  contents: read
+concurrency:
+  group: hy-studio-production-qa
+  cancel-in-progress: false
+jobs:
+  live-release:
+    name: Live API · Authorization · RSVP · Chromium/Firefox/WebKit
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout audited release code
+        uses: actions/checkout@v4
+      - name: Use Node 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.4'
+      - name: Install pinned Playwright
+        run: npm install --no-save --no-audit --no-fund @playwright/test@1.56.1
+      - name: Install production browser test engines
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Test real deployment with synthetic invitation only
+        run: node tests/production/live-release-gate.mjs
+        env:
+          LIVE_BASE: https://hy-studio-preview.vercel.app
+          PRODUCTION_QA_OUTPUT: production-qa-artifacts
+      - name: Upload evidence (no customer data)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hy-studio-production-gate-${{ github.run_number }}
+          path: production-qa-artifacts/
+          retention-days: 14
+          if-no-files-found: warn
