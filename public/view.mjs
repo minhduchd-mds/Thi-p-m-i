@@ -3,6 +3,7 @@ import {migrate,songs,fieldsDefault,surfaceDoc} from "/editor-core.mjs";
 import {renderStage} from "/editor-render.mjs";
 const $=id=>document.getElementById(id);
 const params=new URLSearchParams(location.search);
+if(params.has("embed"))document.documentElement.classList.add("embed-mode");
 let doc=null,cardId=params.get("card")||params.get("code")||(location.pathname.match(/^\/i\/(HY-[A-HJ-NP-Z2-9]{12})\/?$/)?.[1]||""),isOpen=false,pageIndex=1;
 function setPage(index,animate=true){
  if(!doc)return;
