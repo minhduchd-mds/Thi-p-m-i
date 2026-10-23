@@ -463,6 +463,66 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     await expect(page.locator('#templates-panel')).toBeVisible();
   });
 
+
+  test('Desktop 1366×768: left/right panels scroll independently while header and canvas stay fixed',async({page},testInfo)=>{
+    await page.setViewportSize({width:1366,height:768});
+    await ready(page);
+    await expect(page.locator('.topbar')).toBeVisible();
+    await expect(page.locator('.palette')).toHaveCSS('overflow-y','auto');
+    await expect(page.locator('.inspector')).toHaveCSS('overflow-y','auto');
+    const before=await page.evaluate(()=>{
+      const palette=document.querySelector('.palette');
+      const inspector=document.querySelector('.inspector');
+      const canvas=document.querySelector('.canvas-area');
+      const header=document.querySelector('.topbar');
+      return {scroll:scrollY,docHeight:document.documentElement.scrollHeight,viewport:innerHeight,
+        paletteHeight:palette.clientHeight,paletteContent:palette.scrollHeight,
+        inspectorScroll:inspector.scrollTop,
+        canvasTop:canvas.getBoundingClientRect().top,headerTop:header.getBoundingClientRect().top};
+    });
+    expect(before.docHeight).toBeLessThanOrEqual(before.viewport+1);
+    expect(before.paletteContent).toBeGreaterThan(before.paletteHeight+40);
+    await page.locator('.palette .tool-list').hover();
+    await page.mouse.wheel(0,530);
+    await expect.poll(()=>page.locator('.palette').evaluate(el=>el.scrollTop)).toBeGreaterThan(50);
+    expect(await page.locator('.inspector').evaluate(el=>el.scrollTop)).toBe(0);
+    await page.locator('#stage [data-block-id="bride"]').click({force:true});
+    await expect(page.locator('#prop-fontSize')).toBeVisible();
+    const propDims=await page.locator('.inspector').evaluate(el=>({client:el.clientHeight,scroll:el.scrollHeight}));
+    expect(propDims.scroll).toBeGreaterThan(propDims.client+10);
+    await page.locator('.inspector-heading').hover();
+    await page.mouse.wheel(0,480);
+    await expect.poll(()=>page.locator('.inspector').evaluate(el=>el.scrollTop)).toBeGreaterThan(30);
+    const after=await page.evaluate(()=>({
+      scroll:scrollY,docHeight:document.documentElement.scrollHeight,viewport:innerHeight,
+      paletteScroll:document.querySelector('.palette').scrollTop,
+      canvasTop:document.querySelector('.canvas-area').getBoundingClientRect().top,
+      headerTop:document.querySelector('.topbar').getBoundingClientRect().top
+    }));
+    expect(after.scroll).toBe(0);
+    expect(after.docHeight).toBeLessThanOrEqual(after.viewport+1);
+    expect(after.paletteScroll).toBeGreaterThan(50);
+    expect(after.canvasTop).toBeCloseTo(before.canvasTop,0);
+    expect(after.headerTop).toBeCloseTo(before.headerTop,0);
+    await capture(page,testInfo,'22-independent-side-panel-scrolling-1366x768');
+  });
+
+  test('Mobile sidebar content has bounded independent scrolling',async({page})=>{
+    await page.setViewportSize({width:390,height:844});
+    await ready(page);
+    const palette=page.locator('.palette');
+    const inspector=page.locator('.inspector');
+    await expect(palette).toHaveCSS('overflow-y','auto');
+    await expect(inspector).toHaveCSS('overflow-y','auto');
+    const dims=await palette.evaluate(el=>({height:el.clientHeight,full:el.scrollHeight}));
+    expect(dims.height).toBeLessThanOrEqual(525);
+    expect(dims.full).toBeGreaterThan(dims.height);
+    await palette.locator('.tool-list').hover();
+    await page.mouse.wheel(0,400);
+    await expect.poll(()=>palette.evaluate(el=>el.scrollTop)).toBeGreaterThan(0);
+    await expect(page.locator('.topbar')).toHaveCSS('position','sticky');
+  });
+
   test('Xem trước trên mobile 390 × 844 không tràn ngang', async ({ page }, testInfo) => {
     await ready(page);
     await page.locator('#save-local').click();

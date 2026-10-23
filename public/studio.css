@@ -318,3 +318,38 @@ html,body{overflow-x:clip;overflow-y:visible;background:#f6f3ef!important;color:
  .theme-poster{height:165px}
  .canvas-area{height:66svh;min-height:450px}
 }
+
+/* v2.5.1 — viewport-locked desktop workspace, individually scrolling panels.
+   The page itself never scrolls at desktop widths; only content panes do. */
+@media (min-width:861px){
+ html,body{height:100%;max-height:100%;overflow:hidden!important;overscroll-behavior:none}
+ .studio{height:100vh;height:100dvh;max-height:100dvh;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+ .topbar{position:relative!important;top:auto!important;flex:0 0 68px;height:68px;min-height:68px;max-height:68px}
+ .editor-layout{flex:1 1 0;height:auto!important;min-height:0;max-height:none;overflow:hidden;grid-template-rows:minmax(0,1fr)}
+ .tool-rail,.palette,.inspector{
+  height:100%;min-height:0;max-height:100%;
+  overflow-y:auto!important;overflow-x:hidden!important;
+  overscroll-behavior-y:contain;scrollbar-gutter:stable;
+  -webkit-overflow-scrolling:touch
+ }
+ .canvas-area{height:100%;max-height:100%;min-height:0;overflow:hidden}
+ .canvas-toolbar,.active-page-tools,.canvas-footer{flex-shrink:0}
+ .drop-area{flex:1 1 0;min-height:0;overflow:auto;overscroll-behavior:contain}
+ .statusbar{flex:0 0 27px;height:27px;min-height:27px;max-height:27px}
+}
+/* Keep the section controls visible while the palette/inspector scrolls. */
+.palette-title{position:sticky;top:0;z-index:5;padding:9px 3px 11px;margin:-9px -3px 0;background:#fffdfa}
+.palette-tabs{position:sticky;top:38px;z-index:5;background:#f6f1ec}
+.inspector-heading{position:sticky;top:-21px;z-index:5;padding-top:19px;margin-top:-19px;background:#fffdfa}
+.palette,.inspector{scrollbar-width:thin;scrollbar-color:#cdb9b0 #f8f3ef}
+.palette::-webkit-scrollbar,.inspector::-webkit-scrollbar,.tool-rail::-webkit-scrollbar{width:7px}
+.palette::-webkit-scrollbar-track,.inspector::-webkit-scrollbar-track,.tool-rail::-webkit-scrollbar-track{background:#f8f3ef}
+.palette::-webkit-scrollbar-thumb,.inspector::-webkit-scrollbar-thumb,.tool-rail::-webkit-scrollbar-thumb{background:#cfbcb1;border-radius:9px}
+@media (max-width:860px){
+ html,body{height:auto;max-height:none;overflow-x:clip!important;overflow-y:auto!important}
+ .studio{height:auto;max-height:none;min-height:100dvh;overflow:visible}
+ .editor-layout{height:auto!important;overflow:visible}
+ .palette,.inspector{height:auto;min-height:0;max-height:min(62dvh,510px);overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior-y:contain;scrollbar-gutter:stable}
+ .palette-title{top:-15px}
+ .inspector-heading{top:-17px}
+}
