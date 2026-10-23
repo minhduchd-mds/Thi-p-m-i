@@ -6,6 +6,7 @@ const ready = async page => {
   await page.goto(STUDIO);
   await expect(page.locator('#stage .stage-block')).toHaveCount(11);
   await expect(page.locator('#asset-grid .asset-card')).toHaveCount(5);
+  await page.locator('.palette-tab[data-panel="blocks"]').click();
   await expect(page.locator('#fields-form textarea#field-message')).toHaveCount(1);
 };
 const capture = async (page, testInfo, name) => {
@@ -39,6 +40,7 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
 
   test('Ba theme có layout thật, giữ dữ liệu custom; screenshot từng mẫu', async ({ page }, testInfo) => {
     await ready(page);
+    await page.locator('.palette-tab[data-panel="templates"]').click();
     const initial = await page.locator('[data-block-id="bride"]').evaluate(el => el.style.left);
     await capture(page, testInfo, '01-hong-hy-1366');
     page.on('dialog', dialog => dialog.accept());
@@ -226,6 +228,7 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
   test('Lưới không thay nền của Hồng Hỷ, Ngọc Uyển và Hoa Vân', async ({page}, testInfo)=>{
     await ready(page);
     page.on('dialog',d=>d.accept());
+    await page.locator('.palette-tab[data-panel="templates"]').click();
     for(const theme of ['red','jade','pink']){
       await page.locator('[data-theme="'+theme+'"]').click();
       const before=await page.locator('#stage').evaluate(el=>getComputedStyle(el).backgroundImage);
@@ -405,6 +408,59 @@ test.describe('Hỷ Studio v2 – browser journey', () => {
     const layout=await page.evaluate(()=>({screen:innerWidth,page:document.documentElement.scrollWidth}));
     expect(layout.page).toBeLessThanOrEqual(layout.screen+2);
     await capture(page,testInfo,'19-clean-mobile-editor');
+  });
+
+
+  test('Pro Max: header cố định, thư viện mẫu thật và bảng thuộc tính chỉnh sửa được',async({page},testInfo)=>{
+    await page.goto(STUDIO);
+    await expect(page.locator('.tool-rail button')).toHaveCount(9);
+    await expect(page.locator('#templates-panel')).toBeVisible();
+    await expect(page.locator('.top-themes [data-theme]')).toHaveCount(3);
+    await expect(page.locator('.template-filter button')).toHaveCount(3);
+    await expect(page.locator('.topbar')).toHaveCSS('position','sticky');
+    await expect(page.locator('.palette-title')).toHaveText('Mẫu thiệp');
+    await expect(page.locator('#quick-bride')).toBeVisible();
+    await page.locator('#quick-bride').fill('Hà My');
+    await page.locator('#quick-bride').press('Tab');
+    await expect(page.locator('#project-title')).toContainText('Hà My');
+    await expect(page.locator('#stage [data-block-id="bride"]')).toContainText('Hà My');
+    await page.locator('[data-template-filter="traditional"]').click();
+    await expect(page.locator('[data-theme="red"]')).toBeVisible();
+    await expect(page.locator('[data-theme="jade"]')).toBeHidden();
+    await page.locator('[data-template-filter="all"]').click();
+    await expect(page.locator('[data-theme="jade"]')).toBeVisible();
+    await capture(page,testInfo,'20-editor-real-ui-pro-max');
+  });
+
+  test('Mở thiệp 3D trong studio chạy viewer thật, không chỉ hình giả',async({page},testInfo)=>{
+    await ready(page);
+    await page.locator('#mode-preview').click();
+    await expect(page.locator('#live-preview')).toBeVisible();
+    await expect(page.locator('#stage-wrap')).toBeHidden();
+    const viewer=page.frameLocator('#preview-frame');
+    await expect(viewer.locator('#viewer')).toBeVisible({timeout:20000});
+    await expect(viewer.locator('#book')).toHaveClass(/is-open/,{timeout:6000});
+    await expect(viewer.locator('#left-couple')).toContainText('Minh Anh');
+    await expect(viewer.locator('.viewer-pager')).toBeVisible();
+    await capture(page,testInfo,'21-inline-3d-invitation');
+    await page.locator('#mode-design').click();
+    await expect(page.locator('#live-preview')).toBeHidden();
+    await expect(page.locator('#stage .stage-block')).toHaveCount(11);
+  });
+
+  test('Thanh công cụ điều hướng đúng, không để thao tác giả',async({page})=>{
+    await page.goto(STUDIO);
+    await page.locator('[data-rail="blocks"]').click();
+    await expect(page.locator('#blocks-panel')).toBeVisible();
+    await page.locator('[data-rail="text"]').click();
+    await expect(page.locator('#stage .stage-block.is-selected')).toContainText('Lời chúc');
+    await page.locator('[data-rail="location"]').click();
+    await expect(page.locator('#fields-panel')).toBeVisible();
+    await expect(page.locator('#field-venue')).toBeFocused();
+    await page.locator('[data-rail="music"]').click();
+    await expect(page.locator('#music-choice')).toBeFocused();
+    await page.locator('[data-rail="templates"]').click();
+    await expect(page.locator('#templates-panel')).toBeVisible();
   });
 
   test('Xem trước trên mobile 390 × 844 không tràn ngang', async ({ page }, testInfo) => {
